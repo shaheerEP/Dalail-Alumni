@@ -1,10 +1,12 @@
 "use client";
 
-import { useEffect } from "react";
+import { useState, useEffect } from "react";
 import confetti from "canvas-confetti";
-import { CheckCircle2, Share2, Printer, X } from "lucide-react";
+import { CheckCircle2, Share2, Copy, Check, X } from "lucide-react";
 
 export default function RegistrationSlipModal({ isOpen, onClose, data, onResetForm }) {
+  const [copied, setCopied] = useState(false);
+
   useEffect(() => {
     if (isOpen) {
       try {
@@ -21,21 +23,38 @@ export default function RegistrationSlipModal({ isOpen, onClose, data, onResetFo
 
   if (!isOpen || !data) return null;
 
-  const handlePrint = () => {
-    window.print();
+  const handleShare = () => {
+    const formUrl = typeof window !== "undefined" ? window.location.origin : "";
+    const text = `*ALUMNI MEET 2026 - DALAILUL KHAIRATH KAKKIDIPPURAM*\n` +
+      `*Event Date:* 02 October 2026\n\n` +
+      `I have registered for the Alumni Meet! (Reg ID: ${data.registrationId})\n\n` +
+      `All alumni are requested to complete your registration using this link:\n` +
+      `${formUrl}`;
+
+    if (navigator.share) {
+      navigator.share({
+        title: "Dalailul Khairath Alumni Meet Registration",
+        text: text,
+        url: formUrl,
+      }).catch((err) => {
+        if (err.name !== "AbortError") {
+          const url = `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`;
+          window.open(url, "_blank");
+        }
+      });
+    } else {
+      const url = `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`;
+      window.open(url, "_blank");
+    }
   };
 
-  const handleWhatsAppShare = () => {
-    const text = `*Alumni Registration Confirmed!*\n` +
-      `*Institution:* Dalailul Khairath Kakkidippuram\n` +
-      `*Name:* ${data.fullName}\n` +
-      `*Reg ID:* ${data.registrationId}\n` +
-      `*Batch:* ${data.batchYear}\n` +
-      `*Attendance:* ${data.willAttend}\n` +
-      `*Status:* Successfully Registered for the Alumni Meet!`;
-
-    const url = `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`;
-    window.open(url, "_blank");
+  const handleCopyLink = () => {
+    const formUrl = typeof window !== "undefined" ? window.location.origin : "";
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(formUrl);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }
   };
 
   const isAttending = data.willAttend?.toLowerCase().includes("yes");
@@ -133,19 +152,28 @@ export default function RegistrationSlipModal({ isOpen, onClose, data, onResetFo
           {/* Action Buttons */}
           <div className="flex flex-col sm:flex-row gap-2.5 pt-2">
             <button
-              onClick={handleWhatsAppShare}
+              onClick={handleShare}
               className="flex-1 py-3 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-sm transition-colors cursor-pointer"
             >
               <Share2 className="w-4 h-4" />
-              <span>Share on WhatsApp</span>
+              <span>Share Registration Link</span>
             </button>
 
             <button
-              onClick={handlePrint}
-              className="flex-1 py-3 px-4 rounded-xl bg-[#1b263b] hover:bg-[#0d1b2a] text-white font-bold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-sm transition-colors cursor-pointer"
+              onClick={handleCopyLink}
+              className="sm:w-36 py-3 px-4 rounded-xl bg-[#1b263b] hover:bg-[#0d1b2a] text-white font-bold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-sm transition-colors cursor-pointer"
             >
-              <Printer className="w-4 h-4" />
-              <span>Print / Save Pass</span>
+              {copied ? (
+                <>
+                  <Check className="w-4 h-4 text-emerald-400" />
+                  <span>Copied!</span>
+                </>
+              ) : (
+                <>
+                  <Copy className="w-4 h-4" />
+                  <span>Copy Link</span>
+                </>
+              )}
             </button>
           </div>
 
