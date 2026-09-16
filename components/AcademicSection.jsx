@@ -100,7 +100,7 @@ export default function AcademicSection({ formData, errors, onChange, setFormDat
   };
 
   return (
-    <div className="space-y-4 pt-4 border-t border-[#e0e1dd]">
+    <div className="space-y-4 pt-4 border-t border-black/[0.05]">
       <div>
         <h3 className="text-xs sm:text-sm font-extrabold tracking-wider text-[#0d1b2a] uppercase">
           Qualifications & Academic Record

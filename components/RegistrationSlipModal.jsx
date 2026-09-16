@@ -42,7 +42,7 @@ export default function RegistrationSlipModal({ isOpen, onClose, data, onResetFo
 
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto bg-[#0d1b2a]/75 backdrop-blur-sm flex items-center justify-center p-4">
-      <div className="bg-white w-full max-w-lg rounded-3xl shadow-2xl border border-[#c8d1dc] overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+      <div className="bg-white w-full max-w-lg rounded-3xl shadow-2xl border-0 overflow-hidden animate-in fade-in zoom-in-95 duration-200">
         
         {/* Header Ribbon */}
         <div className="bg-gradient-to-b from-[#0d1b2a] to-[#1b263b] text-white p-6 relative text-center">
@@ -53,7 +53,7 @@ export default function RegistrationSlipModal({ isOpen, onClose, data, onResetFo
             <X className="w-5 h-5" />
           </button>
 
-          <div className="w-24 h-32 rounded-2xl bg-white mx-auto flex items-center justify-center mb-3 p-2 shadow-lg border border-[#778da9]/40">
+          <div className="w-20 h-24 rounded-2xl bg-white mx-auto flex items-center justify-center mb-3 p-2 shadow-lg border-0">
             <img src="/logo.png" alt="Logo" className="w-full h-full object-contain" />
           </div>
 
@@ -71,7 +71,7 @@ export default function RegistrationSlipModal({ isOpen, onClose, data, onResetFo
         {/* Pass Details Body */}
         <div className="p-6 space-y-5">
           {/* Reg ID Banner */}
-          <div className="bg-[#f2f3f1] border border-[#c8d1dc] rounded-2xl p-4 flex items-center justify-between">
+          <div className="bg-[#f3f4f6] rounded-2xl p-4 flex items-center justify-between border-0">
             <div>
               <span className="text-[11px] font-bold text-[#415a77] uppercase tracking-wider">
                 Registration Number
@@ -82,10 +82,10 @@ export default function RegistrationSlipModal({ isOpen, onClose, data, onResetFo
             </div>
 
             <div
-              className={`px-3 py-1.5 rounded-xl text-xs font-extrabold uppercase ${
+              className={`px-3 py-1.5 rounded-xl text-xs font-extrabold uppercase border-0 ${
                 isAttending
-                  ? "bg-emerald-100 text-emerald-800 border border-emerald-300"
-                  : "bg-[#e3e8ee] text-[#1b263b] border border-[#c8d1dc]"
+                  ? "bg-emerald-100 text-emerald-800"
+                  : "bg-[#e3e8ee] text-[#1b263b]"
               }`}
             >
               {isAttending ? "Confirmed Attendee" : "Registered"}
@@ -93,33 +93,33 @@ export default function RegistrationSlipModal({ isOpen, onClose, data, onResetFo
           </div>
 
           {/* Student Info Card */}
-          <div className="space-y-2.5 text-xs text-[#415a77] bg-[#f9f9f8] rounded-2xl border border-[#e0e1dd] p-4 shadow-xs">
-            <div className="flex justify-between py-1 border-b border-[#e0e1dd]">
+          <div className="space-y-2.5 text-xs text-[#415a77] bg-[#f3f4f6] rounded-2xl p-4 border-0">
+            <div className="flex justify-between py-1 border-b border-black/[0.05]">
               <span className="font-semibold text-[#415a77]">Full Name:</span>
               <span className="font-bold text-[#0d1b2a] uppercase">{data.fullName}</span>
             </div>
 
-            <div className="flex justify-between py-1 border-b border-[#e0e1dd]">
+            <div className="flex justify-between py-1 border-b border-black/[0.05]">
               <span className="font-semibold text-[#415a77]">Batch / Admission Year:</span>
               <span className="font-bold text-[#3875b6]">{data.batchYear} Batch</span>
             </div>
 
-            <div className="flex justify-between py-1 border-b border-[#e0e1dd]">
+            <div className="flex justify-between py-1 border-b border-black/[0.05]">
               <span className="font-semibold text-[#415a77]">Place:</span>
               <span className="font-semibold text-[#0d1b2a]">{data.place}</span>
             </div>
 
-            <div className="flex justify-between py-1 border-b border-[#e0e1dd]">
+            <div className="flex justify-between py-1 border-b border-black/[0.05]">
               <span className="font-semibold text-[#415a77]">Mobile Number:</span>
               <span className="font-mono text-[#0d1b2a]">{data.mobileNumber}</span>
             </div>
 
-            <div className="flex justify-between py-1 border-b border-[#e0e1dd]">
+            <div className="flex justify-between py-1 border-b border-black/[0.05]">
               <span className="font-semibold text-[#415a77]">Hifz Status:</span>
               <span className="font-medium text-[#0d1b2a]">{data.hifzStatus}</span>
             </div>
 
-            <div className="flex justify-between py-1 border-b border-[#e0e1dd]">
+            <div className="flex justify-between py-1 border-b border-black/[0.05]">
               <span className="font-semibold text-[#415a77]">Current Status:</span>
               <span className="font-medium text-[#0d1b2a]">{data.currentStatus}: {data.jobDesignation}</span>
             </div>

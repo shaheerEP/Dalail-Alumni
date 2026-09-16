@@ -5,7 +5,7 @@ export default function StatusSection({ formData, errors, onChange, onSelectStat
   const isStudy = formData.currentStatus === "Study";
 
   return (
-    <div className="space-y-4 pt-4 border-t border-[#e0e1dd]">
+    <div className="space-y-4 pt-4 border-t border-black/[0.05]">
       <div>
         <h3 className="text-xs sm:text-sm font-extrabold tracking-wider text-[#0d1b2a] uppercase">
           Current Status
@@ -17,26 +17,26 @@ export default function StatusSection({ formData, errors, onChange, onSelectStat
         <button
           type="button"
           onClick={() => onSelectStatus("Job")}
-          className={`flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl border font-bold text-sm transition-all cursor-pointer ${
+          className={`flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl border-0 font-bold text-sm transition-all cursor-pointer ${
             isJob
-              ? "border-[#1b263b] bg-[#c5d0e4]/40 text-[#0d1b2a] shadow-xs"
-              : "border-[#c8d1dc] bg-white text-[#415a77] hover:border-[#778da9] hover:bg-[#f2f3f1]"
+              ? "bg-[#1b263b] text-white shadow-sm"
+              : "bg-[#f3f4f6] text-[#415a77] hover:bg-[#eaecee]"
           }`}
         >
-          <Briefcase className={`w-4 h-4 ${isJob ? "text-[#1b263b]" : "text-[#778da9]"}`} />
+          <Briefcase className={`w-4 h-4 ${isJob ? "text-white" : "text-[#778da9]"}`} />
           <span>Job</span>
         </button>
 
         <button
           type="button"
           onClick={() => onSelectStatus("Study")}
-          className={`flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl border font-bold text-sm transition-all cursor-pointer ${
+          className={`flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl border-0 font-bold text-sm transition-all cursor-pointer ${
             isStudy
-              ? "border-[#1b263b] bg-[#c5d0e4]/40 text-[#0d1b2a] shadow-xs"
-              : "border-[#c8d1dc] bg-white text-[#415a77] hover:border-[#778da9] hover:bg-[#f2f3f1]"
+              ? "bg-[#1b263b] text-white shadow-sm"
+              : "bg-[#f3f4f6] text-[#415a77] hover:bg-[#eaecee]"
           }`}
         >
-          <BookOpen className={`w-4 h-4 ${isStudy ? "text-[#1b263b]" : "text-[#778da9]"}`} />
+          <BookOpen className={`w-4 h-4 ${isStudy ? "text-white" : "text-[#778da9]"}`} />
           <span>Study</span>
         </button>
       </div>

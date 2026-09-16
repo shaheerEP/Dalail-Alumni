@@ -211,9 +211,9 @@ export default function AlumniForm() {
 
   return (
     <>
-      <div className="bg-white rounded-2xl sm:rounded-3xl shadow-xl border border-[#c8d1dc] p-5 sm:p-10 transition-all">
+      <div className="bg-white rounded-2xl sm:rounded-3xl shadow-xl border-0 p-6 sm:p-10 transition-all">
         {/* Card Header */}
-        <div className="mb-6 pb-4 border-b border-[#e0e1dd]">
+        <div className="mb-6 pb-3 border-b border-black/[0.05]">
           <h2 className="text-xl sm:text-2xl font-black text-[#0d1b2a] tracking-tight">
             Registration Form
           </h2>
@@ -221,7 +221,7 @@ export default function AlumniForm() {
 
         {/* Global Submit Error if any */}
         {submitError && (
-          <div className="mb-6 p-4 rounded-2xl bg-red-50 border border-red-200 text-red-700 text-sm flex items-start gap-3">
+          <div className="mb-6 p-4 rounded-2xl bg-red-50 text-red-700 text-sm flex items-start gap-3">
             <AlertCircle className="w-5 h-5 shrink-0 mt-0.5 text-red-500" />
             <div>
               <p className="font-bold">Registration could not be completed</p>

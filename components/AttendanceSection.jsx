@@ -5,7 +5,7 @@ export default function AttendanceSection({ willAttend, onSelectAttendance }) {
   const isNo = willAttend === "No, I will not attend";
 
   return (
-    <div className="space-y-3 pt-4 border-t border-[#e0e1dd]">
+    <div className="space-y-3 pt-4 border-t border-black/[0.05]">
       <div>
         <h3 className="text-xs sm:text-sm font-extrabold tracking-wider text-[#0d1b2a] uppercase">
           Will you attend? <span className="text-red-500">*</span>
@@ -16,20 +16,20 @@ export default function AttendanceSection({ willAttend, onSelectAttendance }) {
         {/* Yes Card */}
         <div
           onClick={() => onSelectAttendance("Yes, I will attend")}
-          className={`radio-card p-3.5 rounded-xl border-2 flex items-center gap-3 transition-all select-none ${
+          className={`radio-card p-3.5 rounded-2xl border-0 flex items-center gap-3 transition-all select-none ${
             isYes
-              ? "border-emerald-600 bg-emerald-50/70 shadow-xs"
-              : "border-[#c8d1dc] bg-white hover:border-[#778da9] hover:bg-[#f2f3f1]"
+              ? "bg-emerald-600 text-white shadow-md shadow-emerald-600/20"
+              : "bg-[#f3f4f6] text-[#415a77] hover:bg-[#eaecee]"
           }`}
         >
           <div
-            className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 transition-colors ${
-              isYes ? "bg-emerald-100 text-emerald-700" : "bg-[#f2f3f1] text-[#778da9]"
+            className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 transition-colors ${
+              isYes ? "bg-white/20 text-white" : "bg-white text-[#778da9]"
             }`}
           >
             <CheckCircle2 className="w-4 h-4" />
           </div>
-          <div className="text-sm font-bold text-[#0d1b2a]">
+          <div className={`text-sm font-bold ${isYes ? "text-white" : "text-[#0d1b2a]"}`}>
             Yes, I will attend
           </div>
         </div>
@@ -37,20 +37,20 @@ export default function AttendanceSection({ willAttend, onSelectAttendance }) {
         {/* No Card */}
         <div
           onClick={() => onSelectAttendance("No, I will not attend")}
-          className={`radio-card p-3.5 rounded-xl border-2 flex items-center gap-3 transition-all select-none ${
+          className={`radio-card p-3.5 rounded-2xl border-0 flex items-center gap-3 transition-all select-none ${
             isNo
-              ? "border-[#415a77] bg-[#e3e8ee] shadow-xs"
-              : "border-[#c8d1dc] bg-white hover:border-[#778da9] hover:bg-[#f2f3f1]"
+              ? "bg-[#1b263b] text-white shadow-md shadow-[#1b263b]/20"
+              : "bg-[#f3f4f6] text-[#415a77] hover:bg-[#eaecee]"
           }`}
         >
           <div
-            className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 transition-colors ${
-              isNo ? "bg-[#c8d1dc] text-[#1b263b]" : "bg-[#f2f3f1] text-[#778da9]"
+            className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 transition-colors ${
+              isNo ? "bg-white/20 text-white" : "bg-white text-[#778da9]"
             }`}
           >
             <XCircle className="w-4 h-4" />
           </div>
-          <div className="text-sm font-bold text-[#0d1b2a]">
+          <div className={`text-sm font-bold ${isNo ? "text-white" : "text-[#0d1b2a]"}`}>
             No, I will not attend
           </div>
         </div>

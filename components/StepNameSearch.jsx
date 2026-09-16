@@ -79,7 +79,7 @@ export default function StepNameSearch({
 
       {!isManualEntry ? (
         <div className="relative">
-          <div className="flex items-center w-full rounded-xl border-[1.5px] border-[#c8d1dc] bg-[#f9f9f8] px-3.5 py-2.5 transition-all focus-within:border-[#3875b6] focus-within:bg-white focus-within:ring-4 focus-within:ring-[#3875b6]/15">
+          <div className="flex items-center w-full rounded-xl bg-[#f3f4f6] px-4 py-2.5 transition-all border-0 focus-within:bg-white focus-within:ring-3 focus-within:ring-[#3875b6]/15">
             <Search className="w-5 h-5 text-[#778da9] shrink-0 mr-3 pointer-events-none" />
             <input
               type="text"
@@ -106,7 +106,7 @@ export default function StepNameSearch({
 
           {/* Autocomplete Dropdown */}
           {isOpen && (
-            <div className="absolute z-30 left-0 right-0 mt-1.5 bg-white rounded-xl shadow-xl border border-[#c8d1dc] overflow-hidden max-h-60 overflow-y-auto">
+            <div className="absolute z-30 left-0 right-0 mt-1.5 bg-white rounded-2xl shadow-xl border-0 overflow-hidden max-h-60 overflow-y-auto">
               {filteredRoster.length > 0 ? (
                 <div className="divide-y divide-[#e3e8ee]">
                   {filteredRoster.map((student) => (
@@ -145,7 +145,7 @@ export default function StepNameSearch({
           )}
         </div>
       ) : (
-        <div className="bg-[#f2f3f1] border border-[#c8d1dc] rounded-xl px-3.5 py-2 text-xs text-[#1b263b] flex items-center justify-between">
+        <div className="bg-[#f3f4f6] rounded-xl px-4 py-2.5 text-xs text-[#1b263b] flex items-center justify-between border-0">
           <span>Entering details manually</span>
           <button
             type="button"

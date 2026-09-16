@@ -6,7 +6,7 @@ export default function PersonalInfoSection({
   onToggleSameAsMobile,
 }) {
   return (
-    <div className="space-y-4 pt-4 border-t border-[#e0e1dd]">
+    <div className="space-y-4 pt-4 border-t border-black/[0.05]">
       <div>
         <h3 className="text-xs sm:text-sm font-extrabold tracking-wider text-[#0d1b2a] uppercase">
           Personal Information
@@ -84,7 +84,7 @@ export default function PersonalInfoSection({
                 type="checkbox"
                 checked={sameAsMobile}
                 onChange={onToggleSameAsMobile}
-                className="w-4 h-4 rounded text-[#3875b6] focus:ring-[#3875b6] border-[#c8d1dc]"
+                className="w-4 h-4 rounded text-[#3875b6] focus:ring-[#3875b6] border-0 bg-[#e5e7eb]"
               />
               <span>Same as Mobile</span>
             </label>
@@ -99,7 +99,7 @@ export default function PersonalInfoSection({
             onChange={onChange}
             disabled={sameAsMobile}
             className={`form-input tracking-wider ${
-              sameAsMobile ? "bg-[#f2f3f1] text-[#778da9] cursor-not-allowed" : ""
+              sameAsMobile ? "opacity-50 cursor-not-allowed" : ""
             }`}
           />
         </div>

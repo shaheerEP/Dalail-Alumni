@@ -71,36 +71,37 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-/* Custom form input styles matching palette */
+/* Custom form input styles matching clean borderless aesthetic */
 .form-input {
   width: 100%;
-  padding: 0.75rem 1rem;
-  border-radius: 0.75rem;
-  border: 1.5px solid #c8d1dc; /* dusty-denim-800 */
-  background-color: #f9f9f8; /* alabaster-grey-900 */
-  color: #0d1b2a; /* ink-black */
+  padding: 0.8rem 1.1rem;
+  border-radius: 0.875rem;
+  border: 1px solid rgba(0, 0, 0, 0.04);
+  background-color: #f3f4f6;
+  color: #0d1b2a;
   font-size: 0.95rem;
   transition: all 0.2s ease;
   outline: none;
 }
 
 .form-input:focus {
-  border-color: #3875b6; /* ink-black-700 */
   background-color: #ffffff;
-  box-shadow: 0 0 0 4px rgba(56, 117, 182, 0.15);
+  border-color: rgba(56, 117, 182, 0.4);
+  box-shadow: 0 0 0 3px rgba(56, 117, 182, 0.12);
 }
 
 .form-input-error {
   border-color: #ef4444 !important;
   background-color: #fef2f2 !important;
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.15) !important;
 }
 
 .form-select {
   width: 100%;
-  padding: 0.75rem 1rem;
-  border-radius: 0.75rem;
-  border: 1.5px solid #c8d1dc;
-  background-color: #f9f9f8;
+  padding: 0.8rem 1.1rem;
+  border-radius: 0.875rem;
+  border: 1px solid rgba(0, 0, 0, 0.04);
+  background-color: #f3f4f6;
   color: #0d1b2a;
   font-size: 0.95rem;
   transition: all 0.2s ease;
@@ -113,9 +114,9 @@ body {
 }
 
 .form-select:focus {
-  border-color: #3875b6;
   background-color: #ffffff;
-  box-shadow: 0 0 0 4px rgba(56, 117, 182, 0.15);
+  border-color: rgba(56, 117, 182, 0.4);
+  box-shadow: 0 0 0 3px rgba(56, 117, 182, 0.12);
 }
 
 /* Smooth transition for active cards */
