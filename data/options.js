@@ -15,27 +15,11 @@ export const HIFZ_STATUS_OPTIONS = [
 
 export const LEAVING_YEARS = Array.from({ length: 2026 - 1989 }, (_, i) => (2026 - i).toString());
 
-// Standard initial options for Islamic Qualifications
-export const ISLAMIC_QUALIFICATIONS = [
-  "Hafiz",
-  "Alim / Sanad",
-  "Wafy / CIC",
-  "Dawa Degree",
-  "Board Higher Secondary",
-  "Dars Education",
-  "Preliminary Studies",
-];
+// Islamic Qualifications (populated dynamically from user submissions)
+export const ISLAMIC_QUALIFICATIONS = [];
 
-// Standard initial options for Academic Qualifications
-export const ACADEMIC_QUALIFICATIONS = [
-  "SSLC / 10th Standard",
-  "+2 / Higher Secondary",
-  "Graduation / Bachelor Degree",
-  "Post Graduation / Master Degree",
-  "Diploma / Technical Certification",
-  "B.Ed / Teacher Training",
-  "Doctorate / Ph.D",
-];
+// Academic Qualifications (populated dynamically from user submissions)
+export const ACADEMIC_QUALIFICATIONS = [];
 
 // Country Calling Codes for Alumni Registration
 export const COUNTRY_CODES = [

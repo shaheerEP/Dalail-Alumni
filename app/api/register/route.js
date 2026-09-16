@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import fs from "fs";
 import path from "path";
+import { saveQualification } from "@/app/api/qualifications/route";
 
 const SUBMISSIONS_FILE = path.join(process.cwd(), "data", "submissions.json");
 
@@ -92,6 +93,10 @@ export async function POST(request) {
 
     // 1. Save locally as fail-safe backup
     saveSubmissionLocally(payload);
+
+    // Save any newly added qualifications for other users
+    if (payload.islamicQualification) saveQualification("islamic", payload.islamicQualification);
+    if (payload.academicQualification) saveQualification("academic", payload.academicQualification);
 
     // 2. Push to Google Sheet Webhook if configured
     const webhookUrl = process.env.GOOGLE_SHEET_WEBHOOK_URL;

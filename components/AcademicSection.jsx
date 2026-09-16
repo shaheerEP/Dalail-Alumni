@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Check, X } from "lucide-react";
 import {
   HIFZ_STATUS_OPTIONS,
@@ -12,6 +12,39 @@ export default function AcademicSection({ formData, errors, onChange, setFormDat
   const [islamicOptions, setIslamicOptions] = useState(ISLAMIC_QUALIFICATIONS);
   const [academicOptions, setAcademicOptions] = useState(ACADEMIC_QUALIFICATIONS);
 
+  const [isCustomIslamic, setIsCustomIslamic] = useState(false);
+  const [customIslamicText, setCustomIslamicText] = useState("");
+
+  const [isCustomAcademic, setIsCustomAcademic] = useState(false);
+  const [customAcademicText, setCustomAcademicText] = useState("");
+
+  // Fetch qualifications dynamically from API (populated by users)
+  useEffect(() => {
+    async function loadQualifications() {
+      try {
+        const res = await fetch("/api/qualifications");
+        if (res.ok) {
+          const data = await res.json();
+          if (Array.isArray(data.islamic)) {
+            setIslamicOptions(data.islamic);
+            if (data.islamic.length === 0) {
+              setIsCustomIslamic(true);
+            }
+          }
+          if (Array.isArray(data.academic)) {
+            setAcademicOptions(data.academic);
+            if (data.academic.length === 0) {
+              setIsCustomAcademic(true);
+            }
+          }
+        }
+      } catch (err) {
+        console.warn("Could not load qualifications:", err);
+      }
+    }
+    loadQualifications();
+  }, []);
+
   const handleHifzToggle = (status) => {
     setFormData((prev) => ({
       ...prev,
@@ -21,12 +54,6 @@ export default function AcademicSection({ formData, errors, onChange, setFormDat
       setErrors((prev) => ({ ...prev, hifzStatus: null }));
     }
   };
-
-  const [isCustomIslamic, setIsCustomIslamic] = useState(false);
-  const [customIslamicText, setCustomIslamicText] = useState("");
-
-  const [isCustomAcademic, setIsCustomAcademic] = useState(false);
-  const [customAcademicText, setCustomAcademicText] = useState("");
 
   const handleIslamicSelect = (e) => {
     const val = e.target.value;
@@ -44,9 +71,12 @@ export default function AcademicSection({ formData, errors, onChange, setFormDat
     const val = e.target.value;
     setCustomIslamicText(val);
     setFormData((prev) => ({ ...prev, islamicQualification: val }));
+    if (setErrors && val.trim()) {
+      setErrors((prev) => ({ ...prev, islamicQualification: null }));
+    }
   };
 
-  const handleSaveCustomIslamic = () => {
+  const handleSaveCustomIslamic = async () => {
     const trimmed = customIslamicText.trim();
     if (trimmed) {
       if (!islamicOptions.includes(trimmed)) {
@@ -54,13 +84,27 @@ export default function AcademicSection({ formData, errors, onChange, setFormDat
       }
       setIsCustomIslamic(false);
       setFormData((prev) => ({ ...prev, islamicQualification: trimmed }));
+      if (setErrors) {
+        setErrors((prev) => ({ ...prev, islamicQualification: null }));
+      }
+      try {
+        await fetch("/api/qualifications", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ type: "islamic", value: trimmed }),
+        });
+      } catch (err) {
+        console.error(err);
+      }
     }
   };
 
   const handleCancelCustomIslamic = () => {
-    setIsCustomIslamic(false);
-    setCustomIslamicText("");
-    setFormData((prev) => ({ ...prev, islamicQualification: "" }));
+    if (islamicOptions.length > 0) {
+      setIsCustomIslamic(false);
+      setCustomIslamicText("");
+      setFormData((prev) => ({ ...prev, islamicQualification: "" }));
+    }
   };
 
   const handleAcademicSelect = (e) => {
@@ -79,9 +123,12 @@ export default function AcademicSection({ formData, errors, onChange, setFormDat
     const val = e.target.value;
     setCustomAcademicText(val);
     setFormData((prev) => ({ ...prev, academicQualification: val }));
+    if (setErrors && val.trim()) {
+      setErrors((prev) => ({ ...prev, academicQualification: null }));
+    }
   };
 
-  const handleSaveCustomAcademic = () => {
+  const handleSaveCustomAcademic = async () => {
     const trimmed = customAcademicText.trim();
     if (trimmed) {
       if (!academicOptions.includes(trimmed)) {
@@ -89,13 +136,27 @@ export default function AcademicSection({ formData, errors, onChange, setFormDat
       }
       setIsCustomAcademic(false);
       setFormData((prev) => ({ ...prev, academicQualification: trimmed }));
+      if (setErrors) {
+        setErrors((prev) => ({ ...prev, academicQualification: null }));
+      }
+      try {
+        await fetch("/api/qualifications", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ type: "academic", value: trimmed }),
+        });
+      } catch (err) {
+        console.error(err);
+      }
     }
   };
 
   const handleCancelCustomAcademic = () => {
-    setIsCustomAcademic(false);
-    setCustomAcademicText("");
-    setFormData((prev) => ({ ...prev, academicQualification: "" }));
+    if (academicOptions.length > 0) {
+      setIsCustomAcademic(false);
+      setCustomAcademicText("");
+      setFormData((prev) => ({ ...prev, academicQualification: "" }));
+    }
   };
 
   return (
