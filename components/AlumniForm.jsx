@@ -211,13 +211,13 @@ export default function AlumniForm() {
 
   return (
     <>
-      <div className="bg-white rounded-3xl shadow-xl border border-[#c8d1dc] p-6 sm:p-10 transition-all">
+      <div className="bg-white rounded-2xl sm:rounded-3xl shadow-xl border border-[#c8d1dc] p-5 sm:p-10 transition-all">
         {/* Card Header */}
         <div className="mb-6">
-          <h2 className="text-xl sm:text-2xl font-black text-[#0d1b2a] tracking-tight">
+          <h2 className="text-lg sm:text-2xl font-black text-[#0d1b2a] tracking-tight leading-snug">
             ALUMNI MEET 2026 - DALAILUL KHAIRATH KAKKIDIPPURAM
           </h2>
-          <h3 className="text-lg sm:text-xl font-bold text-[#3875b6] mt-0.5">
+          <h3 className="text-base sm:text-xl font-bold text-[#3875b6] mt-1">
             Registration Form
           </h3>
           <p className="text-xs sm:text-sm text-[#415a77] mt-1">

@@ -15,7 +15,9 @@ export const metadata = {
   title: "Alumni Meet Registration | Dalailul Khairath Kakkidippuram",
   description: "Official Alumni Registration Portal for Dalailul Khairath Kakkidippuram",
   icons: {
-    icon: "/favicon.ico",
+    icon: "/logo.png",
+    shortcut: "/logo.png",
+    apple: "/logo.png",
   },
 };
 

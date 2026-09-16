@@ -9,7 +9,9 @@ export default function Home() {
       <Header />
 
       {/* Main Registration Card Container */}
-      <main className="flex-1 -mt-8 px-4 sm:px-6 mb-12">
+      {/* On mobile: mt-4 ensures the card is never clipped or hidden behind the header */}
+      {/* On desktop: sm:-mt-10 creates the elegant floating card effect */}
+      <main className="flex-1 mt-4 sm:-mt-10 px-3 sm:px-6 mb-12 relative z-10">
         <div className="max-w-2xl mx-auto">
           <AlumniForm />
         </div>

@@ -102,12 +102,36 @@ export async function POST(request) {
         const controller = new AbortController();
         const timeout = setTimeout(() => controller.abort(), 10000);
 
+        // Include both header-based keys and camelCase keys so any Apps Script matches
+        const sheetPayload = {
+          ...payload,
+          "Registration ID": registrationId,
+          "Full Name": payload.fullName,
+          "Place": payload.place,
+          "Mobile Number": payload.mobileNumber,
+          "WhatsApp Number": payload.whatsappNumber,
+          "Batch / Admission Year": payload.batchYear,
+          "Hifz Status": payload.hifzStatus,
+          "Leaving Year": payload.leavingYear,
+          "Islamic Qualification": payload.islamicQualification,
+          "Academic Qualification": payload.academicQualification,
+          "Current Status": payload.currentStatus,
+          "Job / Designation": payload.jobDesignation,
+          "Institution / Organization Name": payload.institutionName,
+          "Work Location": payload.workLocation,
+          "Will Attend Meet?": payload.willAttend,
+          name: payload.fullName,
+          mobile: payload.mobileNumber,
+          batch: payload.batchYear,
+        };
+
         const sheetResponse = await fetch(webhookUrl, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify(payload),
+          body: JSON.stringify(sheetPayload),
+          redirect: "follow",
           signal: controller.signal,
         });
         clearTimeout(timeout);
