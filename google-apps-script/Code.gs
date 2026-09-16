@@ -5,14 +5,51 @@
  * 1. Open your Google Sheet
  * 2. Click Extensions > Apps Script
  * 3. Replace all existing code in the editor with this script
- * 4. Click Deploy > New deployment
- * 5. Select type: "Web app"
- * 6. Set Description: "Alumni Registration Webhook"
- * 7. Set "Execute as": "Me"
- * 8. Set "Who has access": "Anyone"
- * 9. Click Deploy, authorize permissions, and copy the Web App URL!
- * 10. Paste the URL into .env.local as GOOGLE_SHEET_WEBHOOK_URL="your-url-here"
+ * 4. Click Save (Ctrl+S)
+ * 5. (Optional) Select 'setupHeaders' in the function dropdown at the top and click 'Run' to format headers immediately!
+ * 6. Click Deploy > Manage deployments > Edit > New version > Deploy
  */
+
+var HEADERS = [
+  "Timestamp",
+  "Registration ID",
+  "Full Name",
+  "Place",
+  "Mobile Number",
+  "WhatsApp Number",
+  "Batch / Admission Year",
+  "Hifz Status",
+  "Leaving Year",
+  "Islamic Qualification",
+  "Academic Qualification",
+  "Current Status",
+  "Job / Designation",
+  "Institution / Organization Name",
+  "Work Location",
+  "Will Attend Meet?"
+];
+
+// Run this function directly inside Apps Script to create or fix headers right now!
+function setupHeaders() {
+  var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+  
+  if (sheet.getLastRow() === 0) {
+    sheet.appendRow(HEADERS);
+  } else if (sheet.getRange(1, 1).getValue() !== "Timestamp") {
+    sheet.insertRowBefore(1);
+    sheet.getRange(1, 1, 1, HEADERS.length).setValues([HEADERS]);
+  } else {
+    sheet.getRange(1, 1, 1, HEADERS.length).setValues([HEADERS]);
+  }
+
+  var headerRange = sheet.getRange(1, 1, 1, HEADERS.length);
+  headerRange.setBackground("#0d1b2a");
+  headerRange.setFontColor("#ffffff");
+  headerRange.setFontWeight("bold");
+  headerRange.setFontSize(10);
+  headerRange.setHorizontalAlignment("center");
+  sheet.setFrozenRows(1);
+}
 
 function doPost(e) {
   var lock = LockService.getScriptLock();
@@ -21,30 +58,19 @@ function doPost(e) {
   try {
     var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
     
-    // Set headers if the sheet is newly created
+    // Auto-create or fix headers if missing
     if (sheet.getLastRow() === 0) {
-      sheet.appendRow([
-        "Timestamp",
-        "Registration ID",
-        "Full Name",
-        "Place",
-        "Mobile Number",
-        "WhatsApp Number",
-        "Batch / Admission Year",
-        "Hifz Status",
-        "Leaving Year",
-        "Islamic Qualification",
-        "Academic Qualification",
-        "Current Status",
-        "Job / Designation",
-        "Institution / Organization Name",
-        "Work Location",
-        "Will Attend Meet?"
-      ]);
-      
-      // Style header row
-      var headerRange = sheet.getRange(1, 1, 1, 16);
-      headerRange.setBackground("#0e172e");
+      sheet.appendRow(HEADERS);
+      var headerRange = sheet.getRange(1, 1, 1, HEADERS.length);
+      headerRange.setBackground("#0d1b2a");
+      headerRange.setFontColor("#ffffff");
+      headerRange.setFontWeight("bold");
+      sheet.setFrozenRows(1);
+    } else if (sheet.getRange(1, 1).getValue() !== "Timestamp") {
+      sheet.insertRowBefore(1);
+      sheet.getRange(1, 1, 1, HEADERS.length).setValues([HEADERS]);
+      var headerRange = sheet.getRange(1, 1, 1, HEADERS.length);
+      headerRange.setBackground("#0d1b2a");
       headerRange.setFontColor("#ffffff");
       headerRange.setFontWeight("bold");
       sheet.setFrozenRows(1);
