@@ -12,6 +12,8 @@ import RegistrationSlipModal from "./RegistrationSlipModal";
 
 const INITIAL_FORM_STATE = {
   batchYear: "",
+  joinedBatch: "",
+  joinedSections: [],
   fullName: "",
   place: "",
   mobileCountryCode: "+91",
@@ -54,6 +56,20 @@ export default function AlumniForm() {
     if (errors.batchYear) {
       setErrors((prev) => ({ ...prev, batchYear: null }));
     }
+  };
+
+  // Handle HS / BS Section toggle
+  const handleToggleSection = (section) => {
+    setFormData((prev) => {
+      const current = prev.joinedSections || [];
+      const updated = current.includes(section)
+        ? current.filter((s) => s !== section)
+        : [...current, section];
+      return {
+        ...prev,
+        joinedSections: updated,
+      };
+    });
   };
 
   // Handle student selection from roster autocomplete
@@ -195,8 +211,13 @@ export default function AlumniForm() {
       const waCode = (sameAsMobile ? mobileCode : (formData.whatsappCountryCode || "+91")).trim();
       const cleanWhatsapp = cleanWaDigits ? `${waCode}${cleanWaDigits}` : cleanMobile;
 
+      const sectionString = (formData.joinedSections || []).join(", ");
+
       const submissionData = {
         ...formData,
+        joinedBatch: formData.batchYear,
+        joinedSection: sectionString,
+        joinedSections: formData.joinedSections || [],
         mobileNumber: cleanMobile,
         whatsappNumber: cleanWhatsapp,
       };
@@ -253,10 +274,12 @@ export default function AlumniForm() {
         )}
 
         <form onSubmit={handleSubmit} className="space-y-6">
-          {/* Step 1: Batch / Admission Year */}
+          {/* Step 1: Joined with Batch & Sections */}
           <StepBatchSelect
             selectedBatch={formData.batchYear}
             onSelectBatch={handleBatchSelect}
+            selectedSections={formData.joinedSections}
+            onToggleSection={handleToggleSection}
             error={errors.batchYear}
           />
 

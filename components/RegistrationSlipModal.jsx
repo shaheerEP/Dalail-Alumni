@@ -94,8 +94,10 @@ export default function RegistrationSlipModal({ isOpen, onClose, data, onResetFo
             </div>
 
             <div className="flex justify-between py-1 border-b border-black/[0.05]">
-              <span className="font-semibold text-[#415a77]">Batch:</span>
-              <span className="font-bold text-[#3875b6]">{data.batchYear}</span>
+              <span className="font-semibold text-[#415a77]">Joined with Batch:</span>
+              <span className="font-bold text-[#3875b6]">
+                {data.batchYear} {data.joinedSection ? `(${data.joinedSection})` : ""}
+              </span>
             </div>
 
             <div className="flex justify-between py-1 border-b border-black/[0.05]">

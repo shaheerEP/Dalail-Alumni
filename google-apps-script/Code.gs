@@ -17,7 +17,8 @@ var HEADERS = [
   "Place",
   "Mobile Number",
   "WhatsApp Number",
-  "Batch / Admission Year",
+  "Joined with Batch",
+  "Section (HS / BS)",
   "Hifz Status",
   "Islamic Qualification",
   "Academic Qualification",
@@ -91,7 +92,8 @@ function doPost(e) {
     var place = data.place || data["Place"] || "";
     var mobile = formatPhoneText(data.mobileNumber || data["Mobile Number"] || data.mobile || "");
     var whatsapp = formatPhoneText(data.whatsappNumber || data["WhatsApp Number"] || data.whatsapp || "");
-    var batch = data.batchYear || data["Batch / Admission Year"] || data.batch || "";
+    var batch = data["Joined with Batch"] || data.joinedBatch || data.batchYear || data["Batch / Admission Year"] || data.batch || "";
+    var section = data["Section (HS / BS)"] || data.joinedSection || data.section || (Array.isArray(data.joinedSections) ? data.joinedSections.join(", ") : "") || "";
     var hifz = data.hifzStatus || data["Hifz Status"] || data.hifz || "";
     var islamicQual = data.islamicQualification || data["Islamic Qualification"] || data.islamic || "";
     var academicQual = data.academicQualification || data["Academic Qualification"] || data.academic || "";
@@ -110,6 +112,7 @@ function doPost(e) {
       mobile,
       whatsapp,
       batch,
+      section,
       hifz,
       islamicQual,
       academicQual,
@@ -125,7 +128,7 @@ function doPost(e) {
       message: "Registration recorded successfully",
       registrationId: regId,
       fullName: name,
-      columnsWritten: 15
+      columnsWritten: 16
     })).setMimeType(ContentService.MimeType.JSON);
 
   } catch (error) {

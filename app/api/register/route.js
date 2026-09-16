@@ -44,6 +44,9 @@ export async function POST(request) {
       mobileNumber,
       whatsappNumber,
       batchYear,
+      joinedBatch,
+      joinedSection,
+      joinedSections,
       hifzStatus,
       leavingYear,
       islamicQualification,
@@ -66,13 +69,16 @@ export async function POST(request) {
     if (!cleanMobileDigits || cleanMobileDigits.length < 7 || cleanMobileDigits.length > 16) {
       return NextResponse.json({ error: "Please enter a valid mobile number with country code." }, { status: 400 });
     }
-    if (!batchYear) {
-      return NextResponse.json({ error: "Batch is required." }, { status: 400 });
+    const chosenBatch = joinedBatch || batchYear || "";
+    if (!chosenBatch) {
+      return NextResponse.json({ error: "Joined with Batch is required." }, { status: 400 });
     }
+
+    const chosenSection = joinedSection || (Array.isArray(joinedSections) ? joinedSections.join(", ") : "");
 
     // Generate unique Registration ID
     const randomSuffix = Math.floor(1000 + Math.random() * 9000);
-    const registrationId = `DKK-${batchYear ? batchYear.replace(/\s+/g, "") : "ALM"}-${randomSuffix}`;
+    const registrationId = `DKK-${chosenBatch ? chosenBatch.replace(/\s+/g, "") : "ALM"}-${randomSuffix}`;
     const timestamp = new Date().toLocaleString("en-IN", {
       timeZone: "Asia/Kolkata",
       dateStyle: "medium",
@@ -86,7 +92,10 @@ export async function POST(request) {
       place: place.trim(),
       mobileNumber: mobileNumber?.trim() || cleanMobileDigits,
       whatsappNumber: (whatsappNumber?.trim() || mobileNumber?.trim() || cleanMobileDigits),
-      batchYear: batchYear || "",
+      batchYear: chosenBatch,
+      joinedBatch: chosenBatch,
+      joinedSection: chosenSection,
+      joinedSections: Array.isArray(joinedSections) ? joinedSections : (chosenSection ? [chosenSection] : []),
       hifzStatus: hifzStatus || "",
       leavingYear: leavingYear || "",
       islamicQualification: islamicQualification || "",
@@ -133,7 +142,13 @@ export async function POST(request) {
           "WhatsApp Number": formatPhoneForSheet(payload.whatsappNumber),
           "mobileNumber": formatPhoneForSheet(payload.mobileNumber),
           "whatsappNumber": formatPhoneForSheet(payload.whatsappNumber),
-          "Batch / Admission Year": payload.batchYear,
+          "Joined with Batch": chosenBatch,
+          "Batch / Admission Year": chosenBatch,
+          "batchYear": chosenBatch,
+          "joinedBatch": chosenBatch,
+          "Section (HS / BS)": chosenSection,
+          "Section": chosenSection,
+          "joinedSection": chosenSection,
           "Hifz Status": payload.hifzStatus,
           "Islamic Qualification": payload.islamicQualification,
           "Academic Qualification": payload.academicQualification,
