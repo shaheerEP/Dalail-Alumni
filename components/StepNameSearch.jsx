@@ -53,6 +53,11 @@ export default function StepNameSearch({
     onSelectStudent(null);
   };
 
+  // If no roster records exist for this batch, skip the search dropdown
+  if (!roster || roster.length === 0) {
+    return null;
+  }
+
   return (
     <div className="space-y-2 pt-2" ref={containerRef}>
       <div className="flex items-center justify-between">

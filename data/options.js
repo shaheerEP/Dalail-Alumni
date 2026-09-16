@@ -4,36 +4,8 @@
 export const BATCH_OPTIONS = Array.from({ length: 12 }, (_, i) => `Batch ${i + 1}`);
 export const BATCH_YEARS = BATCH_OPTIONS;
 
-// Sample alumni roster by batch
-export const SAMPLE_ALUMNI_ROSTER = {
-  "Batch 1": [
-    { id: "B1-01", name: "MUHAMMED SHARIF KAKKIDIPPURAM", place: "KAKKIDIPPURAM", mobile: "", hifz: "Hafiz" },
-    { id: "B1-02", name: "ABDUL SALAM T", place: "TIRUR", mobile: "", hifz: "Hafiz" },
-    { id: "B1-03", name: "IBRAHIM KHALIL", place: "KUTTIPPURAM", mobile: "", hifz: "Hafiz" },
-    { id: "B1-04", name: "ANAS MUSTHAFA", place: "EDAPPAL", mobile: "", hifz: "Hafiz" },
-    { id: "B1-05", name: "HASANUL BANNA", place: "CHANGARAMKULAM", mobile: "", hifz: "Not Hafiz" },
-  ],
-  "Batch 2": [
-    { id: "B2-01", name: "ABBAS EA", place: "ALUVA", mobile: "", hifz: "Hafiz" },
-    { id: "B2-02", name: "MUHAMMED SHAFI K", place: "EDAPPAL", mobile: "", hifz: "Hafiz" },
-    { id: "B2-03", name: "ABDUL BASITH M", place: "TIRUR", mobile: "", hifz: "Not Hafiz" },
-    { id: "B2-04", name: "SHUHAIB KAKKIDIPPURAM", place: "KAKKIDIPPURAM", mobile: "", hifz: "Hafiz" },
-    { id: "B2-05", name: "ANAS CHERUMUKKU", place: "CHERUMUKKU", mobile: "", hifz: "Not Hafiz" },
-  ],
-  "Batch 3": [
-    { id: "B3-01", name: "JUNAID K", place: "PONNANI", mobile: "", hifz: "Hafiz" },
-    { id: "B3-02", name: "SALMAN FARIS", place: "KUTTIPPURAM", mobile: "", hifz: "Hafiz" },
-    { id: "B3-03", name: "RASHID V", place: "CHANGARAMKULAM", mobile: "", hifz: "Not Hafiz" },
-  ],
-  "Batch 4": [
-    { id: "B4-01", name: "SHABEER AHMED", place: "VALANCHERY", mobile: "", hifz: "Hafiz" },
-    { id: "B4-02", name: "MOHAMMED RAFI", place: "PERINTHALMANNA", mobile: "", hifz: "Hafiz" },
-  ],
-  "Batch 5": [
-    { id: "B5-01", name: "FAWAS K", place: "MALAPPURAM", mobile: "", hifz: "Hafiz" },
-    { id: "B5-02", name: "HISHAMUDHEEN P", place: "THRISSUR", mobile: "", hifz: "Not Hafiz" },
-  ],
-};
+// Alumni roster by batch (empty by default; add official student records here when available)
+export const SAMPLE_ALUMNI_ROSTER = {};
 
 // Hifz Status options: Hafiz and Not Hafiz
 export const HIFZ_STATUS_OPTIONS = [
