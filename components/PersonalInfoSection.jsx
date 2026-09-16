@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { AlertCircle, CheckCircle2, UserCheck } from "lucide-react";
+import { AlertCircle } from "lucide-react";
 import { COUNTRY_CODES } from "@/data/options";
 
 export default function PersonalInfoSection({
@@ -105,14 +105,6 @@ export default function PersonalInfoSection({
               <p className="mt-2 text-[11px] text-amber-700 leading-tight">
                 ℹ️ If this is your registration, you don't need to register again. If you share this name with someone else, you can proceed.
               </p>
-            </div>
-          )}
-
-          {/* Not Registered Confirmation */}
-          {normalizedInput.length >= 3 && matchingRegistered.length === 0 && !isLoadingRegistered && (
-            <div className="mt-1.5 flex items-center gap-1.5 text-xs text-emerald-600 font-medium animate-in fade-in duration-150">
-              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
-              <span>Not registered yet — you can proceed with registration</span>
             </div>
           )}
         </div>
