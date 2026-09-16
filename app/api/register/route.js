@@ -99,7 +99,13 @@ export async function POST(request) {
     if (payload.academicQualification) saveQualification("academic", payload.academicQualification);
 
     // 2. Push to Google Sheet Webhook if configured
-    const webhookUrl = process.env.GOOGLE_SHEET_WEBHOOK_URL;
+    const OLD_DEPRECATED_URL = "https://script.google.com/macros/s/AKfycbxjQQUapcJIU1lmMgdViqfMCirHbaeY_ZjZwPdzy-T6C2CcN7ykOdiq4N12jO-rVaBf/exec";
+    const ACTIVE_WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbz6xuszwAbSMhY51EzUocjWZfCaCXWD0XDpegxkSR9KR_8jIQhxwEsDnJgUI23NUnK8/exec";
+
+    let webhookUrl = process.env.GOOGLE_SHEET_WEBHOOK_URL || ACTIVE_WEBHOOK_URL;
+    if (webhookUrl === OLD_DEPRECATED_URL) {
+      webhookUrl = ACTIVE_WEBHOOK_URL;
+    }
     let sheetSyncStatus = "not_configured";
 
     if (webhookUrl && webhookUrl.startsWith("http")) {
