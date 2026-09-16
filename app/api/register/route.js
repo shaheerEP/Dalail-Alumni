@@ -100,7 +100,7 @@ export async function POST(request) {
     if (webhookUrl && webhookUrl.startsWith("http")) {
       try {
         const controller = new AbortController();
-        const timeout = setTimeout(() => controller.abort(), 10000);
+        const timeout = setTimeout(() => controller.abort(), 25000);
 
         // Include both header-based keys and camelCase keys so any Apps Script matches
         const sheetPayload = {
