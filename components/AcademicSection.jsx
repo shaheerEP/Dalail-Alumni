@@ -16,7 +16,7 @@ export default function AcademicSection({ formData, errors, onChange, setFormDat
   const handleHifzToggle = (status) => {
     setFormData((prev) => ({
       ...prev,
-      hifzStatus: prev.hifzStatus === status ? "" : status,
+      hifzStatus: status,
     }));
     if (setErrors) {
       setErrors((prev) => ({ ...prev, hifzStatus: null }));
@@ -108,51 +108,55 @@ export default function AcademicSection({ formData, errors, onChange, setFormDat
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        {/* Hifz Status: Hafiz or Not Checkbox */}
+        {/* Hifz Status: Hafiz or Not Checkbox Buttons */}
         <div>
           <label className="block text-xs sm:text-sm font-bold text-[#1b263b] mb-1.5">
             Hifz Status <span className="text-red-500">*</span>
           </label>
           <div className="grid grid-cols-2 gap-2.5">
-            {/* Hafiz Option */}
-            <label
+            {/* Hafiz Button */}
+            <button
+              type="button"
               onClick={() => handleHifzToggle("Hafiz")}
-              className={`flex items-center gap-2.5 px-3 py-2.5 rounded-xl border-2 cursor-pointer transition-all select-none ${
+              className={`flex items-center gap-2.5 px-3 py-2.5 rounded-xl border-2 font-medium text-xs sm:text-sm transition-all cursor-pointer select-none text-left ${
                 formData.hifzStatus === "Hafiz"
-                  ? "border-emerald-600 bg-emerald-50/90 text-emerald-950 font-bold shadow-xs"
+                  ? "border-emerald-600 bg-emerald-50 text-emerald-950 font-bold shadow-xs"
                   : "border-[#c8d1dc] bg-white text-[#415a77] hover:border-[#778da9] hover:bg-[#f9f9f8]"
               } ${errors.hifzStatus ? "border-red-400" : ""}`}
             >
-              <input
-                type="checkbox"
-                name="hifzStatus"
-                value="Hafiz"
-                checked={formData.hifzStatus === "Hafiz"}
-                onChange={() => {}} // Handled by container onClick
-                className="w-4 h-4 rounded text-emerald-600 focus:ring-emerald-500 border-[#778da9] pointer-events-none"
-              />
-              <span className="text-xs sm:text-sm">Hafiz</span>
-            </label>
+              <div
+                className={`w-4 h-4 rounded border flex items-center justify-center transition-colors shrink-0 ${
+                  formData.hifzStatus === "Hafiz"
+                    ? "bg-emerald-600 border-emerald-600 text-white"
+                    : "border-[#778da9] bg-white"
+                }`}
+              >
+                {formData.hifzStatus === "Hafiz" && <Check className="w-3 h-3 stroke-[3]" />}
+              </div>
+              <span>Hafiz</span>
+            </button>
 
-            {/* Not Hafiz Option */}
-            <label
+            {/* Not Hafiz Button */}
+            <button
+              type="button"
               onClick={() => handleHifzToggle("Not Hafiz")}
-              className={`flex items-center gap-2.5 px-3 py-2.5 rounded-xl border-2 cursor-pointer transition-all select-none ${
+              className={`flex items-center gap-2.5 px-3 py-2.5 rounded-xl border-2 font-medium text-xs sm:text-sm transition-all cursor-pointer select-none text-left ${
                 formData.hifzStatus === "Not Hafiz"
                   ? "border-[#415a77] bg-[#e3e8ee] text-[#0d1b2a] font-bold shadow-xs"
                   : "border-[#c8d1dc] bg-white text-[#415a77] hover:border-[#778da9] hover:bg-[#f9f9f8]"
               } ${errors.hifzStatus ? "border-red-400" : ""}`}
             >
-              <input
-                type="checkbox"
-                name="hifzStatus"
-                value="Not Hafiz"
-                checked={formData.hifzStatus === "Not Hafiz"}
-                onChange={() => {}} // Handled by container onClick
-                className="w-4 h-4 rounded text-[#415a77] focus:ring-[#415a77] border-[#778da9] pointer-events-none"
-              />
-              <span className="text-xs sm:text-sm">Not Hafiz</span>
-            </label>
+              <div
+                className={`w-4 h-4 rounded border flex items-center justify-center transition-colors shrink-0 ${
+                  formData.hifzStatus === "Not Hafiz"
+                    ? "bg-[#415a77] border-[#415a77] text-white"
+                    : "border-[#778da9] bg-white"
+                }`}
+              >
+                {formData.hifzStatus === "Not Hafiz" && <Check className="w-3 h-3 stroke-[3]" />}
+              </div>
+              <span>Not Hafiz</span>
+            </button>
           </div>
           {errors.hifzStatus && (
             <p className="text-xs font-medium text-red-500 mt-1">{errors.hifzStatus}</p>
