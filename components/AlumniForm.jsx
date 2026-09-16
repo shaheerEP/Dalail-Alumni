@@ -14,7 +14,9 @@ const INITIAL_FORM_STATE = {
   batchYear: "",
   fullName: "",
   place: "",
+  mobileCountryCode: "+91",
   mobileNumber: "",
+  whatsappCountryCode: "+91",
   whatsappNumber: "",
   hifzStatus: "",
   leavingYear: "",
@@ -87,6 +89,9 @@ export default function AlumniForm() {
       if (name === "mobileNumber" && sameAsMobile) {
         updated.whatsappNumber = value;
       }
+      if (name === "mobileCountryCode" && sameAsMobile) {
+        updated.whatsappCountryCode = value;
+      }
       return updated;
     });
 
@@ -101,7 +106,11 @@ export default function AlumniForm() {
     setSameAsMobile((prev) => {
       const next = !prev;
       if (next) {
-        setFormData((curr) => ({ ...curr, whatsappNumber: curr.mobileNumber }));
+        setFormData((curr) => ({
+          ...curr,
+          whatsappCountryCode: curr.mobileCountryCode,
+          whatsappNumber: curr.mobileNumber,
+        }));
       }
       return next;
     });
@@ -122,7 +131,7 @@ export default function AlumniForm() {
     const errs = {};
 
     if (!formData.batchYear) {
-      errs.batchYear = "Please select your Batch / Admission Year.";
+      errs.batchYear = "Please select your Batch.";
     }
     if (!formData.fullName.trim()) {
       errs.fullName = "Please enter your Full Name.";
@@ -132,16 +141,14 @@ export default function AlumniForm() {
     }
 
     const cleanMobile = (formData.mobileNumber || "").replace(/\D/g, "");
-    if (!cleanMobile || cleanMobile.length !== 10) {
-      errs.mobileNumber = "Please provide a valid 10-digit mobile number.";
+    if (!cleanMobile || cleanMobile.length < 7 || cleanMobile.length > 15) {
+      errs.mobileNumber = "Please enter a valid mobile number.";
     }
 
     if (!formData.hifzStatus) {
       errs.hifzStatus = "Please select whether you are a Hafiz or Not.";
     }
-    if (!formData.leavingYear) {
-      errs.leavingYear = "Please select Leaving Year.";
-    }
+
     if (!formData.islamicQualification) {
       errs.islamicQualification = "Please select Islamic Qualification.";
     }
@@ -179,10 +186,16 @@ export default function AlumniForm() {
     setIsSubmitting(true);
 
     try {
+      const submissionData = {
+        ...formData,
+        mobileNumber: `${formData.mobileCountryCode || "+91"} ${formData.mobileNumber.trim()}`,
+        whatsappNumber: `${sameAsMobile ? (formData.mobileCountryCode || "+91") : (formData.whatsappCountryCode || "+91")} ${(sameAsMobile ? formData.mobileNumber : formData.whatsappNumber).trim()}`,
+      };
+
       const response = await fetch("/api/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(submissionData),
       });
 
       const result = await response.json();

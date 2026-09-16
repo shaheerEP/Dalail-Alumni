@@ -1,4 +1,4 @@
-import { BATCH_YEARS } from "@/data/options";
+import { BATCH_OPTIONS } from "@/data/options";
 
 export default function StepBatchSelect({ selectedBatch, onSelectBatch, error }) {
   return (
@@ -7,7 +7,7 @@ export default function StepBatchSelect({ selectedBatch, onSelectBatch, error })
         htmlFor="batchSelect"
         className="block text-sm sm:text-base font-bold text-[#0d1b2a]"
       >
-        Batch / Admission Year <span className="text-red-500">*</span>
+        Batch <span className="text-red-500">*</span>
       </label>
 
       <div className="relative">
@@ -19,10 +19,10 @@ export default function StepBatchSelect({ selectedBatch, onSelectBatch, error })
             error ? "form-input-error" : ""
           }`}
         >
-          <option value="">Select Batch Year</option>
-          {BATCH_YEARS.map((year) => (
-            <option key={year} value={year}>
-              {year} Batch
+          <option value="">Select Batch</option>
+          {BATCH_OPTIONS.map((batch) => (
+            <option key={batch} value={batch}>
+              {batch}
             </option>
           ))}
         </select>

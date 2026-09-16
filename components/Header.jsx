@@ -1,7 +1,7 @@
 import Image from "next/image";
 
 export default function Header() {
-  const eventDate = process.env.NEXT_PUBLIC_EVENT_DATE || "02 October 2026";
+  const eventDate = "02 October 2026";
   const orgName = process.env.NEXT_PUBLIC_ORGANIZATION_NAME || "Dalailul Khairath Kakkidippuram";
 
   return (

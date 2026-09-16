@@ -1,3 +1,5 @@
+import { COUNTRY_CODES } from "@/data/options";
+
 export default function PersonalInfoSection({
   formData,
   errors,
@@ -57,17 +59,32 @@ export default function PersonalInfoSection({
           <label className="block text-xs sm:text-sm font-bold text-[#1b263b] mb-1">
             Mobile Number <span className="text-red-500">*</span>
           </label>
-          <input
-            type="tel"
-            name="mobileNumber"
-            maxLength={10}
-            placeholder="10-digit mobile number"
-            value={formData.mobileNumber}
-            onChange={onChange}
-            className={`form-input tracking-wider ${
-              errors.mobileNumber ? "form-input-error" : ""
+          <div
+            className={`flex items-center rounded-xl bg-[#f3f4f6] border border-black/[0.04] transition-all focus-within:bg-white focus-within:ring-3 focus-within:ring-[#3875b6]/15 ${
+              errors.mobileNumber ? "border-red-400 bg-red-50/50 ring-2 ring-red-400/20" : ""
             }`}
-          />
+          >
+            <select
+              name="mobileCountryCode"
+              value={formData.mobileCountryCode || "+91"}
+              onChange={onChange}
+              className="bg-transparent py-3 pl-3 pr-1 text-xs sm:text-sm font-bold text-[#0d1b2a] outline-none cursor-pointer border-r border-black/[0.06] shrink-0"
+            >
+              {COUNTRY_CODES.map((item) => (
+                <option key={item.code} value={item.code}>
+                  {item.label}
+                </option>
+              ))}
+            </select>
+            <input
+              type="tel"
+              name="mobileNumber"
+              placeholder="Mobile number"
+              value={formData.mobileNumber}
+              onChange={onChange}
+              className="w-full bg-transparent py-3 px-3 text-xs sm:text-sm text-[#0d1b2a] outline-none tracking-wider font-medium placeholder:text-[#778da9]"
+            />
+          </div>
           {errors.mobileNumber && (
             <p className="text-xs font-medium text-red-500 mt-1">{errors.mobileNumber}</p>
           )}
@@ -90,18 +107,36 @@ export default function PersonalInfoSection({
             </label>
           </div>
 
-          <input
-            type="tel"
-            name="whatsappNumber"
-            maxLength={10}
-            placeholder="10-digit WhatsApp number"
-            value={formData.whatsappNumber}
-            onChange={onChange}
-            disabled={sameAsMobile}
-            className={`form-input tracking-wider ${
-              sameAsMobile ? "opacity-50 cursor-not-allowed" : ""
+          <div
+            className={`flex items-center rounded-xl bg-[#f3f4f6] border border-black/[0.04] transition-all ${
+              sameAsMobile
+                ? "opacity-50 cursor-not-allowed"
+                : "focus-within:bg-white focus-within:ring-3 focus-within:ring-[#3875b6]/15"
             }`}
-          />
+          >
+            <select
+              name="whatsappCountryCode"
+              value={formData.whatsappCountryCode || formData.mobileCountryCode || "+91"}
+              onChange={onChange}
+              disabled={sameAsMobile}
+              className="bg-transparent py-3 pl-3 pr-1 text-xs sm:text-sm font-bold text-[#0d1b2a] outline-none cursor-pointer border-r border-black/[0.06] shrink-0 disabled:cursor-not-allowed"
+            >
+              {COUNTRY_CODES.map((item) => (
+                <option key={item.code} value={item.code}>
+                  {item.label}
+                </option>
+              ))}
+            </select>
+            <input
+              type="tel"
+              name="whatsappNumber"
+              placeholder="WhatsApp number"
+              value={formData.whatsappNumber}
+              onChange={onChange}
+              disabled={sameAsMobile}
+              className="w-full bg-transparent py-3 px-3 text-xs sm:text-sm text-[#0d1b2a] outline-none tracking-wider font-medium placeholder:text-[#778da9] disabled:cursor-not-allowed"
+            />
+          </div>
         </div>
       </div>
     </div>

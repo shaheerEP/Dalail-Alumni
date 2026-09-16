@@ -54,17 +54,17 @@ export async function POST(request) {
     if (!place?.trim()) {
       return NextResponse.json({ error: "Place is required." }, { status: 400 });
     }
-    const cleanMobile = (mobileNumber || "").replace(/\D/g, "");
-    if (!cleanMobile || cleanMobile.length !== 10) {
-      return NextResponse.json({ error: "Please enter a valid 10-digit mobile number." }, { status: 400 });
+    const cleanMobileDigits = (mobileNumber || "").replace(/\D/g, "");
+    if (!cleanMobileDigits || cleanMobileDigits.length < 7 || cleanMobileDigits.length > 16) {
+      return NextResponse.json({ error: "Please enter a valid mobile number with country code." }, { status: 400 });
     }
     if (!batchYear) {
-      return NextResponse.json({ error: "Batch / Admission Year is required." }, { status: 400 });
+      return NextResponse.json({ error: "Batch is required." }, { status: 400 });
     }
 
     // Generate unique Registration ID
     const randomSuffix = Math.floor(1000 + Math.random() * 9000);
-    const registrationId = `DKK-${batchYear || "ALM"}-${randomSuffix}`;
+    const registrationId = `DKK-${batchYear ? batchYear.replace(/\s+/g, "") : "ALM"}-${randomSuffix}`;
     const timestamp = new Date().toLocaleString("en-IN", {
       timeZone: "Asia/Kolkata",
       dateStyle: "medium",
@@ -76,8 +76,8 @@ export async function POST(request) {
       timestamp,
       fullName: fullName.trim(),
       place: place.trim(),
-      mobileNumber: cleanMobile,
-      whatsappNumber: (whatsappNumber || cleanMobile).replace(/\D/g, ""),
+      mobileNumber: mobileNumber?.trim() || cleanMobileDigits,
+      whatsappNumber: (whatsappNumber?.trim() || mobileNumber?.trim() || cleanMobileDigits),
       batchYear: batchYear || "",
       hifzStatus: hifzStatus || "",
       leavingYear: leavingYear || "",
