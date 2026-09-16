@@ -7,7 +7,7 @@ export default function StepBatchSelect({ selectedBatch, onSelectBatch, error })
         htmlFor="batchSelect"
         className="block text-sm sm:text-base font-bold text-[#0d1b2a]"
       >
-        Step 1: Select Alumni Batch / Admission Year <span className="text-red-500">*</span>
+        Batch / Admission Year <span className="text-red-500">*</span>
       </label>
 
       <div className="relative">
@@ -19,7 +19,7 @@ export default function StepBatchSelect({ selectedBatch, onSelectBatch, error })
             error ? "form-input-error" : ""
           }`}
         >
-          <option value="">-- Select Batch / Year --</option>
+          <option value="">Select Batch Year</option>
           {BATCH_YEARS.map((year) => (
             <option key={year} value={year}>
               {year} Batch

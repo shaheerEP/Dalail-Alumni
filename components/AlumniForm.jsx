@@ -137,7 +137,7 @@ export default function AlumniForm() {
     }
 
     if (!formData.hifzStatus) {
-      errs.hifzStatus = "Please select Hifz status.";
+      errs.hifzStatus = "Please select whether you are a Hafiz or Not.";
     }
     if (!formData.leavingYear) {
       errs.leavingYear = "Please select Leaving Year.";
@@ -213,16 +213,10 @@ export default function AlumniForm() {
     <>
       <div className="bg-white rounded-2xl sm:rounded-3xl shadow-xl border border-[#c8d1dc] p-5 sm:p-10 transition-all">
         {/* Card Header */}
-        <div className="mb-6">
-          <h2 className="text-lg sm:text-2xl font-black text-[#0d1b2a] tracking-tight leading-snug">
-            ALUMNI MEET 2026 - DALAILUL KHAIRATH KAKKIDIPPURAM
-          </h2>
-          <h3 className="text-base sm:text-xl font-bold text-[#3875b6] mt-1">
+        <div className="mb-6 pb-4 border-b border-[#e0e1dd]">
+          <h2 className="text-xl sm:text-2xl font-black text-[#0d1b2a] tracking-tight">
             Registration Form
-          </h3>
-          <p className="text-xs sm:text-sm text-[#415a77] mt-1">
-            Please select your batch and confirm your details for the summit.
-          </p>
+          </h2>
         </div>
 
         {/* Global Submit Error if any */}
@@ -271,6 +265,7 @@ export default function AlumniForm() {
                 errors={errors}
                 onChange={handleChange}
                 setFormData={setFormData}
+                setErrors={setErrors}
               />
 
               {/* Step 4: Current Status */}
@@ -297,12 +292,12 @@ export default function AlumniForm() {
                   {isSubmitting ? (
                     <>
                       <Loader2 className="w-5 h-5 animate-spin" />
-                      <span>Submitting Registration...</span>
+                      <span>Submitting...</span>
                     </>
                   ) : (
                     <>
                       <Send className="w-5 h-5 -rotate-12" />
-                      <span>Complete Registration</span>
+                      <span>Submit Registration</span>
                     </>
                   )}
                 </button>

@@ -6,38 +6,38 @@ export const BATCH_YEARS = Array.from({ length: 2026 - 1989 }, (_, i) => (2026 -
 // Sample alumni roster by batch
 export const SAMPLE_ALUMNI_ROSTER = {
   "2012": [
-    { id: "12-01", name: "MUHAMMED SHARIF KAKKIDIPPURAM", place: "KAKKIDIPPURAM", mobile: "", hifz: "Completed" },
-    { id: "12-02", name: "ABDUL SALAM T", place: "TIRUR", mobile: "", hifz: "Completed" },
-    { id: "12-03", name: "IBRAHIM KHALIL", place: "KUTTIPPURAM", mobile: "", hifz: "Completed" },
-    { id: "12-04", name: "ANAS MUSTHAFA", place: "EDAPPAL", mobile: "", hifz: "Completed" },
-    { id: "12-05", name: "HASANUL BANNA", place: "CHANGARAMKULAM", mobile: "", hifz: "Partially Completed" },
+    { id: "12-01", name: "MUHAMMED SHARIF KAKKIDIPPURAM", place: "KAKKIDIPPURAM", mobile: "", hifz: "Hafiz" },
+    { id: "12-02", name: "ABDUL SALAM T", place: "TIRUR", mobile: "", hifz: "Hafiz" },
+    { id: "12-03", name: "IBRAHIM KHALIL", place: "KUTTIPPURAM", mobile: "", hifz: "Hafiz" },
+    { id: "12-04", name: "ANAS MUSTHAFA", place: "EDAPPAL", mobile: "", hifz: "Hafiz" },
+    { id: "12-05", name: "HASANUL BANNA", place: "CHANGARAMKULAM", mobile: "", hifz: "Not Hafiz" },
   ],
   "2015": [
-    { id: "15-01", name: "ABBAS EA", place: "ALUVA", mobile: "", hifz: "Completed" },
-    { id: "15-02", name: "MUHAMMED SHAFI K", place: "EDAPPAL", mobile: "", hifz: "Completed" },
-    { id: "15-03", name: "ABDUL BASITH M", place: "TIRUR", mobile: "", hifz: "Partially Completed" },
-    { id: "15-04", name: "SHUHAIB KAKKIDIPPURAM", place: "KAKKIDIPPURAM", mobile: "", hifz: "Completed" },
-    { id: "15-05", name: "ANAS CHERUMUKKU", place: "CHERUMUKKU", mobile: "", hifz: "Partially Completed" },
+    { id: "15-01", name: "ABBAS EA", place: "ALUVA", mobile: "", hifz: "Hafiz" },
+    { id: "15-02", name: "MUHAMMED SHAFI K", place: "EDAPPAL", mobile: "", hifz: "Hafiz" },
+    { id: "15-03", name: "ABDUL BASITH M", place: "TIRUR", mobile: "", hifz: "Not Hafiz" },
+    { id: "15-04", name: "SHUHAIB KAKKIDIPPURAM", place: "KAKKIDIPPURAM", mobile: "", hifz: "Hafiz" },
+    { id: "15-05", name: "ANAS CHERUMUKKU", place: "CHERUMUKKU", mobile: "", hifz: "Not Hafiz" },
   ],
   "2016": [
-    { id: "16-01", name: "JUNAID K", place: "PONNANI", mobile: "", hifz: "Completed" },
-    { id: "16-02", name: "SALMAN FARIS", place: "KUTTIPPURAM", mobile: "", hifz: "Completed" },
-    { id: "16-03", name: "RASHID V", place: "CHANGARAMKULAM", mobile: "", hifz: "Partially Completed" },
+    { id: "16-01", name: "JUNAID K", place: "PONNANI", mobile: "", hifz: "Hafiz" },
+    { id: "16-02", name: "SALMAN FARIS", place: "KUTTIPPURAM", mobile: "", hifz: "Hafiz" },
+    { id: "16-03", name: "RASHID V", place: "CHANGARAMKULAM", mobile: "", hifz: "Not Hafiz" },
   ],
   "2018": [
-    { id: "18-01", name: "SHABEER AHMED", place: "VALANCHERY", mobile: "", hifz: "Completed" },
-    { id: "18-02", name: "MOHAMMED RAFI", place: "PERINTHALMANNA", mobile: "", hifz: "Completed" },
+    { id: "18-01", name: "SHABEER AHMED", place: "VALANCHERY", mobile: "", hifz: "Hafiz" },
+    { id: "18-02", name: "MOHAMMED RAFI", place: "PERINTHALMANNA", mobile: "", hifz: "Hafiz" },
   ],
   "2020": [
-    { id: "20-01", name: "FAWAS K", place: "MALAPPURAM", mobile: "", hifz: "Completed" },
-    { id: "20-02", name: "HISHAMUDHEEN P", place: "THRISSUR", mobile: "", hifz: "Partially Completed" },
+    { id: "20-01", name: "FAWAS K", place: "MALAPPURAM", mobile: "", hifz: "Hafiz" },
+    { id: "20-02", name: "HISHAMUDHEEN P", place: "THRISSUR", mobile: "", hifz: "Not Hafiz" },
   ],
 };
 
-// Hifz Status options: Completed and Partially Completed only
+// Hifz Status options: Hafiz and Not Hafiz
 export const HIFZ_STATUS_OPTIONS = [
-  "Completed",
-  "Partially Completed",
+  "Hafiz",
+  "Not Hafiz",
 ];
 
 export const LEAVING_YEARS = Array.from({ length: 2026 - 1989 }, (_, i) => (2026 - i).toString());

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { Search, UserPlus, X, Check, ArrowLeft } from "lucide-react";
+import { Search, X, Check, ArrowLeft } from "lucide-react";
 import { SAMPLE_ALUMNI_ROSTER } from "@/data/options";
 
 export default function StepNameSearch({
@@ -57,7 +57,7 @@ export default function StepNameSearch({
     <div className="space-y-2 pt-2" ref={containerRef}>
       <div className="flex items-center justify-between">
         <label className="block text-sm sm:text-base font-bold text-[#0d1b2a]">
-          Step 2: Search & Select Your Name <span className="text-red-500">*</span>
+          Select Your Name <span className="text-red-500">*</span>
         </label>
 
         {/* Name Not In List Action */}
@@ -69,13 +69,10 @@ export default function StepNameSearch({
           {isManualEntry ? (
             <>
               <ArrowLeft className="w-3.5 h-3.5" />
-              <span>Back to Roster List</span>
+              <span>Back to list</span>
             </>
           ) : (
-            <>
-              <UserPlus className="w-3.5 h-3.5" />
-              <span>+ Name Not in List?</span>
-            </>
+            <span>Not in list? Enter manually</span>
           )}
         </button>
       </div>
@@ -86,7 +83,7 @@ export default function StepNameSearch({
             <Search className="w-5 h-5 text-[#778da9] shrink-0 mr-3 pointer-events-none" />
             <input
               type="text"
-              placeholder="Search by your name or place (e.g. Abbas, Aluva)..."
+              placeholder="Search name or place..."
               value={searchTerm}
               onChange={(e) => {
                 setSearchTerm(e.target.value);
@@ -134,32 +131,28 @@ export default function StepNameSearch({
                 </div>
               ) : (
                 <div className="p-4 text-center text-sm text-[#415a77]">
-                  <p>No matching name found in {batch} batch.</p>
+                  <p>No matching name found.</p>
                   <button
                     type="button"
                     onClick={onToggleManualEntry}
                     className="mt-2 text-xs font-semibold text-[#3875b6] hover:underline cursor-pointer"
                   >
-                    Click here to enter your name manually (+ Name Not in List)
+                    Enter name manually
                   </button>
                 </div>
               )}
             </div>
           )}
-
-          <p className="text-[11px] text-[#778da9] mt-1">
-            Tip: If your name isn't listed, click <strong>"+ Name Not in List?"</strong> above to enter your details manually.
-          </p>
         </div>
       ) : (
-        <div className="bg-[#f2f3f1] border border-[#c8d1dc] rounded-xl p-3 text-xs text-[#1b263b] flex items-center justify-between">
-          <span>Manual Entry Mode: Please enter your details below.</span>
+        <div className="bg-[#f2f3f1] border border-[#c8d1dc] rounded-xl px-3.5 py-2 text-xs text-[#1b263b] flex items-center justify-between">
+          <span>Entering details manually</span>
           <button
             type="button"
             onClick={onToggleManualEntry}
-            className="font-bold underline ml-2 text-[#3875b6] cursor-pointer"
+            className="font-bold underline text-[#3875b6] cursor-pointer"
           >
-            Search again
+            Search list
           </button>
         </div>
       )}

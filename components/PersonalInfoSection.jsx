@@ -7,9 +7,9 @@ export default function PersonalInfoSection({
 }) {
   return (
     <div className="space-y-4 pt-4 border-t border-[#e0e1dd]">
-      <div className="flex items-center gap-2">
+      <div>
         <h3 className="text-xs sm:text-sm font-extrabold tracking-wider text-[#0d1b2a] uppercase">
-          PERSONAL INFORMATION
+          Personal Information
         </h3>
       </div>
 
@@ -22,7 +22,7 @@ export default function PersonalInfoSection({
           <input
             type="text"
             name="fullName"
-            placeholder="e.g. Abbas E A"
+            placeholder="Enter full name"
             value={formData.fullName}
             onChange={onChange}
             className={`form-input uppercase ${errors.fullName ? "form-input-error" : ""}`}
@@ -40,7 +40,7 @@ export default function PersonalInfoSection({
           <input
             type="text"
             name="place"
-            placeholder="e.g. Aluva, Kakkidippuram"
+            placeholder="City / Town / Place"
             value={formData.place}
             onChange={onChange}
             className={`form-input uppercase ${errors.place ? "form-input-error" : ""}`}
@@ -61,7 +61,7 @@ export default function PersonalInfoSection({
             type="tel"
             name="mobileNumber"
             maxLength={10}
-            placeholder="e.g. 9876543210"
+            placeholder="10-digit mobile number"
             value={formData.mobileNumber}
             onChange={onChange}
             className={`form-input tracking-wider ${
@@ -94,7 +94,7 @@ export default function PersonalInfoSection({
             type="tel"
             name="whatsappNumber"
             maxLength={10}
-            placeholder="e.g. 9876543210"
+            placeholder="10-digit WhatsApp number"
             value={formData.whatsappNumber}
             onChange={onChange}
             disabled={sameAsMobile}

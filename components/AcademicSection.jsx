@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { PlusCircle, ListFilter, Check } from "lucide-react";
+import { Check, X } from "lucide-react";
 import {
   HIFZ_STATUS_OPTIONS,
   LEAVING_YEARS,
@@ -9,9 +9,19 @@ import {
   ACADEMIC_QUALIFICATIONS,
 } from "@/data/options";
 
-export default function AcademicSection({ formData, errors, onChange, setFormData }) {
+export default function AcademicSection({ formData, errors, onChange, setFormData, setErrors }) {
   const [islamicOptions, setIslamicOptions] = useState(ISLAMIC_QUALIFICATIONS);
   const [academicOptions, setAcademicOptions] = useState(ACADEMIC_QUALIFICATIONS);
+
+  const handleHifzToggle = (status) => {
+    setFormData((prev) => ({
+      ...prev,
+      hifzStatus: prev.hifzStatus === status ? "" : status,
+    }));
+    if (setErrors) {
+      setErrors((prev) => ({ ...prev, hifzStatus: null }));
+    }
+  };
 
   const [isCustomIslamic, setIsCustomIslamic] = useState(false);
   const [customIslamicText, setCustomIslamicText] = useState("");
@@ -39,11 +49,19 @@ export default function AcademicSection({ formData, errors, onChange, setFormDat
 
   const handleSaveCustomIslamic = () => {
     const trimmed = customIslamicText.trim();
-    if (trimmed && !islamicOptions.includes(trimmed)) {
-      setIslamicOptions((prev) => [...prev, trimmed]);
+    if (trimmed) {
+      if (!islamicOptions.includes(trimmed)) {
+        setIslamicOptions((prev) => [...prev, trimmed]);
+      }
       setIsCustomIslamic(false);
       setFormData((prev) => ({ ...prev, islamicQualification: trimmed }));
     }
+  };
+
+  const handleCancelCustomIslamic = () => {
+    setIsCustomIslamic(false);
+    setCustomIslamicText("");
+    setFormData((prev) => ({ ...prev, islamicQualification: "" }));
   };
 
   const handleAcademicSelect = (e) => {
@@ -66,40 +84,76 @@ export default function AcademicSection({ formData, errors, onChange, setFormDat
 
   const handleSaveCustomAcademic = () => {
     const trimmed = customAcademicText.trim();
-    if (trimmed && !academicOptions.includes(trimmed)) {
-      setAcademicOptions((prev) => [...prev, trimmed]);
+    if (trimmed) {
+      if (!academicOptions.includes(trimmed)) {
+        setAcademicOptions((prev) => [...prev, trimmed]);
+      }
       setIsCustomAcademic(false);
       setFormData((prev) => ({ ...prev, academicQualification: trimmed }));
     }
   };
 
+  const handleCancelCustomAcademic = () => {
+    setIsCustomAcademic(false);
+    setCustomAcademicText("");
+    setFormData((prev) => ({ ...prev, academicQualification: "" }));
+  };
+
   return (
     <div className="space-y-4 pt-4 border-t border-[#e0e1dd]">
-      <div className="flex items-center gap-2">
+      <div>
         <h3 className="text-xs sm:text-sm font-extrabold tracking-wider text-[#0d1b2a] uppercase">
-          QUALIFICATIONS & ACADEMIC RECORD
+          Qualifications & Academic Record
         </h3>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        {/* Hifz Status */}
+        {/* Hifz Status: Hafiz or Not Checkbox */}
         <div>
-          <label className="block text-xs sm:text-sm font-bold text-[#1b263b] mb-1">
+          <label className="block text-xs sm:text-sm font-bold text-[#1b263b] mb-1.5">
             Hifz Status <span className="text-red-500">*</span>
           </label>
-          <select
-            name="hifzStatus"
-            value={formData.hifzStatus}
-            onChange={onChange}
-            className={`form-select ${errors.hifzStatus ? "form-input-error" : ""}`}
-          >
-            <option value="">Select Hifz Status</option>
-            {HIFZ_STATUS_OPTIONS.map((status) => (
-              <option key={status} value={status}>
-                {status}
-              </option>
-            ))}
-          </select>
+          <div className="grid grid-cols-2 gap-2.5">
+            {/* Hafiz Option */}
+            <label
+              onClick={() => handleHifzToggle("Hafiz")}
+              className={`flex items-center gap-2.5 px-3 py-2.5 rounded-xl border-2 cursor-pointer transition-all select-none ${
+                formData.hifzStatus === "Hafiz"
+                  ? "border-emerald-600 bg-emerald-50/90 text-emerald-950 font-bold shadow-xs"
+                  : "border-[#c8d1dc] bg-white text-[#415a77] hover:border-[#778da9] hover:bg-[#f9f9f8]"
+              } ${errors.hifzStatus ? "border-red-400" : ""}`}
+            >
+              <input
+                type="checkbox"
+                name="hifzStatus"
+                value="Hafiz"
+                checked={formData.hifzStatus === "Hafiz"}
+                onChange={() => {}} // Handled by container onClick
+                className="w-4 h-4 rounded text-emerald-600 focus:ring-emerald-500 border-[#778da9] pointer-events-none"
+              />
+              <span className="text-xs sm:text-sm">Hafiz</span>
+            </label>
+
+            {/* Not Hafiz Option */}
+            <label
+              onClick={() => handleHifzToggle("Not Hafiz")}
+              className={`flex items-center gap-2.5 px-3 py-2.5 rounded-xl border-2 cursor-pointer transition-all select-none ${
+                formData.hifzStatus === "Not Hafiz"
+                  ? "border-[#415a77] bg-[#e3e8ee] text-[#0d1b2a] font-bold shadow-xs"
+                  : "border-[#c8d1dc] bg-white text-[#415a77] hover:border-[#778da9] hover:bg-[#f9f9f8]"
+              } ${errors.hifzStatus ? "border-red-400" : ""}`}
+            >
+              <input
+                type="checkbox"
+                name="hifzStatus"
+                value="Not Hafiz"
+                checked={formData.hifzStatus === "Not Hafiz"}
+                onChange={() => {}} // Handled by container onClick
+                className="w-4 h-4 rounded text-[#415a77] focus:ring-[#415a77] border-[#778da9] pointer-events-none"
+              />
+              <span className="text-xs sm:text-sm">Not Hafiz</span>
+            </label>
+          </div>
           {errors.hifzStatus && (
             <p className="text-xs font-medium text-red-500 mt-1">{errors.hifzStatus}</p>
           )}
@@ -132,34 +186,9 @@ export default function AcademicSection({ formData, errors, onChange, setFormDat
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         {/* Islamic Qualification */}
         <div>
-          <div className="flex items-center justify-between mb-1">
-            <label className="block text-xs sm:text-sm font-bold text-[#1b263b]">
-              Islamic Qualification <span className="text-red-500">*</span>
-            </label>
-            <button
-              type="button"
-              onClick={() => {
-                setIsCustomIslamic(!isCustomIslamic);
-                if (!isCustomIslamic) {
-                  setCustomIslamicText("");
-                  setFormData((prev) => ({ ...prev, islamicQualification: "" }));
-                }
-              }}
-              className="inline-flex items-center gap-1 text-[11px] font-semibold text-[#3875b6] hover:text-[#234870] cursor-pointer"
-            >
-              {isCustomIslamic ? (
-                <>
-                  <ListFilter className="w-3 h-3" />
-                  <span>Choose from list</span>
-                </>
-              ) : (
-                <>
-                  <PlusCircle className="w-3 h-3" />
-                  <span>+ Add New</span>
-                </>
-              )}
-            </button>
-          </div>
+          <label className="block text-xs sm:text-sm font-bold text-[#1b263b] mb-1">
+            Islamic Qualification <span className="text-red-500">*</span>
+          </label>
 
           {!isCustomIslamic ? (
             <select
@@ -175,37 +204,47 @@ export default function AcademicSection({ formData, errors, onChange, setFormDat
                 </option>
               ))}
               <option value="__ADD_NEW__" className="font-semibold text-[#3875b6]">
-                + Add Custom Qualification...
+                + Other / Add Custom...
               </option>
             </select>
           ) : (
-            <div className="space-y-1.5 animate-in fade-in duration-200">
-              <div className="relative flex items-center">
-                <input
-                  type="text"
-                  placeholder="Enter Islamic qualification..."
-                  value={customIslamicText}
-                  onChange={handleCustomIslamicChange}
-                  className={`form-input pr-20 ${
-                    errors.islamicQualification ? "form-input-error" : ""
-                  }`}
-                  autoFocus
-                />
+            <div className="relative flex items-center">
+              <input
+                type="text"
+                placeholder="Enter qualification..."
+                value={customIslamicText}
+                onChange={handleCustomIslamicChange}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    e.preventDefault();
+                    handleSaveCustomIslamic();
+                  }
+                }}
+                className={`form-input pr-20 ${
+                  errors.islamicQualification ? "form-input-error" : ""
+                }`}
+                autoFocus
+              />
+              <div className="absolute right-2 flex items-center gap-1">
                 {customIslamicText.trim() && (
                   <button
                     type="button"
                     onClick={handleSaveCustomIslamic}
-                    className="absolute right-2 px-2.5 py-1 text-xs font-bold bg-[#1b263b] hover:bg-[#0d1b2a] text-white rounded-lg flex items-center gap-1 cursor-pointer transition-colors"
-                    title="Add to dropdown list"
+                    className="p-1 text-[#1b263b] hover:text-emerald-700 cursor-pointer"
+                    title="Save qualification"
                   >
-                    <Check className="w-3 h-3" />
-                    <span>Save</span>
+                    <Check className="w-4 h-4" />
                   </button>
                 )}
+                <button
+                  type="button"
+                  onClick={handleCancelCustomIslamic}
+                  className="p-1 text-[#778da9] hover:text-[#0d1b2a] cursor-pointer"
+                  title="Cancel & choose from list"
+                >
+                  <X className="w-4 h-4" />
+                </button>
               </div>
-              <p className="text-[11px] text-[#778da9]">
-                Type qualification or click "Choose from list" above to select.
-              </p>
             </div>
           )}
 
@@ -216,34 +255,9 @@ export default function AcademicSection({ formData, errors, onChange, setFormDat
 
         {/* Academic Qualification */}
         <div>
-          <div className="flex items-center justify-between mb-1">
-            <label className="block text-xs sm:text-sm font-bold text-[#1b263b]">
-              Academic Qualification <span className="text-red-500">*</span>
-            </label>
-            <button
-              type="button"
-              onClick={() => {
-                setIsCustomAcademic(!isCustomAcademic);
-                if (!isCustomAcademic) {
-                  setCustomAcademicText("");
-                  setFormData((prev) => ({ ...prev, academicQualification: "" }));
-                }
-              }}
-              className="inline-flex items-center gap-1 text-[11px] font-semibold text-[#3875b6] hover:text-[#234870] cursor-pointer"
-            >
-              {isCustomAcademic ? (
-                <>
-                  <ListFilter className="w-3 h-3" />
-                  <span>Choose from list</span>
-                </>
-              ) : (
-                <>
-                  <PlusCircle className="w-3 h-3" />
-                  <span>+ Add New</span>
-                </>
-              )}
-            </button>
-          </div>
+          <label className="block text-xs sm:text-sm font-bold text-[#1b263b] mb-1">
+            Academic Qualification <span className="text-red-500">*</span>
+          </label>
 
           {!isCustomAcademic ? (
             <select
@@ -259,37 +273,47 @@ export default function AcademicSection({ formData, errors, onChange, setFormDat
                 </option>
               ))}
               <option value="__ADD_NEW__" className="font-semibold text-[#3875b6]">
-                + Add Custom Qualification...
+                + Other / Add Custom...
               </option>
             </select>
           ) : (
-            <div className="space-y-1.5 animate-in fade-in duration-200">
-              <div className="relative flex items-center">
-                <input
-                  type="text"
-                  placeholder="Enter academic qualification..."
-                  value={customAcademicText}
-                  onChange={handleCustomAcademicChange}
-                  className={`form-input pr-20 ${
-                    errors.academicQualification ? "form-input-error" : ""
-                  }`}
-                  autoFocus
-                />
+            <div className="relative flex items-center">
+              <input
+                type="text"
+                placeholder="Enter qualification..."
+                value={customAcademicText}
+                onChange={handleCustomAcademicChange}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    e.preventDefault();
+                    handleSaveCustomAcademic();
+                  }
+                }}
+                className={`form-input pr-20 ${
+                  errors.academicQualification ? "form-input-error" : ""
+                }`}
+                autoFocus
+              />
+              <div className="absolute right-2 flex items-center gap-1">
                 {customAcademicText.trim() && (
                   <button
                     type="button"
                     onClick={handleSaveCustomAcademic}
-                    className="absolute right-2 px-2.5 py-1 text-xs font-bold bg-[#1b263b] hover:bg-[#0d1b2a] text-white rounded-lg flex items-center gap-1 cursor-pointer transition-colors"
-                    title="Add to dropdown list"
+                    className="p-1 text-[#1b263b] hover:text-emerald-700 cursor-pointer"
+                    title="Save qualification"
                   >
-                    <Check className="w-3 h-3" />
-                    <span>Save</span>
+                    <Check className="w-4 h-4" />
                   </button>
                 )}
+                <button
+                  type="button"
+                  onClick={handleCancelCustomAcademic}
+                  className="p-1 text-[#778da9] hover:text-[#0d1b2a] cursor-pointer"
+                  title="Cancel & choose from list"
+                >
+                  <X className="w-4 h-4" />
+                </button>
               </div>
-              <p className="text-[11px] text-[#778da9]">
-                Type qualification or click "Choose from list" above to select.
-              </p>
             </div>
           )}
 
