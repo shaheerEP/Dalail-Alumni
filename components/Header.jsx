@@ -3,7 +3,7 @@ import Image from "next/image";
 export default function Header() {
   const portalSubtitle = process.env.NEXT_PUBLIC_PORTAL_SUBTITLE || "DALAILUL KHAIRATH KAKKIDIPPURAM ALUMNI PORTAL";
   const eventTitle = process.env.NEXT_PUBLIC_EVENT_TITLE || "ALUMNI MEET 2026 - DALAILUL KHAIRATH KAKKIDIPPURAM";
-  const eventDate = process.env.NEXT_PUBLIC_EVENT_DATE || "October 2";
+  const eventDate = process.env.NEXT_PUBLIC_EVENT_DATE || "02 October 2026";
 
   return (
     <header className="bg-gradient-to-b from-[#0d1b2a] via-[#101b2a] to-[#1b263b] text-white pt-8 pb-10 sm:pb-20 px-4 shadow-xl border-b border-[#415a77]/40 relative">
