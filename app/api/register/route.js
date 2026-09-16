@@ -3,22 +3,29 @@ import fs from "fs";
 import path from "path";
 import { saveQualification } from "@/app/api/qualifications/route";
 
-const SUBMISSIONS_FILE = path.join(process.cwd(), "data", "submissions.json");
+const SUBMISSIONS_FILE = process.env.VERCEL
+  ? path.join("/tmp", "submissions.json")
+  : path.join(process.cwd(), "data", "submissions.json");
 
 // Ensure data directory and file exist
 function ensureStorage() {
-  const dir = path.join(process.cwd(), "data");
-  if (!fs.existsSync(dir)) {
-    fs.mkdirSync(dir, { recursive: true });
-  }
-  if (!fs.existsSync(SUBMISSIONS_FILE)) {
-    fs.writeFileSync(SUBMISSIONS_FILE, JSON.stringify([], null, 2), "utf8");
+  try {
+    const dir = path.dirname(SUBMISSIONS_FILE);
+    if (!fs.existsSync(dir)) {
+      fs.mkdirSync(dir, { recursive: true });
+    }
+    if (!fs.existsSync(SUBMISSIONS_FILE)) {
+      fs.writeFileSync(SUBMISSIONS_FILE, JSON.stringify([], null, 2), "utf8");
+    }
+  } catch (e) {
+    // Ignore storage init error on read-only environments
   }
 }
 
 function saveSubmissionLocally(record) {
   try {
     ensureStorage();
+    if (!fs.existsSync(SUBMISSIONS_FILE)) return;
     const current = JSON.parse(fs.readFileSync(SUBMISSIONS_FILE, "utf8") || "[]");
     current.push(record);
     fs.writeFileSync(SUBMISSIONS_FILE, JSON.stringify(current, null, 2), "utf8");
@@ -99,12 +106,13 @@ export async function POST(request) {
     if (payload.academicQualification) saveQualification("academic", payload.academicQualification);
 
     // 2. Push to Google Sheet Webhook if configured
-    const OLD_DEPRECATED_URL = "https://script.google.com/macros/s/AKfycbxjQQUapcJIU1lmMgdViqfMCirHbaeY_ZjZwPdzy-T6C2CcN7ykOdiq4N12jO-rVaBf/exec";
     const ACTIVE_WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbz6xuszwAbSMhY51EzUocjWZfCaCXWD0XDpegxkSR9KR_8jIQhxwEsDnJgUI23NUnK8/exec";
+    const rawEnvUrl = (process.env.GOOGLE_SHEET_WEBHOOK_URL || "").trim().replace(/^["']|["']$/g, "");
 
-    let webhookUrl = process.env.GOOGLE_SHEET_WEBHOOK_URL || ACTIVE_WEBHOOK_URL;
-    if (webhookUrl === OLD_DEPRECATED_URL) {
-      webhookUrl = ACTIVE_WEBHOOK_URL;
+    // If env var is missing, empty, or contains the old deployment ID, always route to ACTIVE_WEBHOOK_URL
+    let webhookUrl = ACTIVE_WEBHOOK_URL;
+    if (rawEnvUrl && !rawEnvUrl.includes("AKfycbxj") && rawEnvUrl.startsWith("http")) {
+      webhookUrl = rawEnvUrl;
     }
     let sheetSyncStatus = "not_configured";
 
@@ -113,7 +121,7 @@ export async function POST(request) {
         const controller = new AbortController();
         const timeout = setTimeout(() => controller.abort(), 25000);
 
-        // Include both header-based keys and camelCase keys so any Apps Script matches
+        // Include both header-based keys and camelCase keys for Apps Script
         const sheetPayload = {
           ...payload,
           "Registration ID": registrationId,
@@ -131,9 +139,6 @@ export async function POST(request) {
           "Institution / Organization Name": payload.institutionName,
           "Work Location": payload.workLocation,
           "Will Attend Meet?": payload.willAttend,
-          name: payload.fullName,
-          mobile: payload.mobileNumber,
-          batch: payload.batchYear,
         };
 
         const sheetResponse = await fetch(webhookUrl, {
@@ -175,16 +180,28 @@ export async function POST(request) {
   }
 }
 
-// GET endpoint to view submission stats or download JSON
+// GET endpoint to view submission stats or verify deployed version
 export async function GET() {
+  const ACTIVE_WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbz6xuszwAbSMhY51EzUocjWZfCaCXWD0XDpegxkSR9KR_8jIQhxwEsDnJgUI23NUnK8/exec";
+  const rawEnvUrl = (process.env.GOOGLE_SHEET_WEBHOOK_URL || "").trim().replace(/^["']|["']$/g, "");
+  let webhookUrl = ACTIVE_WEBHOOK_URL;
+  if (rawEnvUrl && !rawEnvUrl.includes("AKfycbxj") && rawEnvUrl.startsWith("http")) {
+    webhookUrl = rawEnvUrl;
+  }
+
+  let count = 0;
   try {
     ensureStorage();
-    const data = JSON.parse(fs.readFileSync(SUBMISSIONS_FILE, "utf8") || "[]");
-    return NextResponse.json({
-      total: data.length,
-      submissions: data,
-    });
-  } catch (err) {
-    return NextResponse.json({ error: err.message }, { status: 500 });
-  }
+    if (fs.existsSync(SUBMISSIONS_FILE)) {
+      const data = JSON.parse(fs.readFileSync(SUBMISSIONS_FILE, "utf8") || "[]");
+      count = data.length;
+    }
+  } catch (e) {}
+
+  return NextResponse.json({
+    status: "online",
+    version: "v4-verified-active",
+    webhookTarget: webhookUrl.slice(0, 45) + "...",
+    totalSubmissions: count,
+  });
 }
