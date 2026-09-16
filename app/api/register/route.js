@@ -105,15 +105,10 @@ export async function POST(request) {
     if (payload.islamicQualification) saveQualification("islamic", payload.islamicQualification);
     if (payload.academicQualification) saveQualification("academic", payload.academicQualification);
 
-    // 2. Push to Google Sheet Webhook if configured
+    // 2. Push to Google Sheet Webhook
+    // The active, confirmed 16-column Google Apps Script Webhook URL
     const ACTIVE_WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbz6xuszwAbSMhY51EzUocjWZfCaCXWD0XDpegxkSR9KR_8jIQhxwEsDnJgUI23NUnK8/exec";
-    const rawEnvUrl = (process.env.GOOGLE_SHEET_WEBHOOK_URL || "").trim().replace(/^["']|["']$/g, "");
-
-    // If env var is missing, empty, or contains the old deployment ID, always route to ACTIVE_WEBHOOK_URL
-    let webhookUrl = ACTIVE_WEBHOOK_URL;
-    if (rawEnvUrl && !rawEnvUrl.includes("AKfycbxj") && rawEnvUrl.startsWith("http")) {
-      webhookUrl = rawEnvUrl;
-    }
+    const webhookUrl = ACTIVE_WEBHOOK_URL;
     let sheetSyncStatus = "not_configured";
 
     if (webhookUrl && webhookUrl.startsWith("http")) {
@@ -183,11 +178,6 @@ export async function POST(request) {
 // GET endpoint to view submission stats or verify deployed version
 export async function GET() {
   const ACTIVE_WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbz6xuszwAbSMhY51EzUocjWZfCaCXWD0XDpegxkSR9KR_8jIQhxwEsDnJgUI23NUnK8/exec";
-  const rawEnvUrl = (process.env.GOOGLE_SHEET_WEBHOOK_URL || "").trim().replace(/^["']|["']$/g, "");
-  let webhookUrl = ACTIVE_WEBHOOK_URL;
-  if (rawEnvUrl && !rawEnvUrl.includes("AKfycbxj") && rawEnvUrl.startsWith("http")) {
-    webhookUrl = rawEnvUrl;
-  }
 
   let count = 0;
   try {
@@ -200,8 +190,8 @@ export async function GET() {
 
   return NextResponse.json({
     status: "online",
-    version: "v4-verified-active",
-    webhookTarget: webhookUrl.slice(0, 45) + "...",
+    version: "v5-locked-active-url",
+    webhookTarget: ACTIVE_WEBHOOK_URL,
     totalSubmissions: count,
   });
 }
