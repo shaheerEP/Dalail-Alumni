@@ -19,7 +19,6 @@ var HEADERS = [
   "WhatsApp Number",
   "Batch / Admission Year",
   "Hifz Status",
-  "Leaving Year",
   "Islamic Qualification",
   "Academic Qualification",
   "Current Status",
@@ -49,6 +48,15 @@ function setupHeaders() {
   headerRange.setFontSize(10);
   headerRange.setHorizontalAlignment("center");
   sheet.setFrozenRows(1);
+}
+
+function formatPhoneText(val) {
+  if (!val) return "";
+  var str = val.toString().replace(/\s+/g, "").trim();
+  if (str.charAt(0) === "+") {
+    return "'" + str;
+  }
+  return str;
 }
 
 function doPost(e) {
@@ -81,11 +89,10 @@ function doPost(e) {
     var regId = data.registrationId || data["Registration ID"] || data.regId || "";
     var name = data.fullName || data["Full Name"] || data.name || "";
     var place = data.place || data["Place"] || "";
-    var mobile = data.mobileNumber || data["Mobile Number"] || data.mobile || "";
-    var whatsapp = data.whatsappNumber || data["WhatsApp Number"] || data.whatsapp || "";
+    var mobile = formatPhoneText(data.mobileNumber || data["Mobile Number"] || data.mobile || "");
+    var whatsapp = formatPhoneText(data.whatsappNumber || data["WhatsApp Number"] || data.whatsapp || "");
     var batch = data.batchYear || data["Batch / Admission Year"] || data.batch || "";
     var hifz = data.hifzStatus || data["Hifz Status"] || data.hifz || "";
-    var leavingYear = data.leavingYear || data["Leaving Year"] || "";
     var islamicQual = data.islamicQualification || data["Islamic Qualification"] || data.islamic || "";
     var academicQual = data.academicQualification || data["Academic Qualification"] || data.academic || "";
     var status = data.currentStatus || data["Current Status"] || data.status || "";
@@ -104,7 +111,6 @@ function doPost(e) {
       whatsapp,
       batch,
       hifz,
-      leavingYear,
       islamicQual,
       academicQual,
       status,
@@ -119,7 +125,7 @@ function doPost(e) {
       message: "Registration recorded successfully",
       registrationId: regId,
       fullName: name,
-      columnsWritten: 16
+      columnsWritten: 15
     })).setMimeType(ContentService.MimeType.JSON);
 
   } catch (error) {

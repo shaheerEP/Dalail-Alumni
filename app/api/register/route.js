@@ -116,17 +116,25 @@ export async function POST(request) {
         const controller = new AbortController();
         const timeout = setTimeout(() => controller.abort(), 25000);
 
+        // Format phone numbers as text for Google Sheets (leading apostrophe prevents #ERROR! formula interpretation)
+        const formatPhoneForSheet = (val) => {
+          if (!val) return "";
+          const cleaned = val.toString().replace(/\s+/g, "").trim();
+          return cleaned.startsWith("'") ? cleaned : `'${cleaned}`;
+        };
+
         // Include both header-based keys and camelCase keys for Apps Script
         const sheetPayload = {
           ...payload,
           "Registration ID": registrationId,
           "Full Name": payload.fullName,
           "Place": payload.place,
-          "Mobile Number": payload.mobileNumber,
-          "WhatsApp Number": payload.whatsappNumber,
+          "Mobile Number": formatPhoneForSheet(payload.mobileNumber),
+          "WhatsApp Number": formatPhoneForSheet(payload.whatsappNumber),
+          "mobileNumber": formatPhoneForSheet(payload.mobileNumber),
+          "whatsappNumber": formatPhoneForSheet(payload.whatsappNumber),
           "Batch / Admission Year": payload.batchYear,
           "Hifz Status": payload.hifzStatus,
-          "Leaving Year": payload.leavingYear,
           "Islamic Qualification": payload.islamicQualification,
           "Academic Qualification": payload.academicQualification,
           "Current Status": payload.currentStatus,

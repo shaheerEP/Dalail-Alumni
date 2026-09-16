@@ -186,10 +186,19 @@ export default function AlumniForm() {
     setIsSubmitting(true);
 
     try {
+      const cleanMobileDigits = (formData.mobileNumber || "").replace(/\D/g, "");
+      const mobileCode = (formData.mobileCountryCode || "+91").trim();
+      const cleanMobile = cleanMobileDigits ? `${mobileCode}${cleanMobileDigits}` : "";
+
+      const rawWaDigits = sameAsMobile ? formData.mobileNumber : formData.whatsappNumber;
+      const cleanWaDigits = (rawWaDigits || "").replace(/\D/g, "");
+      const waCode = (sameAsMobile ? mobileCode : (formData.whatsappCountryCode || "+91")).trim();
+      const cleanWhatsapp = cleanWaDigits ? `${waCode}${cleanWaDigits}` : cleanMobile;
+
       const submissionData = {
         ...formData,
-        mobileNumber: `${formData.mobileCountryCode || "+91"} ${formData.mobileNumber.trim()}`,
-        whatsappNumber: `${sameAsMobile ? (formData.mobileCountryCode || "+91") : (formData.whatsappCountryCode || "+91")} ${(sameAsMobile ? formData.mobileNumber : formData.whatsappNumber).trim()}`,
+        mobileNumber: cleanMobile,
+        whatsappNumber: cleanWhatsapp,
       };
 
       const response = await fetch("/api/register", {

@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import confetti from "canvas-confetti";
-import { CheckCircle2, Share2, Copy, Check, X } from "lucide-react";
+import { CheckCircle2, Copy, Check, X } from "lucide-react";
 
 export default function RegistrationSlipModal({ isOpen, onClose, data, onResetForm }) {
   const [copied, setCopied] = useState(false);
@@ -22,31 +22,6 @@ export default function RegistrationSlipModal({ isOpen, onClose, data, onResetFo
   }, [isOpen]);
 
   if (!isOpen || !data) return null;
-
-  const handleShare = () => {
-    const formUrl = typeof window !== "undefined" ? window.location.origin : "";
-    const text = `*ALUMNI MEET 2026 - DALAILUL KHAIRATH KAKKIDIPPURAM*\n` +
-      `*Event Date:* 02 October 2026\n\n` +
-      `I have registered for the Alumni Meet! (Reg ID: ${data.registrationId})\n\n` +
-      `All alumni are requested to complete your registration using this link:\n` +
-      `${formUrl}`;
-
-    if (navigator.share) {
-      navigator.share({
-        title: "Dalailul Khairath Alumni Meet Registration",
-        text: text,
-        url: formUrl,
-      }).catch((err) => {
-        if (err.name !== "AbortError") {
-          const url = `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`;
-          window.open(url, "_blank");
-        }
-      });
-    } else {
-      const url = `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`;
-      window.open(url, "_blank");
-    }
-  };
 
   const handleCopyLink = () => {
     const formUrl = typeof window !== "undefined" ? window.location.origin : "";
@@ -149,29 +124,21 @@ export default function RegistrationSlipModal({ isOpen, onClose, data, onResetFo
             </div>
           </div>
 
-          {/* Action Buttons */}
-          <div className="flex flex-col sm:flex-row gap-2.5 pt-2">
-            <button
-              onClick={handleShare}
-              className="flex-1 py-3 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-sm transition-colors cursor-pointer"
-            >
-              <Share2 className="w-4 h-4" />
-              <span>Share Registration Link</span>
-            </button>
-
+          {/* Action Button: Copy Registration Link */}
+          <div className="pt-2">
             <button
               onClick={handleCopyLink}
-              className="sm:w-36 py-3 px-4 rounded-xl bg-[#1b263b] hover:bg-[#0d1b2a] text-white font-bold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-sm transition-colors cursor-pointer"
+              className="w-full py-3.5 px-5 rounded-xl bg-[#1b263b] hover:bg-[#0d1b2a] text-white font-bold text-sm flex items-center justify-center gap-2 shadow-md transition-colors cursor-pointer"
             >
               {copied ? (
                 <>
                   <Check className="w-4 h-4 text-emerald-400" />
-                  <span>Copied!</span>
+                  <span>Link Copied to Clipboard!</span>
                 </>
               ) : (
                 <>
                   <Copy className="w-4 h-4" />
-                  <span>Copy Link</span>
+                  <span>Copy Registration Link</span>
                 </>
               )}
             </button>

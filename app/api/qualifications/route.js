@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import fs from "fs";
 import path from "path";
+import { getGoogleSheetData } from "@/lib/googleSheetData";
 
 const FILE_PATH = path.join(process.cwd(), "data", "qualifications.json");
 
@@ -45,8 +46,28 @@ export function saveQualification(type, value) {
 }
 
 export async function GET() {
-  const data = getStoredQualifications();
-  return NextResponse.json(data);
+  try {
+    const sheetData = await getGoogleSheetData();
+    const localData = getStoredQualifications();
+
+    const islamicSet = new Set([
+      ...(sheetData.qualifications?.islamic || []),
+      ...(localData.islamic || []),
+    ]);
+
+    const academicSet = new Set([
+      ...(sheetData.qualifications?.academic || []),
+      ...(localData.academic || []),
+    ]);
+
+    return NextResponse.json({
+      islamic: Array.from(islamicSet).filter(Boolean).sort((a, b) => a.localeCompare(b)),
+      academic: Array.from(academicSet).filter(Boolean).sort((a, b) => a.localeCompare(b)),
+    });
+  } catch (err) {
+    console.error("Error in GET /api/qualifications:", err);
+    return NextResponse.json(getStoredQualifications());
+  }
 }
 
 export async function POST(request) {
