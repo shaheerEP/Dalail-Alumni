@@ -78,29 +78,48 @@ function doPost(e) {
 
     var data = JSON.parse(e.postData.contents);
 
+    var regId = data.registrationId || data["Registration ID"] || data.regId || "";
+    var name = data.fullName || data["Full Name"] || data.name || "";
+    var place = data.place || data["Place"] || "";
+    var mobile = data.mobileNumber || data["Mobile Number"] || data.mobile || "";
+    var whatsapp = data.whatsappNumber || data["WhatsApp Number"] || data.whatsapp || "";
+    var batch = data.batchYear || data["Batch / Admission Year"] || data.batch || "";
+    var hifz = data.hifzStatus || data["Hifz Status"] || data.hifz || "";
+    var leavingYear = data.leavingYear || data["Leaving Year"] || "";
+    var islamicQual = data.islamicQualification || data["Islamic Qualification"] || data.islamic || "";
+    var academicQual = data.academicQualification || data["Academic Qualification"] || data.academic || "";
+    var status = data.currentStatus || data["Current Status"] || data.status || "";
+    var job = data.jobDesignation || data["Job / Designation"] || data.job || "";
+    var institution = data.institutionName || data["Institution / Organization Name"] || data.institution || "";
+    var location = data.workLocation || data["Work Location"] || data.location || "";
+    var willAttend = data.willAttend || data["Will Attend Meet?"] || "";
+    var timestamp = data.timestamp || new Date().toLocaleString("en-IN", { timeZone: "Asia/Kolkata" });
+
     sheet.appendRow([
-      data.timestamp || new Date().toLocaleString("en-IN", { timeZone: "Asia/Kolkata" }),
-      data.registrationId || "",
-      data.fullName || "",
-      data.place || "",
-      data.mobileNumber || "",
-      data.whatsappNumber || "",
-      data.batchYear || "",
-      data.hifzStatus || "",
-      data.leavingYear || "",
-      data.islamicQualification || "",
-      data.academicQualification || "",
-      data.currentStatus || "",
-      data.jobDesignation || "",
-      data.institutionName || "",
-      data.workLocation || "",
-      data.willAttend || ""
+      timestamp,
+      regId,
+      name,
+      place,
+      mobile,
+      whatsapp,
+      batch,
+      hifz,
+      leavingYear,
+      islamicQual,
+      academicQual,
+      status,
+      job,
+      institution,
+      location,
+      willAttend
     ]);
 
     return ContentService.createTextOutput(JSON.stringify({
       status: "success",
       message: "Registration recorded successfully",
-      registrationId: data.registrationId
+      registrationId: regId,
+      fullName: name,
+      columnsWritten: 16
     })).setMimeType(ContentService.MimeType.JSON);
 
   } catch (error) {
