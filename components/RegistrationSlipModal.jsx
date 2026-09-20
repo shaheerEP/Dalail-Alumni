@@ -56,10 +56,10 @@ export default function RegistrationSlipModal({ isOpen, onClose, data, onResetFo
             Registration Successful!
           </div>
 
-          <h3 className="text-lg sm:text-xl font-black uppercase tracking-tight text-white mt-1">
-            ALUMNI MEET 2026
+          <h3 className="text-xl sm:text-2xl font-black uppercase tracking-wider text-white mt-1">
+            LINKUP 2026
           </h3>
-          <p className="text-xs text-[#c8d1dc]">Dalailul Khairath Kakkidippuram - Registration Pass</p>
+          <p className="text-xs text-[#c8d1dc]">Dalailul Khairath Kakkidippuram • Alumni Meet Pass</p>
         </div>
 
         {/* Pass Details Body */}

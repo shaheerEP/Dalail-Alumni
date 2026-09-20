@@ -12,8 +12,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata = {
-  title: "Alumni Meet Registration | Dalailul Khairath Kakkidippuram",
-  description: "Official Alumni Registration Portal for Dalailul Khairath Kakkidippuram",
+  title: "LINKUP 2026 | Dalailul Khairath Kakkidippuram Alumni Meet",
+  description: "Official LINKUP 2026 Alumni Registration Portal for Dalailul Khairath Kakkidippuram",
   icons: {
     icon: "/logo.png",
     shortcut: "/logo.png",

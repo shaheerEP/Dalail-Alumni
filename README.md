@@ -1,6 +1,6 @@
-# Dalail-Alumni
+# Dalail-Alumni – LINKUP 2026
 
-Official Alumni Meet Registration Portal for **Dalailul Khairath Kakkidippuram**.
+Official **LINKUP 2026** Alumni Meet Registration & Pass Portal for **Dalailul Khairath Kakkidippuram**.
 
 Built with **Next.js (App Router)**, **Tailwind CSS**, and **Google Sheets integration**.
 

@@ -25,14 +25,27 @@ export default function Header() {
         </p>
 
         {/* Event Main Title */}
-        <h1 className="text-xl sm:text-3xl font-black tracking-tight text-white uppercase mt-1 px-2">
-          Alumni Meet 2026
+        <h1 className="text-2xl sm:text-4xl font-black tracking-widest text-white uppercase mt-1 px-2">
+          LINKUP
         </h1>
+        <p className="text-xs text-amber-400 font-bold uppercase tracking-widest mt-0.5">
+          Alumni Meet 2026
+        </p>
 
-        {/* Event Date Badge */}
-        <div className="mt-3 inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-[#1b263b]/90 border border-[#778da9]/30 text-xs text-[#e0e1dd]">
-          <span className="text-[#8ba1ca]">Event Date:</span>
-          <span className="text-amber-400 font-bold">{eventDate}</span>
+        {/* Event Date Badge & Actions */}
+        <div className="mt-3 flex flex-wrap items-center justify-center gap-2.5">
+          <div className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-[#1b263b]/90 border border-[#778da9]/30 text-xs text-[#e0e1dd]">
+            <span className="text-[#8ba1ca]">Event Date:</span>
+            <span className="text-amber-400 font-bold">{eventDate}</span>
+          </div>
+
+          <a
+            href="/get-pass"
+            className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 text-[#0d1b2a] font-extrabold text-xs shadow-md hover:shadow-amber-500/20 transition-all hover:scale-[1.03] cursor-pointer"
+          >
+            <span className="text-sm">🎫</span>
+            <span>Get Pass</span>
+          </a>
         </div>
       </div>
     </header>
