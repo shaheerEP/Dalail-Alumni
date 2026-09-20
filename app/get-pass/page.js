@@ -182,13 +182,8 @@ export default function GetPassPage() {
   return (
     <div className="min-h-screen flex flex-col bg-[#ececea]">
       {/* Header */}
-      <header className="bg-gradient-to-b from-[#0d1b2a] via-[#101b2a] to-[#1b263b] text-white pt-7 pb-10 sm:pb-12 px-4 border-b border-[#415a77]/30">
+      <header className="bg-gradient-to-b from-[#0d1b2a] via-[#101b2a] to-[#1b263b] text-white pt-8 pb-10 sm:pb-12 px-4 border-b border-[#415a77]/30">
         <div className="max-w-3xl mx-auto flex flex-col items-center text-center">
-          <Link href="/" className="inline-flex items-center gap-1.5 text-xs text-[#8ba1ca] hover:text-white transition-colors mb-3">
-            <ArrowLeft className="w-3.5 h-3.5" />
-            <span>Back to Registration</span>
-          </Link>
-
           <div className="w-16 h-20 rounded-2xl bg-white shadow-xl flex items-center justify-center p-2 mb-2">
             <Image
               src="/logo.png"
@@ -248,6 +243,17 @@ export default function GetPassPage() {
                   {isSearching && (
                     <RefreshCw className="w-4 h-4 text-[#3875b6] animate-spin absolute right-3.5 top-1/2 -translate-y-1/2" />
                   )}
+                </div>
+
+                {/* Back to Registration at exact bottom of the name input field */}
+                <div className="mt-2.5 flex items-center justify-between">
+                  <Link
+                    href="/"
+                    className="inline-flex items-center gap-1.5 text-xs font-bold text-[#3875b6] hover:text-[#0d1b2a] hover:underline transition-colors cursor-pointer"
+                  >
+                    <ArrowLeft className="w-3.5 h-3.5" />
+                    <span>Back to Registration</span>
+                  </Link>
                 </div>
               </div>
 

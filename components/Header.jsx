@@ -32,20 +32,10 @@ export default function Header() {
           Alumni Meet 2026
         </p>
 
-        {/* Event Date Badge & Actions */}
-        <div className="mt-3 flex flex-wrap items-center justify-center gap-2.5">
-          <div className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-[#1b263b]/90 border border-[#778da9]/30 text-xs text-[#e0e1dd]">
-            <span className="text-[#8ba1ca]">Event Date:</span>
-            <span className="text-amber-400 font-bold">{eventDate}</span>
-          </div>
-
-          <a
-            href="/get-pass"
-            className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 text-[#0d1b2a] font-extrabold text-xs shadow-md hover:shadow-amber-500/20 transition-all hover:scale-[1.03] cursor-pointer"
-          >
-            <span className="text-sm">🎫</span>
-            <span>Get Pass</span>
-          </a>
+        {/* Event Date Badge */}
+        <div className="mt-3 inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-[#1b263b]/90 border border-[#778da9]/30 text-xs text-[#e0e1dd]">
+          <span className="text-[#8ba1ca]">Event Date:</span>
+          <span className="text-amber-400 font-bold">{eventDate}</span>
         </div>
       </div>
     </header>
