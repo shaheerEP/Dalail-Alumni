@@ -1,8 +1,9 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Link from "next/link";
 import confetti from "canvas-confetti";
-import { CheckCircle2, Copy, Check, X } from "lucide-react";
+import { CheckCircle2, Copy, Check, X, QrCode } from "lucide-react";
 
 export default function RegistrationSlipModal({ isOpen, onClose, data, onResetForm }) {
   const [copied, setCopied] = useState(false);
@@ -126,11 +127,21 @@ export default function RegistrationSlipModal({ isOpen, onClose, data, onResetFo
             </div>
           </div>
 
-          {/* Action Button: Copy Registration Link */}
-          <div className="pt-2">
+          {/* Action Buttons */}
+          <div className="pt-2 space-y-2.5">
+            {/* Get Pass Button */}
+            <Link
+              href="/get-pass"
+              className="w-full py-3.5 px-5 rounded-xl bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 text-[#0d1b2a] font-extrabold text-sm flex items-center justify-center gap-2 shadow-md transition-all cursor-pointer hover:scale-[1.01]"
+            >
+              <QrCode className="w-4 h-4" />
+              <span>Get Pass & QR Code</span>
+            </Link>
+
+            {/* Copy Registration Link */}
             <button
               onClick={handleCopyLink}
-              className="w-full py-3.5 px-5 rounded-xl bg-[#1b263b] hover:bg-[#0d1b2a] text-white font-bold text-sm flex items-center justify-center gap-2 shadow-md transition-colors cursor-pointer"
+              className="w-full py-3 px-5 rounded-xl bg-[#1b263b] hover:bg-[#0d1b2a] text-white font-bold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-sm transition-colors cursor-pointer"
             >
               {copied ? (
                 <>
