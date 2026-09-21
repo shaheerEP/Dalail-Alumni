@@ -10,7 +10,6 @@ import {
   Clock,
   Search,
   Filter,
-  Download,
   LogOut,
   Lock,
   User,
@@ -384,66 +383,6 @@ export default function AdminPage() {
       return true;
     });
   }, [alumni, searchTerm, filterBatch, filterReporting, filterAttendance, filterStatus, filterHifz]);
-
-  // Export filtered roster to CSV
-  const handleExportCSV = () => {
-    if (!filteredAlumni.length) {
-      alert("No records to export.");
-      return;
-    }
-
-    const headers = [
-      "Registration ID",
-      "Full Name",
-      "Batch",
-      "Section",
-      "Place",
-      "Mobile Number",
-      "WhatsApp Number",
-      "Will Attend?",
-      "Reporting Status",
-      "Reported Timestamp",
-      "Hifz Status",
-      "Current Status",
-      "Job / Designation",
-      "Organization",
-      "Work Location",
-      "Islamic Qualification",
-      "Academic Qualification",
-      "Registration Timestamp",
-    ];
-
-    const rows = filteredAlumni.map((a) => [
-      `"${a.registrationId || ""}"`,
-      `"${(a.fullName || "").replace(/"/g, '""')}"`,
-      `"${a.batchYear || a.joinedBatch || ""}"`,
-      `"${a.joinedSection || ""}"`,
-      `"${(a.place || "").replace(/"/g, '""')}"`,
-      `"${a.mobileNumber || ""}"`,
-      `"${a.whatsappNumber || ""}"`,
-      `"${a.willAttend || ""}"`,
-      `"${a.isReported ? "REPORTED (PRESENT)" : "PENDING"}"`,
-      `"${a.reportedAt || ""}"`,
-      `"${a.hifzStatus || ""}"`,
-      `"${a.currentStatus || ""}"`,
-      `"${(a.jobDesignation || "").replace(/"/g, '""')}"`,
-      `"${(a.institutionName || "").replace(/"/g, '""')}"`,
-      `"${(a.workLocation || "").replace(/"/g, '""')}"`,
-      `"${(a.islamicQualification || "").replace(/"/g, '""')}"`,
-      `"${(a.academicQualification || "").replace(/"/g, '""')}"`,
-      `"${a.timestamp || ""}"`,
-    ]);
-
-    const csvContent = "\uFEFF" + [headers.join(","), ...rows.map((r) => r.join(","))].join("\r\n");
-    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.href = url;
-    link.setAttribute("download", `Dalailul_Alumni_Report_${new Date().toISOString().slice(0, 10)}.csv`);
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-  };
 
   // ----------------------------------------------------
   // RENDER: Loading or Login Screen
@@ -833,35 +772,24 @@ export default function AdminPage() {
           <div className="space-y-4">
             {/* Filter Hub Card */}
             <div className="bg-white rounded-3xl p-5 shadow-sm border border-black/[0.04] space-y-4">
-              <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
-                {/* Search Bar */}
-                <div className="relative flex-1">
-                  <Search className="w-4 h-4 text-[#778da9] absolute left-3.5 top-1/2 -translate-y-1/2" />
-                  <input
-                    type="text"
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    placeholder="Search by Name, Reg ID, Mobile, Place, Job..."
-                    className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-[#f3f4f6] border border-black/[0.05] text-xs sm:text-sm font-medium focus:bg-white focus:border-[#3875b6] outline-none"
-                  />
-                  {searchTerm && (
-                    <button
-                      onClick={() => setSearchTerm("")}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-[#778da9] hover:text-black cursor-pointer"
-                    >
-                      ✕
-                    </button>
-                  )}
-                </div>
-
-                {/* CSV Export Button */}
-                <button
-                  onClick={handleExportCSV}
-                  className="px-4 py-2.5 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold shadow-sm transition-colors flex items-center justify-center gap-2 shrink-0 cursor-pointer"
-                >
-                  <Download className="w-4 h-4" />
-                  <span>Export to CSV ({filteredAlumni.length})</span>
-                </button>
+              {/* Search Bar */}
+              <div className="relative">
+                <Search className="w-4 h-4 text-[#778da9] absolute left-3.5 top-1/2 -translate-y-1/2" />
+                <input
+                  type="text"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  placeholder="Search by Name, Reg ID, Mobile, Place, Job..."
+                  className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-[#f3f4f6] border border-black/[0.05] text-xs sm:text-sm font-medium focus:bg-white focus:border-[#3875b6] outline-none"
+                />
+                {searchTerm && (
+                  <button
+                    onClick={() => setSearchTerm("")}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-[#778da9] hover:text-black cursor-pointer"
+                  >
+                    ✕
+                  </button>
+                )}
               </div>
 
               {/* Filter Dropdowns Row */}
