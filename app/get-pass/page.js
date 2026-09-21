@@ -36,10 +36,135 @@ export default function GetPassPage() {
   // Verified Pass Data
   const [verifiedPass, setVerifiedPass] = useState(null);
   const [qrDataUrl, setQrDataUrl] = useState("");
+  const [passCardImage, setPassCardImage] = useState("");
+  const [isGeneratingPass, setIsGeneratingPass] = useState(false);
   const [isDownloading, setIsDownloading] = useState(false);
 
   const passRef = useRef(null);
   const searchTimeoutRef = useRef(null);
+
+  // Generate composite pass image with QR and Registration ID on the template PNG
+  const generateTicketPass = async (alumnus) => {
+    if (!alumnus) return;
+    setIsGeneratingPass(true);
+
+    try {
+      const canvas = document.createElement("canvas");
+      canvas.width = 1024;
+      canvas.height = 578;
+      const ctx = canvas.getContext("2d");
+
+      // 1. Load base template image
+      const template = new window.Image();
+      template.crossOrigin = "anonymous";
+      template.src = "/pass-template.png";
+      await new Promise((resolve, reject) => {
+        template.onload = resolve;
+        template.onerror = reject;
+      });
+      ctx.drawImage(template, 0, 0, 1024, 578);
+
+      // 2. Generate QR code image
+      const qrData = await QRCode.toDataURL(alumnus.registrationId, {
+        width: 360,
+        margin: 1,
+        color: {
+          dark: "#1c2b00",
+          light: "#ffffff",
+        },
+      });
+      const qrImg = new window.Image();
+      await new Promise((resolve) => {
+        qrImg.onload = resolve;
+        qrImg.src = qrData;
+      });
+
+      // Center of right side is x ≈ 778
+      const centerX = 778;
+
+      // 3. Draw Alumnus Name
+      ctx.fillStyle = "#1e2c00";
+      let fontSize = 23;
+      ctx.font = `bold ${fontSize}px Georgia, serif`;
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+
+      let displayName = (alumnus.fullName || "").toUpperCase();
+      while (ctx.measureText(displayName).width > 340 && fontSize > 13) {
+        fontSize -= 1.5;
+        ctx.font = `bold ${fontSize}px Georgia, serif`;
+      }
+      ctx.fillText(displayName, centerX, 106);
+
+      // 4. Draw Batch Tag
+      ctx.fillStyle = "#557300";
+      ctx.font = "bold 13px system-ui, -apple-system, sans-serif";
+      const batchText = `${alumnus.batchYear || alumnus.joinedBatch || ""} ${
+        alumnus.joinedSection ? `(${alumnus.joinedSection})` : ""
+      }`.trim();
+      if (batchText) {
+        ctx.fillText(batchText, centerX, 131);
+      }
+
+      // 5. Draw QR Code with subtle white rounded container
+      const qrSize = 165;
+      const qrX = centerX - qrSize / 2;
+      const qrY = 154;
+
+      // Background rounded card for QR
+      ctx.fillStyle = "#ffffff";
+      ctx.shadowColor = "rgba(0, 0, 0, 0.08)";
+      ctx.shadowBlur = 10;
+      ctx.shadowOffsetY = 3;
+      ctx.beginPath();
+      if (ctx.roundRect) {
+        ctx.roundRect(qrX - 8, qrY - 8, qrSize + 16, qrSize + 16, 14);
+      } else {
+        ctx.rect(qrX - 8, qrY - 8, qrSize + 16, qrSize + 16);
+      }
+      ctx.fill();
+
+      // Reset shadow
+      ctx.shadowColor = "transparent";
+      ctx.shadowBlur = 0;
+      ctx.shadowOffsetY = 0;
+
+      ctx.drawImage(qrImg, qrX, qrY, qrSize, qrSize);
+
+      // 6. Draw Registration ID Badge
+      const regId = alumnus.registrationId;
+      ctx.font = "bold 15px monospace";
+      const textWidth = ctx.measureText(regId).width;
+      const badgeW = Math.max(textWidth + 28, 175);
+      const badgeH = 32;
+      const badgeX = centerX - badgeW / 2;
+      const badgeY = qrY + qrSize + 16;
+
+      // Badge pill background
+      ctx.fillStyle = "#5c7c00";
+      ctx.beginPath();
+      if (ctx.roundRect) {
+        ctx.roundRect(badgeX, badgeY, badgeW, badgeH, 8);
+      } else {
+        ctx.rect(badgeX, badgeY, badgeW, badgeH);
+      }
+      ctx.fill();
+
+      // Badge text
+      ctx.fillStyle = "#ffffff";
+      ctx.font = "bold 15px monospace";
+      ctx.fillText(regId, centerX, badgeY + badgeH / 2 + 1);
+
+      const dataUrl = canvas.toDataURL("image/png");
+      setPassCardImage(dataUrl);
+      return dataUrl;
+    } catch (e) {
+      console.error("Error generating pass canvas:", e);
+      return null;
+    } finally {
+      setIsGeneratingPass(false);
+    }
+  };
 
   // Live search when typing name
   useEffect(() => {
@@ -73,15 +198,17 @@ export default function GetPassPage() {
     };
   }, [searchTerm]);
 
-  // Generate QR Code when verified pass is set
+  // Generate composite pass when verified pass is set
   useEffect(() => {
     if (verifiedPass?.registrationId) {
+      generateTicketPass(verifiedPass);
+
       const qrPayload = verifiedPass.registrationId;
       QRCode.toDataURL(qrPayload, {
         width: 320,
         margin: 2,
         color: {
-          dark: "#0d1b2a",
+          dark: "#1c2b00",
           light: "#ffffff",
         },
       })
@@ -134,20 +261,30 @@ export default function GetPassPage() {
 
   // Download pass as image
   const handleDownloadImage = async () => {
-    if (!passRef.current) return;
+    if (!verifiedPass) return;
     setIsDownloading(true);
     try {
-      // Use toPng with options to ensure crisp render
-      const dataUrl = await toPng(passRef.current, {
-        quality: 0.98,
-        pixelRatio: 2,
-        backgroundColor: "#ffffff",
-      });
+      let finalDataUrl = passCardImage;
+      if (!finalDataUrl) {
+        finalDataUrl = await generateTicketPass(verifiedPass);
+      }
 
-      const link = document.createElement("a");
-      link.download = `Pass_${verifiedPass.fullName.replace(/\s+/g, "_")}_${verifiedPass.registrationId}.png`;
-      link.href = dataUrl;
-      link.click();
+      if (finalDataUrl) {
+        const link = document.createElement("a");
+        link.download = `LINKUP_Pass_${verifiedPass.fullName.replace(/\s+/g, "_")}_${verifiedPass.registrationId}.png`;
+        link.href = finalDataUrl;
+        link.click();
+      } else if (passRef.current) {
+        const dataUrl = await toPng(passRef.current, {
+          quality: 0.98,
+          pixelRatio: 2,
+          backgroundColor: "#f7faeb",
+        });
+        const link = document.createElement("a");
+        link.download = `LINKUP_Pass_${verifiedPass.fullName.replace(/\s+/g, "_")}_${verifiedPass.registrationId}.png`;
+        link.href = dataUrl;
+        link.click();
+      }
     } catch (err) {
       console.error("Failed to download image:", err);
       alert("Could not generate image automatically. You can use the Print / Save PDF option.");
@@ -172,6 +309,7 @@ export default function GetPassPage() {
   const handleReset = () => {
     setSelectedCandidate(null);
     setVerifiedPass(null);
+    setPassCardImage("");
     setMobileNumber("");
     setVerifyError("");
     setSearchTerm("");
@@ -447,135 +585,120 @@ export default function GetPassPage() {
                 </span>
               </div>
 
-              {/* The Actual Pass Card to be downloaded / printed */}
+              {/* The Official Ticket Pass Card using the PNG template */}
               <div
                 ref={passRef}
-                className="bg-white rounded-3xl shadow-2xl overflow-hidden border border-black/[0.08]"
+                className="relative w-full aspect-[1024/578] rounded-2xl sm:rounded-3xl overflow-hidden shadow-2xl bg-[#f7faeb] select-none border border-black/[0.08]"
                 id="alumni-pass-card"
               >
-                {/* Header Ribbon */}
-                <div className="bg-gradient-to-br from-[#0d1b2a] via-[#101b2a] to-[#1b263b] text-white p-6 relative text-center">
-                  <div className="w-20 h-24 rounded-2xl bg-white mx-auto flex items-center justify-center p-2 shadow-xl mb-3">
+                {passCardImage ? (
+                  <img
+                    src={passCardImage}
+                    alt={`LINKUP 2026 Pass for ${verifiedPass.fullName}`}
+                    className="w-full h-full object-contain pointer-events-none"
+                  />
+                ) : (
+                  /* Dynamic CSS overlay while canvas renders */
+                  <div className="relative w-full h-full">
                     <img
-                      src="/logo.png"
-                      alt="Logo"
-                      className="w-full h-full object-contain"
+                      src="/pass-template.png"
+                      alt="LINKUP Official Pass"
+                      className="w-full h-full object-contain pointer-events-none"
                     />
-                  </div>
 
-                  <p className="text-[#8ba1ca] text-[11px] font-bold uppercase tracking-wider">
-                    Dalailul Khairath Kakkidippuram
-                  </p>
-                  <h2 className="text-2xl sm:text-3xl font-black uppercase tracking-wider text-white mt-0.5">
-                    LINKUP 2026
-                  </h2>
-                  <div className="inline-flex items-center gap-2 mt-2 px-3 py-1 rounded-full bg-white/10 border border-white/15 text-xs text-[#e0e1dd]">
-                    <span>Alumni Meet Official Pass</span>
-                    <span>•</span>
-                    <span className="text-amber-400 font-bold">02 October 2026</span>
-                  </div>
-                </div>
+                    {/* Right side dynamic overlay */}
+                    <div
+                      className="absolute top-0 right-0 h-full flex flex-col items-center justify-between"
+                      style={{ width: "42%", padding: "7.5% 3% 16.5% 3%" }}
+                    >
+                      <div className="text-center">
+                        <h3 className="font-serif font-black text-xs sm:text-base md:text-lg text-[#1e2c00] uppercase truncate max-w-[170px] sm:max-w-[260px]">
+                          {verifiedPass.fullName}
+                        </h3>
+                        <p className="text-[9px] sm:text-xs font-bold text-[#557300]">
+                          {verifiedPass.batchYear || verifiedPass.joinedBatch} {verifiedPass.joinedSection ? `(${verifiedPass.joinedSection})` : ""}
+                        </p>
+                      </div>
 
-                {/* Body Details */}
-                <div className="p-6 space-y-5 bg-white">
-                  {/* Name and Reg ID */}
-                  <div className="text-center pb-4 border-b border-black/[0.06]">
-                    <span className="text-[10px] font-black tracking-widest text-[#778da9] uppercase">
-                      Alumnus Name
-                    </span>
-                    <h3 className="text-2xl sm:text-3xl font-black text-[#0d1b2a] uppercase tracking-tight mt-0.5">
-                      {verifiedPass.fullName}
-                    </h3>
-
-                    <div className="mt-2.5 inline-flex items-center gap-2">
-                      <span className="px-3 py-1 rounded-lg bg-[#0d1b2a] text-amber-400 font-mono font-black text-sm tracking-wider shadow-sm">
-                        {verifiedPass.registrationId}
-                      </span>
-                      <span className="px-3 py-1 rounded-lg bg-[#e3e8ee] text-[#1b263b] font-bold text-xs">
-                        {verifiedPass.batchYear || verifiedPass.joinedBatch} {verifiedPass.joinedSection ? `(${verifiedPass.joinedSection})` : ""}
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* QR Code Section */}
-                  <div className="bg-[#f9f9f8] rounded-2xl p-4 sm:p-5 flex flex-col sm:flex-row items-center justify-center gap-5 border border-black/[0.05]">
-                    <div className="w-36 h-36 bg-white p-2 rounded-2xl shadow-md border border-black/[0.06] flex items-center justify-center shrink-0">
-                      {qrDataUrl ? (
-                        <img
-                          src={qrDataUrl}
-                          alt="Entry Pass QR Code"
-                          className="w-full h-full object-contain"
-                        />
-                      ) : (
-                        <div className="text-xs text-[#778da9]">Generating QR...</div>
-                      )}
-                    </div>
-
-                    <div className="text-center sm:text-left space-y-1.5">
-                      <span className="text-[10px] font-extrabold text-[#778da9] uppercase tracking-wider">
-                        Alumni Reporting QR Code
-                      </span>
-                      <h4 className="text-sm font-black text-[#0d1b2a]">
-                        Scan at Meet Reception
-                      </h4>
-                      <p className="text-xs text-[#415a77] leading-relaxed max-w-xs">
-                        Show this QR code at the registration reception on October 02, 2026, to mark your attendance instantly.
-                      </p>
-
-                      <div className="pt-1">
-                        {verifiedPass.isReported ? (
-                          <span className="inline-flex items-center gap-1 text-xs font-bold text-emerald-800 bg-emerald-100 px-3 py-1 rounded-lg">
-                            <CheckCircle2 className="w-3.5 h-3.5" />
-                            Reported Present ({verifiedPass.reportedAt || "Verified"})
-                          </span>
-                        ) : (
-                          <span className="inline-flex items-center gap-1 text-xs font-bold text-amber-800 bg-amber-100 px-3 py-1 rounded-lg">
-                            <span>⏱️</span>
-                            Pending Check-in at Event
-                          </span>
+                      <div className="p-1 sm:p-2 bg-white rounded-xl shadow-md">
+                        {qrDataUrl && (
+                          <img
+                            src={qrDataUrl}
+                            alt="QR Code"
+                            className="w-16 h-16 sm:w-28 sm:h-28 md:w-36 md:h-36 object-contain"
+                          />
                         )}
+                      </div>
+
+                      <div className="px-2.5 sm:px-3.5 py-0.5 sm:py-1 rounded-md bg-[#5c7c00] text-white font-mono font-bold text-[9px] sm:text-xs shadow-sm">
+                        {verifiedPass.registrationId}
                       </div>
                     </div>
                   </div>
+                )}
+              </div>
 
-                  {/* Member Meta Grid */}
-                  <div className="grid grid-cols-2 gap-2 text-xs bg-[#f3f4f6] p-4 rounded-2xl">
-                    <div>
-                      <span className="text-[10px] font-bold text-[#778da9] uppercase">Place</span>
-                      <p className="font-bold text-[#0d1b2a]">{verifiedPass.place || "—"}</p>
-                    </div>
+              {/* Attendee Details & Event Reporting Card */}
+              <div className="bg-white rounded-2xl p-4 sm:p-5 shadow-sm border border-black/[0.06] space-y-3">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 pb-3 border-b border-black/[0.06]">
+                  <div>
+                    <span className="text-[10px] font-bold text-[#778da9] uppercase tracking-wider">
+                      Attendee
+                    </span>
+                    <h4 className="text-base font-black text-[#0d1b2a] uppercase">
+                      {verifiedPass.fullName}
+                    </h4>
+                    <p className="text-xs text-[#415a77]">
+                      {verifiedPass.batchYear || verifiedPass.joinedBatch} {verifiedPass.joinedSection ? `(${verifiedPass.joinedSection})` : ""} • {verifiedPass.place}
+                    </p>
+                  </div>
 
-                    <div>
-                      <span className="text-[10px] font-bold text-[#778da9] uppercase">Hifz Status</span>
-                      <p className="font-bold text-[#0d1b2a]">{verifiedPass.hifzStatus || "—"}</p>
-                    </div>
-
-                    <div className="col-span-2 pt-1 border-t border-black/[0.05]">
-                      <span className="text-[10px] font-bold text-[#778da9] uppercase">Current Status</span>
-                      <p className="font-bold text-[#0d1b2a]">
-                        {verifiedPass.currentStatus}: {verifiedPass.jobDesignation || verifiedPass.institutionName || "—"}
-                      </p>
-                    </div>
+                  <div>
+                    {verifiedPass.isReported ? (
+                      <span className="inline-flex items-center gap-1 text-xs font-bold text-emerald-800 bg-emerald-100 px-3 py-1.5 rounded-xl">
+                        <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                        <span>Reported Present ({verifiedPass.reportedAt || "Verified"})</span>
+                      </span>
+                    ) : (
+                      <span className="inline-flex items-center gap-1 text-xs font-bold text-amber-800 bg-amber-100 px-3 py-1.5 rounded-xl">
+                        <span>⏱️</span>
+                        <span>Pending Check-in at Event</span>
+                      </span>
+                    )}
                   </div>
                 </div>
 
-                {/* Footer of Pass */}
-                <div className="bg-[#f9f9f8] px-6 py-3 border-t border-black/[0.05] text-center text-[10px] text-[#778da9] font-medium">
-                  Official Entry Pass issued by Dalailul Khairath Kakkidippuram Alumni Committee
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5 text-xs text-[#415a77]">
+                  <div>
+                    <span className="text-[10px] font-bold text-[#778da9] uppercase">Registration ID</span>
+                    <p className="font-mono font-bold text-[#0d1b2a]">{verifiedPass.registrationId}</p>
+                  </div>
+
+                  <div>
+                    <span className="text-[10px] font-bold text-[#778da9] uppercase">Hifz Status</span>
+                    <p className="font-bold text-[#0d1b2a]">{verifiedPass.hifzStatus || "—"}</p>
+                  </div>
+
+                  <div className="col-span-2 sm:col-span-1">
+                    <span className="text-[10px] font-bold text-[#778da9] uppercase">Current Status</span>
+                    <p className="font-bold text-[#0d1b2a] truncate">
+                      {verifiedPass.currentStatus}: {verifiedPass.jobDesignation || verifiedPass.institutionName || "—"}
+                    </p>
+                  </div>
                 </div>
               </div>
 
               {/* Action Buttons */}
-              <div className="space-y-2.5 pt-2">
+              <div className="space-y-2.5 pt-1">
                 {/* Download Pass as Image */}
                 <button
                   type="button"
                   onClick={handleDownloadImage}
-                  disabled={isDownloading}
-                  className="w-full py-4 px-5 rounded-2xl bg-gradient-to-r from-[#1b263b] via-[#0d1b2a] to-[#1b263b] hover:from-[#0d1b2a] hover:to-[#0d1b2a] text-white font-extrabold text-sm sm:text-base flex items-center justify-center gap-2.5 shadow-xl transition-all cursor-pointer hover:scale-[1.01] active:scale-[0.99]"
+                  disabled={isDownloading || isGeneratingPass}
+                  className="w-full py-4 px-5 rounded-2xl bg-gradient-to-r from-[#5c7c00] via-[#486300] to-[#5c7c00] hover:from-[#486300] hover:to-[#384e00] text-white font-extrabold text-sm sm:text-base flex items-center justify-center gap-2.5 shadow-xl transition-all cursor-pointer hover:scale-[1.01] active:scale-[0.99] disabled:opacity-50"
                 >
-                  <Download className="w-5 h-5 text-amber-400" />
-                  <span>{isDownloading ? "Generating Image..." : "Download Pass as Image (PNG)"}</span>
+                  <Download className="w-5 h-5 text-amber-300" />
+                  <span>{isDownloading ? "Preparing Image..." : "Download Official Pass (PNG)"}</span>
                 </button>
 
                 <div className="grid grid-cols-2 gap-2.5">
