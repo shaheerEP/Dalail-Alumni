@@ -341,7 +341,7 @@ export default function GetPassPage() {
       </header>
 
       {/* Main Content Area */}
-      <main className="flex-1 mt-4 sm:-mt-6 px-3 sm:px-6 mb-12 relative z-10">
+      <main className={`flex-1 ${verifiedPass ? "mt-4 sm:mt-6" : "mt-4 sm:-mt-6"} px-3 sm:px-6 mb-12 relative z-10`}>
         <div className="max-w-xl mx-auto">
           {/* STEP 1: Search Name */}
           {!selectedCandidate && !verifiedPass && (
@@ -554,19 +554,19 @@ export default function GetPassPage() {
           {verifiedPass && (
             <div className="space-y-4">
               {/* Top Bar with actions */}
-              <div className="flex items-center justify-between px-2">
+              <div className="flex items-center justify-between px-1">
                 <button
                   type="button"
                   onClick={handleReset}
-                  className="inline-flex items-center gap-1.5 text-xs font-bold text-[#719100] hover:underline cursor-pointer"
+                  className="inline-flex items-center gap-1.5 text-xs font-bold text-[#576b2d] hover:text-[#192200] bg-white hover:bg-[#eef2dc] px-3.5 py-1.5 rounded-full border border-[#719100]/20 shadow-xs transition-colors cursor-pointer"
                 >
-                  <ArrowLeft className="w-3.5 h-3.5" />
+                  <ArrowLeft className="w-3.5 h-3.5 text-[#719100]" />
                   <span>Search Another Pass</span>
                 </button>
 
-                <span className="text-[11px] font-bold text-[#2d3a00] bg-[#719100]/20 px-3 py-1 rounded-full flex items-center gap-1 border border-[#719100]/30">
+                <span className="text-[11px] font-bold text-[#192200] bg-white px-3.5 py-1.5 rounded-full flex items-center gap-1.5 border border-[#719100]/30 shadow-xs">
                   <CheckCircle2 className="w-3.5 h-3.5 text-[#719100]" />
-                  Identity Verified
+                  <span>Identity Verified</span>
                 </span>
               </div>
 
