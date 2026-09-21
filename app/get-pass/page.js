@@ -10,11 +10,8 @@ import {
   CheckCircle2,
   AlertCircle,
   Download,
-  Share2,
-  Printer,
   ArrowLeft,
   Phone,
-  User,
   ShieldCheck,
   RefreshCw,
   Sparkles,
@@ -99,9 +96,7 @@ export default function GetPassPage() {
       // 4. Draw Batch Tag
       ctx.fillStyle = "#557300";
       ctx.font = "bold 13px system-ui, -apple-system, sans-serif";
-      const batchText = `${alumnus.batchYear || alumnus.joinedBatch || ""} ${
-        alumnus.joinedSection ? `(${alumnus.joinedSection})` : ""
-      }`.trim();
+      const batchText = (alumnus.batchYear || alumnus.joinedBatch || "").trim();
       if (batchText) {
         ctx.fillText(batchText, centerX, 131);
       }
@@ -287,22 +282,10 @@ export default function GetPassPage() {
       }
     } catch (err) {
       console.error("Failed to download image:", err);
-      alert("Could not generate image automatically. You can use the Print / Save PDF option.");
+      alert("Could not generate image automatically. Please try again.");
     } finally {
       setIsDownloading(false);
     }
-  };
-
-  // Share via WhatsApp
-  const handleShareWhatsApp = () => {
-    if (!verifiedPass) return;
-    const text = `🎉 Here is my LINKUP 2026 Pass!\n\n*${verifiedPass.fullName}*\nReg ID: *${verifiedPass.registrationId}*\nBatch: ${verifiedPass.batchYear || verifiedPass.joinedBatch}\nPlace: ${verifiedPass.place}\n\nDalailul Khairath Kakkidippuram - LINKUP 2026.`;
-    window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, "_blank");
-  };
-
-  // Print pass
-  const handlePrint = () => {
-    window.print();
   };
 
   // Reset to search again
@@ -422,7 +405,7 @@ export default function GetPassPage() {
                               </h3>
                               <div className="flex flex-wrap items-center gap-1.5 text-[11px] text-[#778da9] mt-0.5">
                                 <span className="font-semibold text-[#415a77]">
-                                  {alumnus.batchYear} {alumnus.joinedSection ? `(${alumnus.joinedSection})` : ""}
+                                  {alumnus.batchYear}
                                 </span>
                                 {alumnus.place && (
                                   <>
@@ -616,7 +599,7 @@ export default function GetPassPage() {
                           {verifiedPass.fullName}
                         </h3>
                         <p className="text-[9px] sm:text-xs font-bold text-[#557300]">
-                          {verifiedPass.batchYear || verifiedPass.joinedBatch} {verifiedPass.joinedSection ? `(${verifiedPass.joinedSection})` : ""}
+                          {verifiedPass.batchYear || verifiedPass.joinedBatch}
                         </p>
                       </div>
 
@@ -639,57 +622,36 @@ export default function GetPassPage() {
               </div>
 
               {/* Attendee Details & Event Reporting Card */}
-              <div className="bg-white rounded-2xl p-4 sm:p-5 shadow-sm border border-black/[0.06] space-y-3">
-                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 pb-3 border-b border-black/[0.06]">
-                  <div>
-                    <span className="text-[10px] font-bold text-[#778da9] uppercase tracking-wider">
-                      Attendee
-                    </span>
-                    <h4 className="text-base font-black text-[#0d1b2a] uppercase">
-                      {verifiedPass.fullName}
-                    </h4>
-                    <p className="text-xs text-[#415a77]">
-                      {verifiedPass.batchYear || verifiedPass.joinedBatch} {verifiedPass.joinedSection ? `(${verifiedPass.joinedSection})` : ""} • {verifiedPass.place}
-                    </p>
-                  </div>
-
-                  <div>
-                    {verifiedPass.isReported ? (
-                      <span className="inline-flex items-center gap-1 text-xs font-bold text-emerald-800 bg-emerald-100 px-3 py-1.5 rounded-xl">
-                        <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-                        <span>Reported Present ({verifiedPass.reportedAt || "Verified"})</span>
-                      </span>
-                    ) : (
-                      <span className="inline-flex items-center gap-1 text-xs font-bold text-amber-800 bg-amber-100 px-3 py-1.5 rounded-xl">
-                        <span>⏱️</span>
-                        <span>Pending Check-in at Event</span>
-                      </span>
-                    )}
-                  </div>
+              <div className="bg-white rounded-2xl p-4 sm:p-5 shadow-sm border border-black/[0.06] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                <div>
+                  <span className="text-[10px] font-bold text-[#778da9] uppercase tracking-wider">
+                    Attendee
+                  </span>
+                  <h4 className="text-base font-black text-[#0d1b2a] uppercase">
+                    {verifiedPass.fullName}
+                  </h4>
+                  <p className="text-xs text-[#415a77]">
+                    {verifiedPass.batchYear || verifiedPass.joinedBatch}{verifiedPass.place ? ` • ${verifiedPass.place}` : ""}
+                  </p>
                 </div>
 
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5 text-xs text-[#415a77]">
-                  <div>
-                    <span className="text-[10px] font-bold text-[#778da9] uppercase">Registration ID</span>
-                    <p className="font-mono font-bold text-[#0d1b2a]">{verifiedPass.registrationId}</p>
-                  </div>
-
-                  <div>
-                    <span className="text-[10px] font-bold text-[#778da9] uppercase">Hifz Status</span>
-                    <p className="font-bold text-[#0d1b2a]">{verifiedPass.hifzStatus || "—"}</p>
-                  </div>
-
-                  <div className="col-span-2 sm:col-span-1">
-                    <span className="text-[10px] font-bold text-[#778da9] uppercase">Current Status</span>
-                    <p className="font-bold text-[#0d1b2a] truncate">
-                      {verifiedPass.currentStatus}: {verifiedPass.jobDesignation || verifiedPass.institutionName || "—"}
-                    </p>
-                  </div>
+                <div>
+                  {verifiedPass.isReported ? (
+                    <span className="inline-flex items-center gap-1 text-xs font-bold text-emerald-800 bg-emerald-100 px-3 py-1.5 rounded-xl">
+                      <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                      <span>Reported Present ({verifiedPass.reportedAt || "Verified"})</span>
+                    </span>
+                  ) : (
+                    <span className="inline-flex items-center gap-1 text-xs font-bold text-amber-800 bg-amber-100 px-3 py-1.5 rounded-xl">
+                      <span>⏱️</span>
+                      <span>Pending Check-in at Event</span>
+                    </span>
+                  )}
                 </div>
               </div>
 
-              {/* Action Buttons */}
-              <div className="space-y-2.5 pt-1">
+              {/* Action Button */}
+              <div className="pt-1">
                 {/* Download Pass as Image */}
                 <button
                   type="button"
@@ -700,26 +662,6 @@ export default function GetPassPage() {
                   <Download className="w-5 h-5 text-amber-300" />
                   <span>{isDownloading ? "Preparing Image..." : "Download Official Pass (PNG)"}</span>
                 </button>
-
-                <div className="grid grid-cols-2 gap-2.5">
-                  <button
-                    type="button"
-                    onClick={handleShareWhatsApp}
-                    className="py-3 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-sm transition-colors cursor-pointer"
-                  >
-                    <Share2 className="w-4 h-4" />
-                    <span>Share on WhatsApp</span>
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={handlePrint}
-                    className="py-3 px-4 rounded-xl bg-[#e3e8ee] hover:bg-[#c8d1dc] text-[#0d1b2a] font-bold text-xs flex items-center justify-center gap-2 transition-colors cursor-pointer"
-                  >
-                    <Printer className="w-4 h-4" />
-                    <span>Print / Save PDF</span>
-                  </button>
-                </div>
               </div>
             </div>
           )}
