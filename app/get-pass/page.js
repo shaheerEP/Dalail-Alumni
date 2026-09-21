@@ -14,7 +14,11 @@ import {
   Phone,
   ShieldCheck,
   RefreshCw,
+  Pencil,
+  X,
+  Check,
 } from "lucide-react";
+import { BATCH_OPTIONS } from "@/data/options";
 import Footer from "@/components/Footer";
 
 export default function GetPassPage() {
@@ -35,6 +39,14 @@ export default function GetPassPage() {
   const [passCardImage, setPassCardImage] = useState("");
   const [isGeneratingPass, setIsGeneratingPass] = useState(false);
   const [isDownloading, setIsDownloading] = useState(false);
+
+  // Edit Details Modal state
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [editFormData, setEditFormData] = useState({});
+  const [editErrors, setEditErrors] = useState({});
+  const [isSavingEdit, setIsSavingEdit] = useState(false);
+  const [editSuccessMsg, setEditSuccessMsg] = useState("");
+  const [qualOptions, setQualOptions] = useState({ islamic: [], academic: [] });
 
   const passRef = useRef(null);
   const searchTimeoutRef = useRef(null);
@@ -205,6 +217,58 @@ export default function GetPassPage() {
     };
   }, [searchTerm]);
 
+  // Auto-login if directed from registration success modal or via link params
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    // 1. Check if sessionStorage has autoVerifiedPass
+    try {
+      const cached = sessionStorage.getItem("autoVerifiedPass");
+      if (cached) {
+        const parsed = JSON.parse(cached);
+        if (parsed && parsed.registrationId && parsed.fullName) {
+          setVerifiedPass(parsed);
+          if (parsed.mobileNumber) {
+            setMobileNumber(parsed.mobileNumber);
+          }
+          return;
+        }
+      }
+    } catch (e) {
+      console.error("Session pass read error:", e);
+    }
+
+    // 2. Fallback: check URL parameters (?regId=...&mobile=...)
+    try {
+      const urlParams = new URLSearchParams(window.location.search);
+      const regId = urlParams.get("regId");
+      const mobile = urlParams.get("mobile");
+
+      if (regId && mobile) {
+        setVerifyLoading(true);
+        fetch("/api/pass/verify", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ registrationId: regId, mobileNumber: mobile }),
+        })
+          .then((res) => res.json())
+          .then((data) => {
+            if (data.success && data.alumnus) {
+              setVerifiedPass(data.alumnus);
+              setMobileNumber(mobile);
+              try {
+                sessionStorage.setItem("autoVerifiedPass", JSON.stringify(data.alumnus));
+              } catch (e) {}
+            }
+          })
+          .catch((err) => console.error("Auto verify error:", err))
+          .finally(() => setVerifyLoading(false));
+      }
+    } catch (err) {
+      console.error("URL params read error:", err);
+    }
+  }, []);
+
   // Generate composite pass when verified pass is set
   useEffect(() => {
     if (verifiedPass?.registrationId) {
@@ -310,6 +374,107 @@ export default function GetPassPage() {
     setSearchTerm("");
     setSearchResults([]);
     setHasSearched(false);
+    setIsEditModalOpen(false);
+    setEditSuccessMsg("");
+    if (typeof window !== "undefined") {
+      try {
+        sessionStorage.removeItem("autoVerifiedPass");
+        window.history.replaceState({}, "", "/get-pass");
+      } catch (e) {}
+    }
+  };
+
+  // Load qualification options for edit modal suggestions
+  useEffect(() => {
+    async function loadQuals() {
+      try {
+        const res = await fetch("/api/qualifications");
+        if (res.ok) {
+          const data = await res.json();
+          setQualOptions({
+            islamic: data.islamic || [],
+            academic: data.academic || [],
+          });
+        }
+      } catch (e) {}
+    }
+    loadQuals();
+  }, []);
+
+  // Open Edit Modal with pre-filled details
+  const handleOpenEditModal = () => {
+    if (!verifiedPass) return;
+    setEditFormData({
+      fullName: verifiedPass.fullName || "",
+      place: verifiedPass.place || "",
+      mobileNumber: verifiedPass.mobileNumber || "",
+      whatsappNumber: verifiedPass.whatsappNumber || verifiedPass.mobileNumber || "",
+      batchYear: verifiedPass.batchYear || verifiedPass.joinedBatch || "Batch 1",
+      joinedSection: verifiedPass.joinedSection || "HS",
+      hifzStatus: verifiedPass.hifzStatus || "Not Hafiz",
+      islamicQualification: verifiedPass.islamicQualification || "",
+      academicQualification: verifiedPass.academicQualification || "",
+      currentStatus: verifiedPass.currentStatus || "Job",
+      jobDesignation: verifiedPass.jobDesignation || "",
+      institutionName: verifiedPass.institutionName || "",
+      workLocation: verifiedPass.workLocation || "",
+      willAttend: verifiedPass.willAttend || "Yes, I will attend",
+    });
+    setEditErrors({});
+    setIsEditModalOpen(true);
+  };
+
+  // Submit Updated Details
+  const handleSaveEdit = async (e) => {
+    e.preventDefault();
+    if (!editFormData.fullName?.trim()) {
+      setEditErrors({ fullName: "Full name is required." });
+      return;
+    }
+    if (!editFormData.place?.trim()) {
+      setEditErrors({ place: "Place is required." });
+      return;
+    }
+
+    setIsSavingEdit(true);
+    setEditErrors({});
+
+    try {
+      const res = await fetch("/api/pass/update", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          registrationId: verifiedPass.registrationId,
+          originalMobile: mobileNumber,
+          ...editFormData,
+        }),
+      });
+
+      const data = await res.json();
+      if (res.ok && data.success) {
+        setVerifiedPass(data.alumnus);
+        if (typeof window !== "undefined") {
+          try {
+            sessionStorage.setItem("autoVerifiedPass", JSON.stringify(data.alumnus));
+          } catch (e) {}
+        }
+        if (data.alumnus.mobileNumber) {
+          setMobileNumber(data.alumnus.mobileNumber);
+        }
+        setIsEditModalOpen(false);
+        // Re-generate pass canvas image with updated details
+        generateTicketPass(data.alumnus);
+        setEditSuccessMsg("Registration details updated successfully!");
+        setTimeout(() => setEditSuccessMsg(""), 4500);
+      } else {
+        setEditErrors({ submit: data.error || "Failed to update details. Please try again." });
+      }
+    } catch (err) {
+      console.error("Save edit error:", err);
+      setEditErrors({ submit: "Connection error. Please try again." });
+    } finally {
+      setIsSavingEdit(false);
+    }
   };
 
   return (
@@ -343,8 +508,16 @@ export default function GetPassPage() {
       {/* Main Content Area */}
       <main className={`flex-1 ${verifiedPass ? "mt-4 sm:mt-6" : "mt-4 sm:-mt-6"} px-3 sm:px-6 mb-12 relative z-10`}>
         <div className="max-w-xl mx-auto">
+          {/* STEP 0: Loading pass automatically */}
+          {!selectedCandidate && !verifiedPass && verifyLoading && (
+            <div className="bg-white rounded-3xl shadow-xl p-8 border border-[#719100]/15 text-center my-6">
+              <RefreshCw className="w-8 h-8 text-[#719100] animate-spin mx-auto mb-3" />
+              <p className="text-sm font-bold text-[#192200]">Loading your entry pass...</p>
+            </div>
+          )}
+
           {/* STEP 1: Search Name */}
-          {!selectedCandidate && !verifiedPass && (
+          {!selectedCandidate && !verifiedPass && !verifyLoading && (
             <div className="bg-white rounded-3xl shadow-xl p-5 sm:p-7 border border-[#719100]/15">
               <div className="text-center mb-6">
                 <div className="w-12 h-12 rounded-2xl bg-[#eef2dc] text-[#719100] flex items-center justify-center mx-auto mb-3 shadow-inner">
@@ -570,6 +743,14 @@ export default function GetPassPage() {
                 </span>
               </div>
 
+              {/* Success Notification */}
+              {editSuccessMsg && (
+                <div className="p-3 rounded-xl bg-[#eef2dc] border border-[#719100]/30 text-xs text-[#2d3a00] font-bold flex items-center gap-2 shadow-xs animate-in fade-in duration-200">
+                  <CheckCircle2 className="w-4 h-4 text-[#719100] shrink-0" />
+                  <span>{editSuccessMsg}</span>
+                </div>
+              )}
+
               {/* The Official Ticket Pass Card using the PNG template */}
               <div
                 ref={passRef}
@@ -624,31 +805,46 @@ export default function GetPassPage() {
               </div>
 
               {/* Attendee Details & Event Reporting Card */}
-              <div className="bg-white rounded-2xl p-4 sm:p-5 shadow-sm border border-[#719100]/15 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-                <div>
-                  <span className="text-[10px] font-bold text-[#6e8242] uppercase tracking-wider">
-                    Attendee
-                  </span>
-                  <h4 className="text-base font-black text-[#192200] uppercase">
-                    {verifiedPass.fullName}
-                  </h4>
-                  <p className="text-xs text-[#576b2d]">
-                    {verifiedPass.batchYear || verifiedPass.joinedBatch}{verifiedPass.place ? ` • ${verifiedPass.place}` : ""}
-                  </p>
+              <div className="bg-white rounded-2xl p-4 sm:p-5 shadow-sm border border-[#719100]/15 flex flex-col justify-between gap-3">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                  <div className="flex-1 min-w-0">
+                    <span className="text-[10px] font-bold text-[#6e8242] uppercase tracking-wider block mb-1">
+                      Attendee
+                    </span>
+                    <h4 className="text-base font-black text-[#192200] uppercase truncate">
+                      {verifiedPass.fullName}
+                    </h4>
+                    <p className="text-xs text-[#576b2d]">
+                      {verifiedPass.batchYear || verifiedPass.joinedBatch}{verifiedPass.place ? ` • ${verifiedPass.place}` : ""}
+                    </p>
+                  </div>
+
+                  <div>
+                    {verifiedPass.isReported ? (
+                      <span className="inline-flex items-center gap-1 text-xs font-bold text-[#2d3a00] bg-[#719100]/20 px-3 py-1.5 rounded-xl border border-[#719100]/30">
+                        <CheckCircle2 className="w-4 h-4 text-[#719100]" />
+                        <span>Reported Present ({verifiedPass.reportedAt || "Verified"})</span>
+                      </span>
+                    ) : (
+                      <span className="inline-flex items-center gap-1 text-xs font-bold text-amber-900 bg-amber-100 px-3 py-1.5 rounded-xl border border-amber-200">
+                        <span>⏱️</span>
+                        <span>Pending Check-in at Event</span>
+                      </span>
+                    )}
+                  </div>
                 </div>
 
-                <div>
-                  {verifiedPass.isReported ? (
-                    <span className="inline-flex items-center gap-1 text-xs font-bold text-[#2d3a00] bg-[#719100]/20 px-3 py-1.5 rounded-xl border border-[#719100]/30">
-                      <CheckCircle2 className="w-4 h-4 text-[#719100]" />
-                      <span>Reported Present ({verifiedPass.reportedAt || "Verified"})</span>
-                    </span>
-                  ) : (
-                    <span className="inline-flex items-center gap-1 text-xs font-bold text-amber-900 bg-amber-100 px-3 py-1.5 rounded-xl border border-amber-200">
-                      <span>⏱️</span>
-                      <span>Pending Check-in at Event</span>
-                    </span>
-                  )}
+                {/* Right Bottom Part: Edit Details Link */}
+                <div className="flex justify-end pt-1">
+                  <button
+                    type="button"
+                    onClick={handleOpenEditModal}
+                    className="inline-flex items-center gap-1 text-[11px] font-bold text-[#719100] hover:text-[#556e00] hover:underline transition-colors cursor-pointer"
+                    title="Edit Added Details"
+                  >
+                    <Pencil className="w-3 h-3 text-[#719100]" />
+                    <span>Edit Details</span>
+                  </button>
                 </div>
               </div>
 
@@ -669,6 +865,345 @@ export default function GetPassPage() {
           )}
         </div>
       </main>
+
+      {/* ----------------------------------------------------
+          MODAL: Edit Added Details
+      ---------------------------------------------------- */}
+      {isEditModalOpen && verifiedPass && (
+        <div className="fixed inset-0 z-50 overflow-y-auto bg-black/75 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4">
+          <div className="bg-white w-full max-w-xl rounded-3xl shadow-2xl overflow-hidden border border-[#719100]/25 animate-in fade-in zoom-in-95 duration-150 my-6">
+            {/* Modal Header */}
+            <div className="bg-gradient-to-r from-[#141b00] via-[#202b00] to-[#2d3a00] text-white p-4 sm:p-5 flex items-center justify-between">
+              <div>
+                <span className="text-[10px] font-bold uppercase tracking-wider text-[#fff000]">
+                  Alumnus Registration Record
+                </span>
+                <h3 className="text-base sm:text-lg font-black uppercase text-white flex items-center gap-2 mt-0.5">
+                  <Pencil className="w-4 h-4 text-[#fff000]" />
+                  <span>Edit Registration Details</span>
+                </h3>
+                <span className="text-[11px] font-mono text-[#d8ec78] font-semibold">
+                  {verifiedPass.registrationId}
+                </span>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsEditModalOpen(false)}
+                className="p-1.5 rounded-full text-[#d8ec78] hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Modal Form */}
+            <form onSubmit={handleSaveEdit}>
+              <div className="p-4 sm:p-6 space-y-4 max-h-[68vh] overflow-y-auto text-xs">
+                {editErrors.submit && (
+                  <div className="p-3 rounded-xl bg-red-50 text-red-700 text-xs font-medium border border-red-200">
+                    {editErrors.submit}
+                  </div>
+                )}
+
+                {/* Full Name & Place */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-[11px] font-bold uppercase tracking-wider text-[#2d3a00] mb-1">
+                      Full Name <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      value={editFormData.fullName || ""}
+                      onChange={(e) => setEditFormData({ ...editFormData, fullName: e.target.value })}
+                      className="w-full px-3 py-2.5 rounded-xl bg-[#eef2dc] border border-[#719100]/20 text-xs font-bold text-[#192200] uppercase focus:bg-white focus:border-[#719100] outline-none"
+                      required
+                    />
+                    {editErrors.fullName && (
+                      <p className="text-[10px] text-red-600 mt-1">{editErrors.fullName}</p>
+                    )}
+                  </div>
+
+                  <div>
+                    <label className="block text-[11px] font-bold uppercase tracking-wider text-[#2d3a00] mb-1">
+                      Place <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      value={editFormData.place || ""}
+                      onChange={(e) => setEditFormData({ ...editFormData, place: e.target.value })}
+                      className="w-full px-3 py-2.5 rounded-xl bg-[#eef2dc] border border-[#719100]/20 text-xs font-bold text-[#192200] uppercase focus:bg-white focus:border-[#719100] outline-none"
+                      required
+                    />
+                    {editErrors.place && (
+                      <p className="text-[10px] text-red-600 mt-1">{editErrors.place}</p>
+                    )}
+                  </div>
+                </div>
+
+                {/* Batch & Section */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-[11px] font-bold uppercase tracking-wider text-[#2d3a00] mb-1">
+                      Joined with Batch
+                    </label>
+                    <select
+                      value={editFormData.batchYear || ""}
+                      onChange={(e) => setEditFormData({ ...editFormData, batchYear: e.target.value })}
+                      className="w-full px-3 py-2.5 rounded-xl bg-[#eef2dc] border border-[#719100]/20 text-xs font-bold text-[#192200] focus:bg-white focus:border-[#719100] outline-none"
+                    >
+                      {BATCH_OPTIONS.map((b) => (
+                        <option key={b} value={b}>
+                          {b}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-[11px] font-bold uppercase tracking-wider text-[#2d3a00] mb-1">
+                      Section (HS / BS)
+                    </label>
+                    <select
+                      value={editFormData.joinedSection || ""}
+                      onChange={(e) => setEditFormData({ ...editFormData, joinedSection: e.target.value })}
+                      className="w-full px-3 py-2.5 rounded-xl bg-[#eef2dc] border border-[#719100]/20 text-xs font-bold text-[#192200] focus:bg-white focus:border-[#719100] outline-none"
+                    >
+                      <option value="HS">HS</option>
+                      <option value="BS">BS</option>
+                      <option value="Both (HS & BS)">Both (HS & BS)</option>
+                      <option value="">None / Other</option>
+                    </select>
+                  </div>
+                </div>
+
+                {/* Mobile & WhatsApp */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-[11px] font-bold uppercase tracking-wider text-[#2d3a00] mb-1">
+                      Mobile Number
+                    </label>
+                    <input
+                      type="tel"
+                      value={editFormData.mobileNumber || ""}
+                      onChange={(e) => setEditFormData({ ...editFormData, mobileNumber: e.target.value })}
+                      className="w-full px-3 py-2.5 rounded-xl bg-[#eef2dc] border border-[#719100]/20 text-xs font-mono font-bold text-[#192200] focus:bg-white focus:border-[#719100] outline-none"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-[11px] font-bold uppercase tracking-wider text-[#2d3a00] mb-1">
+                      WhatsApp Number
+                    </label>
+                    <input
+                      type="tel"
+                      value={editFormData.whatsappNumber || ""}
+                      onChange={(e) => setEditFormData({ ...editFormData, whatsappNumber: e.target.value })}
+                      className="w-full px-3 py-2.5 rounded-xl bg-[#eef2dc] border border-[#719100]/20 text-xs font-mono font-bold text-[#192200] focus:bg-white focus:border-[#719100] outline-none"
+                    />
+                  </div>
+                </div>
+
+                {/* Hifz Status */}
+                <div>
+                  <label className="block text-[11px] font-bold uppercase tracking-wider text-[#2d3a00] mb-1.5">
+                    Hifz Status
+                  </label>
+                  <div className="grid grid-cols-2 gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setEditFormData({ ...editFormData, hifzStatus: "Hafiz" })}
+                      className={`py-2 px-3 rounded-xl font-bold text-xs transition-all cursor-pointer ${
+                        editFormData.hifzStatus === "Hafiz"
+                          ? "bg-[#719100] text-white shadow-xs"
+                          : "bg-[#eef2dc] text-[#576b2d] hover:bg-[#e4ebce]"
+                      }`}
+                    >
+                      Hafiz
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setEditFormData({ ...editFormData, hifzStatus: "Not Hafiz" })}
+                      className={`py-2 px-3 rounded-xl font-bold text-xs transition-all cursor-pointer ${
+                        editFormData.hifzStatus === "Not Hafiz"
+                          ? "bg-[#2d3a00] text-white shadow-xs"
+                          : "bg-[#eef2dc] text-[#576b2d] hover:bg-[#e4ebce]"
+                      }`}
+                    >
+                      Not Hafiz
+                    </button>
+                  </div>
+                </div>
+
+                {/* Islamic & Academic Qualifications */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-[11px] font-bold uppercase tracking-wider text-[#2d3a00] mb-1">
+                      Islamic Qualification
+                    </label>
+                    <input
+                      type="text"
+                      list="edit-islamic-quals"
+                      value={editFormData.islamicQualification || ""}
+                      onChange={(e) => setEditFormData({ ...editFormData, islamicQualification: e.target.value })}
+                      placeholder="e.g. Moulavi Fazil, etc."
+                      className="w-full px-3 py-2.5 rounded-xl bg-[#eef2dc] border border-[#719100]/20 text-xs font-medium text-[#192200] focus:bg-white focus:border-[#719100] outline-none"
+                    />
+                    <datalist id="edit-islamic-quals">
+                      {qualOptions.islamic.map((q, i) => (
+                        <option key={i} value={q} />
+                      ))}
+                    </datalist>
+                  </div>
+
+                  <div>
+                    <label className="block text-[11px] font-bold uppercase tracking-wider text-[#2d3a00] mb-1">
+                      Academic Qualification
+                    </label>
+                    <input
+                      type="text"
+                      list="edit-academic-quals"
+                      value={editFormData.academicQualification || ""}
+                      onChange={(e) => setEditFormData({ ...editFormData, academicQualification: e.target.value })}
+                      placeholder="e.g. BA, B.Tech, MBA, etc."
+                      className="w-full px-3 py-2.5 rounded-xl bg-[#eef2dc] border border-[#719100]/20 text-xs font-medium text-[#192200] focus:bg-white focus:border-[#719100] outline-none"
+                    />
+                    <datalist id="edit-academic-quals">
+                      {qualOptions.academic.map((q, i) => (
+                        <option key={i} value={q} />
+                      ))}
+                    </datalist>
+                  </div>
+                </div>
+
+                {/* Current Status */}
+                <div>
+                  <label className="block text-[11px] font-bold uppercase tracking-wider text-[#2d3a00] mb-1.5">
+                    Current Status
+                  </label>
+                  <div className="grid grid-cols-3 gap-2">
+                    {["Job", "Study", "Business"].map((st) => (
+                      <button
+                        key={st}
+                        type="button"
+                        onClick={() => setEditFormData({ ...editFormData, currentStatus: st })}
+                        className={`py-2 px-3 rounded-xl font-bold text-xs transition-all cursor-pointer ${
+                          editFormData.currentStatus === st
+                            ? "bg-[#719100] text-white shadow-xs"
+                            : "bg-[#eef2dc] text-[#576b2d] hover:bg-[#e4ebce]"
+                        }`}
+                      >
+                        {st}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Designation / Course & Institution */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-[11px] font-bold uppercase tracking-wider text-[#2d3a00] mb-1">
+                      {editFormData.currentStatus === "Study" ? "Course / Degree" : "Job / Designation"}
+                    </label>
+                    <input
+                      type="text"
+                      value={editFormData.jobDesignation || ""}
+                      onChange={(e) => setEditFormData({ ...editFormData, jobDesignation: e.target.value })}
+                      placeholder={editFormData.currentStatus === "Study" ? "e.g. B.Sc Computer Science" : "e.g. Software Engineer / Teacher"}
+                      className="w-full px-3 py-2.5 rounded-xl bg-[#eef2dc] border border-[#719100]/20 text-xs font-medium text-[#192200] focus:bg-white focus:border-[#719100] outline-none"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-[11px] font-bold uppercase tracking-wider text-[#2d3a00] mb-1">
+                      {editFormData.currentStatus === "Study" ? "College / University" : "Company / Institution Name"}
+                    </label>
+                    <input
+                      type="text"
+                      value={editFormData.institutionName || ""}
+                      onChange={(e) => setEditFormData({ ...editFormData, institutionName: e.target.value })}
+                      placeholder="e.g. Calicut University / ABC Corp"
+                      className="w-full px-3 py-2.5 rounded-xl bg-[#eef2dc] border border-[#719100]/20 text-xs font-medium text-[#192200] focus:bg-white focus:border-[#719100] outline-none"
+                    />
+                  </div>
+                </div>
+
+                {/* Work Location */}
+                <div>
+                  <label className="block text-[11px] font-bold uppercase tracking-wider text-[#2d3a00] mb-1">
+                    Work / Study Location
+                  </label>
+                  <input
+                    type="text"
+                    value={editFormData.workLocation || ""}
+                    onChange={(e) => setEditFormData({ ...editFormData, workLocation: e.target.value })}
+                    placeholder="e.g. Dubai / Calicut / Bangalore"
+                    className="w-full px-3 py-2.5 rounded-xl bg-[#eef2dc] border border-[#719100]/20 text-xs font-medium text-[#192200] focus:bg-white focus:border-[#719100] outline-none"
+                  />
+                </div>
+
+                {/* Attendance */}
+                <div>
+                  <label className="block text-[11px] font-bold uppercase tracking-wider text-[#2d3a00] mb-1.5">
+                    Will you attend LINKUP 2026?
+                  </label>
+                  <div className="grid grid-cols-2 gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setEditFormData({ ...editFormData, willAttend: "Yes, I will attend" })}
+                      className={`py-2 px-3 rounded-xl font-bold text-xs transition-all cursor-pointer ${
+                        (editFormData.willAttend || "").toLowerCase().includes("yes")
+                          ? "bg-[#719100] text-white shadow-xs"
+                          : "bg-[#eef2dc] text-[#576b2d] hover:bg-[#e4ebce]"
+                      }`}
+                    >
+                      Yes, I will attend
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setEditFormData({ ...editFormData, willAttend: "Cannot attend" })}
+                      className={`py-2 px-3 rounded-xl font-bold text-xs transition-all cursor-pointer ${
+                        !(editFormData.willAttend || "").toLowerCase().includes("yes")
+                          ? "bg-[#2d3a00] text-white shadow-xs"
+                          : "bg-[#eef2dc] text-[#576b2d] hover:bg-[#e4ebce]"
+                      }`}
+                    >
+                      Cannot attend
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              {/* Modal Footer */}
+              <div className="p-4 sm:p-5 bg-[#fbfdf4] border-t border-[#719100]/15 flex items-center justify-end gap-2.5">
+                <button
+                  type="button"
+                  onClick={() => setIsEditModalOpen(false)}
+                  disabled={isSavingEdit}
+                  className="px-4 py-2.5 rounded-xl border border-[#719100]/20 text-[#576b2d] font-bold text-xs hover:bg-[#eef2dc] transition-colors cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={isSavingEdit}
+                  className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-[#719100] to-[#556e00] hover:opacity-95 text-white font-bold text-xs flex items-center gap-2 shadow-sm transition-all cursor-pointer disabled:opacity-50"
+                >
+                  {isSavingEdit ? (
+                    <>
+                      <RefreshCw className="w-3.5 h-3.5 animate-spin text-[#fff000]" />
+                      <span>Saving Changes...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Check className="w-3.5 h-3.5" />
+                      <span>Save Changes</span>
+                    </>
+                  )}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
 
       <Footer />
     </div>

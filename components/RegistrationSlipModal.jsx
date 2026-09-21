@@ -35,6 +35,21 @@ export default function RegistrationSlipModal({ isOpen, onClose, data, onResetFo
 
   const isAttending = data.willAttend?.toLowerCase().includes("yes");
 
+  const handleGetPass = () => {
+    if (typeof window !== "undefined" && data) {
+      try {
+        sessionStorage.setItem("autoVerifiedPass", JSON.stringify(data));
+      } catch (err) {
+        console.error("Failed to store pass in session:", err);
+      }
+    }
+  };
+
+  const passUrl =
+    data?.registrationId && data?.mobileNumber
+      ? `/get-pass?regId=${encodeURIComponent(data.registrationId)}&mobile=${encodeURIComponent(data.mobileNumber)}`
+      : "/get-pass";
+
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto bg-[#141b00]/80 backdrop-blur-sm flex items-center justify-center p-4">
       <div className="bg-white w-full max-w-lg rounded-3xl shadow-2xl border border-[#719100]/20 overflow-hidden animate-in fade-in zoom-in-95 duration-200">
@@ -131,7 +146,8 @@ export default function RegistrationSlipModal({ isOpen, onClose, data, onResetFo
           <div className="pt-2 space-y-2.5">
             {/* Get Pass Button */}
             <Link
-              href="/get-pass"
+              href={passUrl}
+              onClick={handleGetPass}
               className="w-full py-3.5 px-5 rounded-xl bg-gradient-to-r from-[#fff000] to-[#fed700] hover:from-[#fff542] hover:to-[#ffe033] text-[#192200] font-black text-sm flex items-center justify-center gap-2 shadow-md transition-all cursor-pointer hover:scale-[1.01]"
             >
               <QrCode className="w-4 h-4 text-[#192200]" />
