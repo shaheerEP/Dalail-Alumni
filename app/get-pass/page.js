@@ -14,7 +14,6 @@ import {
   Phone,
   ShieldCheck,
   RefreshCw,
-  Sparkles,
 } from "lucide-react";
 import Footer from "@/components/Footer";
 
@@ -452,16 +451,6 @@ export default function GetPassPage() {
                       </div>
                     )
                   )}
-                </div>
-              )}
-
-              {/* Help tip */}
-              {!searchTerm && (
-                <div className="mt-6 p-4 rounded-2xl bg-[#eef2dc] text-xs text-[#576b2d] flex items-start gap-2.5 border border-[#719100]/15">
-                  <Sparkles className="w-4 h-4 text-[#719100] shrink-0 mt-0.5" />
-                  <p>
-                    Tip: Start typing your first name or surname. Once your name appears in the list, click it and enter your mobile number to retrieve your pass with the QR code.
-                  </p>
                 </div>
               )}
             </div>
