@@ -78,33 +78,37 @@ export default function PersonalInfoSection({
 
           {/* Already Registered Notification */}
           {matchingRegistered.length > 0 && (
-            <div className="mt-2 p-3 rounded-xl bg-amber-50 border border-amber-200 text-xs text-amber-900 animate-in fade-in duration-150">
-              <div className="flex items-center gap-1.5 font-bold text-amber-800">
+            <div className="mt-2 p-3 rounded-xl bg-amber-50/90 border border-amber-200 text-xs text-amber-900 animate-in fade-in duration-150 shadow-xs">
+              <div className="flex items-center gap-1.5 font-bold text-amber-800 pb-1.5 border-b border-amber-200/60">
                 <AlertCircle className="w-4 h-4 text-amber-600 shrink-0" />
                 <span>
                   {isExactMatch ? "Name Already Registered:" : "Similar Name Already Registered:"}
                 </span>
               </div>
-              <div className="mt-2 space-y-1.5 max-h-36 overflow-y-auto">
+              <div className="mt-2 space-y-1.5 max-h-40 overflow-y-auto pr-0.5">
                 {matchingRegistered.map((alum, idx) => (
                   <div
                     key={idx}
-                    className="flex flex-wrap items-center justify-between gap-1.5 p-2 rounded-lg bg-white border border-amber-100 shadow-2xs"
+                    className="p-2.5 rounded-xl bg-white border border-amber-100 shadow-2xs space-y-1"
                   >
-                    <div className="flex items-center gap-1.5">
-                      <span className="font-bold text-[#192200] uppercase">{alum.name}</span>
-                      {alum.batch && <span className="text-amber-700 font-medium">({alum.batch})</span>}
-                      {alum.place && <span className="text-gray-500">· {alum.place}</span>}
+                    <div className="font-bold text-[#192200] uppercase text-xs leading-snug">
+                      {alum.name}
                     </div>
-                    <span className="px-2 py-0.5 rounded bg-amber-100 text-[10px] font-mono font-bold text-amber-900 shrink-0">
-                      {alum.regId}
-                    </span>
+                    <div className="flex items-center gap-2 text-[11px] text-[#576b2d]">
+                      {alum.batch && (
+                        <span className="px-2 py-0.5 rounded bg-[#eef2dc] text-[#2d3a00] font-semibold text-[10px] shrink-0 border border-[#719100]/20">
+                          {alum.batch}
+                        </span>
+                      )}
+                      {alum.place && (
+                        <span className="font-medium text-[#576b2d] uppercase truncate">
+                          {alum.place}
+                        </span>
+                      )}
+                    </div>
                   </div>
                 ))}
               </div>
-              <p className="mt-2 text-[11px] text-amber-700 leading-tight">
-                ℹ️ If this is your registration, you don&apos;t need to register again. If you share this name with someone else, you can proceed.
-              </p>
             </div>
           )}
         </div>
