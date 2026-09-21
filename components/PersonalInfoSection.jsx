@@ -4,6 +4,21 @@ import { useState, useEffect } from "react";
 import { AlertCircle } from "lucide-react";
 import { COUNTRY_CODES } from "@/data/options";
 
+function isSameBatch(batchA, batchB) {
+  if (!batchA || !batchB) return false;
+  const cleanA = batchA.toString().trim().toLowerCase().replace(/\s+/g, "");
+  const cleanB = batchB.toString().trim().toLowerCase().replace(/\s+/g, "");
+  if (cleanA === cleanB) return true;
+
+  const digitsA = cleanA.match(/\d+/)?.[0];
+  const digitsB = cleanB.match(/\d+/)?.[0];
+  if (digitsA && digitsB) {
+    return parseInt(digitsA, 10) === parseInt(digitsB, 10);
+  }
+
+  return cleanA === cleanB;
+}
+
 export default function PersonalInfoSection({
   formData,
   errors,
@@ -34,13 +49,18 @@ export default function PersonalInfoSection({
     loadRegistered();
   }, []);
 
-  // Compute matched alumni as user types
+  // Compute matched alumni as user types (strictly within the same selected batch)
   const inputName = (formData.fullName || "").trim();
   const normalizedInput = inputName.toLowerCase().replace(/\s+/g, " ");
+  const currentBatch = formData.batchYear || "";
 
   const matchingRegistered =
     normalizedInput.length >= 2
       ? registeredList.filter((alum) => {
+          // Strictly show similar name ONLY from the same batch
+          if (!currentBatch || !alum.batch || !isSameBatch(currentBatch, alum.batch)) {
+            return false;
+          }
           const alumNameNorm = (alum.name || "").toLowerCase().replace(/\s+/g, " ");
           return alumNameNorm.includes(normalizedInput) || normalizedInput.includes(alumNameNorm);
         })
