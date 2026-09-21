@@ -314,11 +314,11 @@ export default function GetPassPage() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#ececea]">
+    <div className="min-h-screen flex flex-col bg-[#f5f7eb]">
       {/* Header */}
-      <header className="bg-gradient-to-b from-[#0d1b2a] via-[#101b2a] to-[#1b263b] text-white pt-8 pb-10 sm:pb-12 px-4 border-b border-[#415a77]/30">
+      <header className="bg-gradient-to-b from-[#141b00] via-[#202b00] to-[#2d3a00] text-white pt-8 pb-10 sm:pb-12 px-4 border-b border-[#719100]/30">
         <div className="max-w-3xl mx-auto flex flex-col items-center text-center">
-          <div className="w-16 h-20 rounded-2xl bg-white shadow-xl flex items-center justify-center p-2 mb-2">
+          <div className="w-16 h-20 rounded-2xl bg-white shadow-xl flex items-center justify-center p-2 mb-2 border border-[#719100]/20">
             <Image
               src="/logo.png"
               alt="Logo"
@@ -329,13 +329,13 @@ export default function GetPassPage() {
             />
           </div>
 
-          <p className="text-[#8ba1ca] text-xs font-semibold tracking-wide uppercase">
+          <p className="text-[#d8ec78] text-xs font-semibold tracking-wide uppercase">
             Dalailul Khairath Kakkidippuram
           </p>
-          <h1 className="text-xl sm:text-2xl font-black tracking-tight text-white uppercase mt-0.5">
+          <h1 className="text-xl sm:text-2xl font-serif font-black tracking-tight text-white uppercase mt-0.5">
             LINKUP 2026 • Entry Pass Portal
           </h1>
-          <p className="text-xs text-[#c8d1dc] mt-1 max-w-md">
+          <p className="text-xs text-[#d8ec78]/80 mt-1 max-w-md">
             Retrieve your digital entry pass and personalized QR code for reporting at LINKUP 2026.
           </p>
         </div>
@@ -346,22 +346,22 @@ export default function GetPassPage() {
         <div className="max-w-xl mx-auto">
           {/* STEP 1: Search Name */}
           {!selectedCandidate && !verifiedPass && (
-            <div className="bg-white rounded-3xl shadow-xl p-5 sm:p-7 border border-black/[0.04]">
+            <div className="bg-white rounded-3xl shadow-xl p-5 sm:p-7 border border-[#719100]/15">
               <div className="text-center mb-6">
-                <div className="w-12 h-12 rounded-2xl bg-[#f3f4f6] text-[#1b263b] flex items-center justify-center mx-auto mb-3 shadow-inner">
-                  <Search className="w-6 h-6 text-[#3875b6]" />
+                <div className="w-12 h-12 rounded-2xl bg-[#eef2dc] text-[#719100] flex items-center justify-center mx-auto mb-3 shadow-inner">
+                  <Search className="w-6 h-6 text-[#719100]" />
                 </div>
-                <h2 className="text-lg sm:text-xl font-black text-[#0d1b2a]">
+                <h2 className="text-lg sm:text-xl font-black text-[#192200]">
                   Find Your Registration Pass
                 </h2>
-                <p className="text-xs text-[#415a77] mt-1">
+                <p className="text-xs text-[#576b2d] mt-1">
                   Type your name below. The system searches registered alumni based on your typed spellings.
                 </p>
               </div>
 
               {/* Name Input */}
               <div className="relative mb-4">
-                <label className="block text-xs font-bold uppercase tracking-wider text-[#415a77] mb-2">
+                <label className="block text-xs font-bold uppercase tracking-wider text-[#576b2d] mb-2">
                   Type Registered Name
                 </label>
                 <div className="relative">
@@ -370,12 +370,12 @@ export default function GetPassPage() {
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                     placeholder="e.g. Shaheer, Majid, Muhammed..."
-                    className="w-full pl-11 pr-10 py-3.5 rounded-2xl bg-[#f3f4f6] border border-black/[0.05] text-[#0d1b2a] text-sm sm:text-base font-medium focus:bg-white focus:border-[#3875b6] focus:ring-4 focus:ring-[#3875b6]/15 outline-none transition-all"
+                    className="w-full pl-11 pr-10 py-3.5 rounded-2xl bg-[#eef2dc] border border-[#719100]/15 text-[#192200] text-sm sm:text-base font-medium focus:bg-white focus:border-[#719100] focus:ring-4 focus:ring-[#719100]/15 outline-none transition-all"
                     autoFocus
                   />
-                  <Search className="w-5 h-5 text-[#778da9] absolute left-3.5 top-1/2 -translate-y-1/2" />
+                  <Search className="w-5 h-5 text-[#6e8242] absolute left-3.5 top-1/2 -translate-y-1/2" />
                   {isSearching && (
-                    <RefreshCw className="w-4 h-4 text-[#3875b6] animate-spin absolute right-3.5 top-1/2 -translate-y-1/2" />
+                    <RefreshCw className="w-4 h-4 text-[#719100] animate-spin absolute right-3.5 top-1/2 -translate-y-1/2" />
                   )}
                 </div>
 
@@ -383,7 +383,7 @@ export default function GetPassPage() {
                 <div className="mt-2.5 flex items-center justify-between">
                   <Link
                     href="/"
-                    className="inline-flex items-center gap-1.5 text-xs font-bold text-[#3875b6] hover:text-[#0d1b2a] hover:underline transition-colors cursor-pointer"
+                    className="inline-flex items-center gap-1.5 text-xs font-bold text-[#719100] hover:text-[#4d6300] hover:underline transition-colors cursor-pointer"
                   >
                     <ArrowLeft className="w-3.5 h-3.5" />
                     <span>Back to Registration</span>
@@ -394,30 +394,30 @@ export default function GetPassPage() {
               {/* Search Autocomplete Suggestions */}
               {searchTerm.trim().length > 0 && (
                 <div className="mt-3 space-y-2">
-                  <div className="flex items-center justify-between text-[11px] font-bold text-[#778da9] uppercase tracking-wider px-1">
+                  <div className="flex items-center justify-between text-[11px] font-bold text-[#6e8242] uppercase tracking-wider px-1">
                     <span>Matching Registered Alumni</span>
                     <span>{searchResults.length} found</span>
                   </div>
 
                   {searchResults.length > 0 ? (
-                    <div className="divide-y divide-black/[0.05] max-h-80 overflow-y-auto rounded-2xl border border-black/[0.06] bg-[#f9f9f8]">
+                    <div className="divide-y divide-[#719100]/10 max-h-80 overflow-y-auto rounded-2xl border border-[#719100]/15 bg-[#f9fbf2]">
                       {searchResults.map((alumnus) => (
                         <button
                           key={alumnus.registrationId}
                           type="button"
                           onClick={() => handleSelectName(alumnus)}
-                          className="w-full text-left p-3.5 hover:bg-white hover:shadow-sm transition-all flex items-center justify-between gap-3 group cursor-pointer"
+                          className="w-full text-left p-3.5 hover:bg-[#eef2dc] hover:shadow-sm transition-all flex items-center justify-between gap-3 group cursor-pointer"
                         >
                           <div className="flex items-center gap-3 min-w-0">
-                            <div className="w-9 h-9 rounded-xl bg-[#e3e8ee] text-[#1b263b] flex items-center justify-center font-bold text-sm shrink-0 group-hover:bg-[#1b263b] group-hover:text-white transition-colors">
+                            <div className="w-9 h-9 rounded-xl bg-[#719100] text-white flex items-center justify-center font-bold text-sm shrink-0 group-hover:bg-[#2d3a00] transition-colors">
                               {alumnus.fullName.charAt(0).toUpperCase()}
                             </div>
                             <div className="min-w-0">
-                              <h3 className="text-sm font-bold text-[#0d1b2a] truncate group-hover:text-[#3875b6] transition-colors">
+                              <h3 className="text-sm font-bold text-[#192200] truncate group-hover:text-[#719100] transition-colors">
                                 {alumnus.fullName}
                               </h3>
-                              <div className="flex flex-wrap items-center gap-1.5 text-[11px] text-[#778da9] mt-0.5">
-                                <span className="font-semibold text-[#415a77]">
+                              <div className="flex flex-wrap items-center gap-1.5 text-[11px] text-[#576b2d] mt-0.5">
+                                <span className="font-semibold text-[#719100]">
                                   {alumnus.batchYear}
                                 </span>
                                 {alumnus.place && (
@@ -430,7 +430,7 @@ export default function GetPassPage() {
                             </div>
                           </div>
 
-                          <div className="shrink-0 text-xs font-bold text-[#3875b6] bg-white border border-[#3875b6]/30 group-hover:bg-[#3875b6] group-hover:text-white px-3 py-1 rounded-xl transition-all">
+                          <div className="shrink-0 text-xs font-bold text-[#719100] bg-white border border-[#719100]/30 group-hover:bg-[#719100] group-hover:text-white px-3 py-1 rounded-xl transition-all">
                             Select ➔
                           </div>
                         </button>
@@ -438,13 +438,13 @@ export default function GetPassPage() {
                     </div>
                   ) : (
                     hasSearched && (
-                      <div className="text-center py-8 px-4 bg-[#f9f9f8] rounded-2xl border border-dashed border-[#c8d1dc]">
-                        <p className="text-xs font-bold text-[#415a77]">
+                      <div className="text-center py-8 px-4 bg-[#f9fbf2] rounded-2xl border border-dashed border-[#719100]/30">
+                        <p className="text-xs font-bold text-[#576b2d]">
                           No registered alumni found matching &ldquo;{searchTerm}&rdquo;
                         </p>
-                        <p className="text-[11px] text-[#778da9] mt-1">
+                        <p className="text-[11px] text-[#6e8242] mt-1">
                           Check your spelling or{" "}
-                          <Link href="/" className="text-[#3875b6] font-semibold underline">
+                          <Link href="/" className="text-[#719100] font-bold underline">
                             register as a new member
                           </Link>
                           .
@@ -457,8 +457,8 @@ export default function GetPassPage() {
 
               {/* Help tip */}
               {!searchTerm && (
-                <div className="mt-6 p-4 rounded-2xl bg-[#f3f4f6] text-xs text-[#415a77] flex items-start gap-2.5">
-                  <Sparkles className="w-4 h-4 text-amber-500 shrink-0 mt-0.5" />
+                <div className="mt-6 p-4 rounded-2xl bg-[#eef2dc] text-xs text-[#576b2d] flex items-start gap-2.5 border border-[#719100]/15">
+                  <Sparkles className="w-4 h-4 text-[#719100] shrink-0 mt-0.5" />
                   <p>
                     Tip: Start typing your first name or surname. Once your name appears in the list, click it and enter your mobile number to retrieve your pass with the QR code.
                   </p>
@@ -469,21 +469,21 @@ export default function GetPassPage() {
 
           {/* STEP 2: Mobile Number Verification */}
           {selectedCandidate && !verifiedPass && (
-            <div className="bg-white rounded-3xl shadow-xl p-5 sm:p-7 border border-black/[0.04]">
+            <div className="bg-white rounded-3xl shadow-xl p-5 sm:p-7 border border-[#719100]/15">
               {/* Selected Candidate Banner */}
-              <div className="flex items-center justify-between pb-4 mb-5 border-b border-black/[0.06]">
+              <div className="flex items-center justify-between pb-4 mb-5 border-b border-[#719100]/15">
                 <div className="flex items-center gap-3">
-                  <div className="w-11 h-11 rounded-2xl bg-[#1b263b] text-white flex items-center justify-center font-extrabold text-base">
+                  <div className="w-11 h-11 rounded-2xl bg-[#2d3a00] text-white flex items-center justify-center font-extrabold text-base">
                     {selectedCandidate.fullName.charAt(0).toUpperCase()}
                   </div>
                   <div>
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-[#778da9]">
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-[#6e8242]">
                       Selected Alumnus
                     </span>
-                    <h3 className="text-base font-black text-[#0d1b2a]">
+                    <h3 className="text-base font-black text-[#192200]">
                       {selectedCandidate.fullName}
                     </h3>
-                    <p className="text-xs text-[#415a77]">
+                    <p className="text-xs text-[#576b2d]">
                       {selectedCandidate.batchYear} • {selectedCandidate.place}
                     </p>
                   </div>
@@ -492,7 +492,7 @@ export default function GetPassPage() {
                 <button
                   type="button"
                   onClick={() => setSelectedCandidate(null)}
-                  className="text-xs font-bold text-[#3875b6] hover:underline cursor-pointer"
+                  className="text-xs font-bold text-[#719100] hover:underline cursor-pointer"
                 >
                   Change
                 </button>
@@ -501,10 +501,10 @@ export default function GetPassPage() {
               {/* Phone Prompt */}
               <form onSubmit={handleVerify} className="space-y-4">
                 <div>
-                  <label className="block text-xs font-bold uppercase tracking-wider text-[#415a77] mb-1.5">
+                  <label className="block text-xs font-bold uppercase tracking-wider text-[#576b2d] mb-1.5">
                     Enter Registered Mobile Number
                   </label>
-                  <p className="text-xs text-[#778da9] mb-2.5">
+                  <p className="text-xs text-[#6e8242] mb-2.5">
                     For your privacy and security, enter the phone number you used during registration to view your pass.
                   </p>
                   <div className="relative">
@@ -516,10 +516,10 @@ export default function GetPassPage() {
                         setVerifyError("");
                       }}
                       placeholder="e.g. 9633050025 or +91..."
-                      className="w-full pl-11 pr-4 py-3.5 rounded-2xl bg-[#f3f4f6] border border-black/[0.05] text-[#0d1b2a] text-sm sm:text-base font-mono font-medium focus:bg-white focus:border-[#3875b6] focus:ring-4 focus:ring-[#3875b6]/15 outline-none transition-all"
+                      className="w-full pl-11 pr-4 py-3.5 rounded-2xl bg-[#eef2dc] border border-[#719100]/15 text-[#192200] text-sm sm:text-base font-mono font-medium focus:bg-white focus:border-[#719100] focus:ring-4 focus:ring-[#719100]/15 outline-none transition-all"
                       autoFocus
                     />
-                    <Phone className="w-5 h-5 text-[#778da9] absolute left-3.5 top-1/2 -translate-y-1/2" />
+                    <Phone className="w-5 h-5 text-[#6e8242] absolute left-3.5 top-1/2 -translate-y-1/2" />
                   </div>
                 </div>
 
@@ -534,7 +534,7 @@ export default function GetPassPage() {
                   <button
                     type="submit"
                     disabled={verifyLoading}
-                    className="flex-1 py-3.5 px-5 rounded-xl bg-gradient-to-r from-[#1b263b] to-[#0d1b2a] hover:from-[#0d1b2a] hover:to-[#1b263b] text-white font-bold text-sm flex items-center justify-center gap-2 shadow-md transition-all cursor-pointer disabled:opacity-50"
+                    className="flex-1 py-3.5 px-5 rounded-xl bg-gradient-to-r from-[#719100] via-[#5d7700] to-[#719100] hover:from-[#5d7700] hover:to-[#4a6000] text-white font-bold text-sm flex items-center justify-center gap-2 shadow-md transition-all cursor-pointer disabled:opacity-50"
                   >
                     {verifyLoading ? (
                       <>
@@ -543,7 +543,7 @@ export default function GetPassPage() {
                       </>
                     ) : (
                       <>
-                        <ShieldCheck className="w-4 h-4 text-emerald-400" />
+                        <ShieldCheck className="w-4 h-4 text-[#fff000]" />
                         <span>Verify & Generate Pass</span>
                       </>
                     )}
@@ -552,7 +552,7 @@ export default function GetPassPage() {
                   <button
                     type="button"
                     onClick={() => setSelectedCandidate(null)}
-                    className="py-3.5 px-4 rounded-xl bg-[#f3f4f6] hover:bg-[#e3e8ee] text-[#415a77] font-semibold text-xs transition-colors cursor-pointer"
+                    className="py-3.5 px-4 rounded-xl bg-[#eef2dc] hover:bg-[#e4eacb] text-[#576b2d] font-bold text-xs transition-colors cursor-pointer"
                   >
                     Cancel
                   </button>
@@ -569,14 +569,14 @@ export default function GetPassPage() {
                 <button
                   type="button"
                   onClick={handleReset}
-                  className="inline-flex items-center gap-1.5 text-xs font-bold text-[#3875b6] hover:underline cursor-pointer"
+                  className="inline-flex items-center gap-1.5 text-xs font-bold text-[#719100] hover:underline cursor-pointer"
                 >
                   <ArrowLeft className="w-3.5 h-3.5" />
                   <span>Search Another Pass</span>
                 </button>
 
-                <span className="text-[11px] font-bold text-emerald-700 bg-emerald-100 px-3 py-1 rounded-full flex items-center gap-1">
-                  <CheckCircle2 className="w-3.5 h-3.5" />
+                <span className="text-[11px] font-bold text-[#2d3a00] bg-[#719100]/20 px-3 py-1 rounded-full flex items-center gap-1 border border-[#719100]/30">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-[#719100]" />
                   Identity Verified
                 </span>
               </div>
@@ -635,27 +635,27 @@ export default function GetPassPage() {
               </div>
 
               {/* Attendee Details & Event Reporting Card */}
-              <div className="bg-white rounded-2xl p-4 sm:p-5 shadow-sm border border-black/[0.06] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+              <div className="bg-white rounded-2xl p-4 sm:p-5 shadow-sm border border-[#719100]/15 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
                 <div>
-                  <span className="text-[10px] font-bold text-[#778da9] uppercase tracking-wider">
+                  <span className="text-[10px] font-bold text-[#6e8242] uppercase tracking-wider">
                     Attendee
                   </span>
-                  <h4 className="text-base font-black text-[#0d1b2a] uppercase">
+                  <h4 className="text-base font-black text-[#192200] uppercase">
                     {verifiedPass.fullName}
                   </h4>
-                  <p className="text-xs text-[#415a77]">
+                  <p className="text-xs text-[#576b2d]">
                     {verifiedPass.batchYear || verifiedPass.joinedBatch}{verifiedPass.place ? ` • ${verifiedPass.place}` : ""}
                   </p>
                 </div>
 
                 <div>
                   {verifiedPass.isReported ? (
-                    <span className="inline-flex items-center gap-1 text-xs font-bold text-emerald-800 bg-emerald-100 px-3 py-1.5 rounded-xl">
-                      <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                    <span className="inline-flex items-center gap-1 text-xs font-bold text-[#2d3a00] bg-[#719100]/20 px-3 py-1.5 rounded-xl border border-[#719100]/30">
+                      <CheckCircle2 className="w-4 h-4 text-[#719100]" />
                       <span>Reported Present ({verifiedPass.reportedAt || "Verified"})</span>
                     </span>
                   ) : (
-                    <span className="inline-flex items-center gap-1 text-xs font-bold text-amber-800 bg-amber-100 px-3 py-1.5 rounded-xl">
+                    <span className="inline-flex items-center gap-1 text-xs font-bold text-amber-900 bg-amber-100 px-3 py-1.5 rounded-xl border border-amber-200">
                       <span>⏱️</span>
                       <span>Pending Check-in at Event</span>
                     </span>
@@ -670,9 +670,9 @@ export default function GetPassPage() {
                   type="button"
                   onClick={handleDownloadImage}
                   disabled={isDownloading || isGeneratingPass}
-                  className="w-full py-4 px-5 rounded-2xl bg-gradient-to-r from-[#5c7c00] via-[#486300] to-[#5c7c00] hover:from-[#486300] hover:to-[#384e00] text-white font-extrabold text-sm sm:text-base flex items-center justify-center gap-2.5 shadow-xl transition-all cursor-pointer hover:scale-[1.01] active:scale-[0.99] disabled:opacity-50"
+                  className="w-full py-4 px-5 rounded-2xl bg-gradient-to-r from-[#719100] via-[#5d7700] to-[#719100] hover:from-[#5d7700] hover:to-[#4a6000] text-white font-black text-sm sm:text-base flex items-center justify-center gap-2.5 shadow-xl transition-all cursor-pointer hover:scale-[1.01] active:scale-[0.99] disabled:opacity-50"
                 >
-                  <Download className="w-5 h-5 text-amber-300" />
+                  <Download className="w-5 h-5 text-[#fff000]" />
                   <span>{isDownloading ? "Preparing Image..." : "Download Official Pass (PNG)"}</span>
                 </button>
               </div>

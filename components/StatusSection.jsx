@@ -5,9 +5,9 @@ export default function StatusSection({ formData, errors, onChange, onSelectStat
   const isStudy = formData.currentStatus === "Study";
 
   return (
-    <div className="space-y-4 pt-4 border-t border-black/[0.05]">
+    <div className="space-y-4 pt-4 border-t border-[#719100]/15">
       <div>
-        <h3 className="text-xs sm:text-sm font-extrabold tracking-wider text-[#0d1b2a] uppercase">
+        <h3 className="text-xs sm:text-sm font-extrabold tracking-wider text-[#192200] uppercase">
           Current Status
         </h3>
       </div>
@@ -19,11 +19,11 @@ export default function StatusSection({ formData, errors, onChange, onSelectStat
           onClick={() => onSelectStatus("Job")}
           className={`flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl border-0 font-bold text-sm transition-all cursor-pointer ${
             isJob
-              ? "bg-[#1b263b] text-white shadow-sm"
-              : "bg-[#f3f4f6] text-[#415a77] hover:bg-[#eaecee]"
+              ? "bg-[#719100] text-white shadow-sm"
+              : "bg-[#eef2dc] text-[#576b2d] hover:bg-[#e4eacb]"
           }`}
         >
-          <Briefcase className={`w-4 h-4 ${isJob ? "text-white" : "text-[#778da9]"}`} />
+          <Briefcase className={`w-4 h-4 ${isJob ? "text-white" : "text-[#6e8242]"}`} />
           <span>Job</span>
         </button>
 
@@ -32,11 +32,11 @@ export default function StatusSection({ formData, errors, onChange, onSelectStat
           onClick={() => onSelectStatus("Study")}
           className={`flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl border-0 font-bold text-sm transition-all cursor-pointer ${
             isStudy
-              ? "bg-[#1b263b] text-white shadow-sm"
-              : "bg-[#f3f4f6] text-[#415a77] hover:bg-[#eaecee]"
+              ? "bg-[#719100] text-white shadow-sm"
+              : "bg-[#eef2dc] text-[#576b2d] hover:bg-[#e4eacb]"
           }`}
         >
-          <BookOpen className={`w-4 h-4 ${isStudy ? "text-white" : "text-[#778da9]"}`} />
+          <BookOpen className={`w-4 h-4 ${isStudy ? "text-white" : "text-[#6e8242]"}`} />
           <span>Study</span>
         </button>
       </div>
@@ -45,7 +45,7 @@ export default function StatusSection({ formData, errors, onChange, onSelectStat
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5 pt-1">
         {/* Job / Designation or Course */}
         <div>
-          <label className="block text-xs sm:text-sm font-bold text-[#1b263b] mb-1">
+          <label className="block text-xs sm:text-sm font-bold text-[#192200] mb-1">
             {isStudy ? "Course / Field" : "Job / Designation"}{" "}
             <span className="text-red-500">*</span>
           </label>
@@ -64,7 +64,7 @@ export default function StatusSection({ formData, errors, onChange, onSelectStat
 
         {/* Institution / Company Name */}
         <div>
-          <label className="block text-xs sm:text-sm font-bold text-[#1b263b] mb-1">
+          <label className="block text-xs sm:text-sm font-bold text-[#192200] mb-1">
             {isStudy ? "Institution / University" : "Company / Organization"}{" "}
             <span className="text-red-500">*</span>
           </label>
@@ -83,7 +83,7 @@ export default function StatusSection({ formData, errors, onChange, onSelectStat
 
         {/* Work / Study Location */}
         <div>
-          <label className="block text-xs sm:text-sm font-bold text-[#1b263b] mb-1">
+          <label className="block text-xs sm:text-sm font-bold text-[#192200] mb-1">
             {isStudy ? "Study Location" : "Work Location"}{" "}
             <span className="text-red-500">*</span>
           </label>

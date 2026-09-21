@@ -17,7 +17,7 @@ export default function StepBatchSelect({
       <div>
         <label
           htmlFor="batchSelect"
-          className="block text-sm sm:text-base font-bold text-[#0d1b2a] mb-1.5"
+          className="block text-sm sm:text-base font-bold text-[#192200] mb-1.5"
         >
           Joined with Batch <span className="text-red-500">*</span>
         </label>
@@ -27,7 +27,7 @@ export default function StepBatchSelect({
             id="batchSelect"
             value={selectedBatch}
             onChange={(e) => onSelectBatch(e.target.value)}
-            className={`form-select font-medium text-[#1b263b] ${
+            className={`form-select font-medium text-[#192200] ${
               error ? "form-input-error" : ""
             }`}
           >
@@ -49,7 +49,7 @@ export default function StepBatchSelect({
 
       {/* Section Checkboxes: HS and BS */}
       <div>
-        <label className="block text-xs sm:text-sm font-bold text-[#1b263b] mb-1.5">
+        <label className="block text-xs sm:text-sm font-bold text-[#192200] mb-1.5">
           Section (HS / BS)
         </label>
         
@@ -60,15 +60,15 @@ export default function StepBatchSelect({
             onClick={() => onToggleSection && onToggleSection("HS")}
             className={`flex items-center gap-2.5 px-4 py-2.5 rounded-xl border font-bold text-xs sm:text-sm transition-all cursor-pointer select-none ${
               isHS
-                ? "bg-[#1b263b] text-white border-[#1b263b] shadow-sm"
-                : "bg-[#f3f4f6] text-[#415a77] border-black/[0.06] hover:bg-[#eaecee]"
+                ? "bg-[#719100] text-white border-[#719100] shadow-sm"
+                : "bg-[#eef2dc] text-[#576b2d] border-[#719100]/20 hover:bg-[#e4eacb]"
             }`}
           >
             <div
               className={`w-4 h-4 rounded flex items-center justify-center transition-colors shrink-0 ${
                 isHS
-                  ? "bg-white text-[#1b263b]"
-                  : "bg-white border border-[#c8d1dc]"
+                  ? "bg-white text-[#719100]"
+                  : "bg-white border border-[#cbd8a7]"
               }`}
             >
               {isHS && <Check className="w-3 h-3 stroke-[3]" />}
@@ -82,15 +82,15 @@ export default function StepBatchSelect({
             onClick={() => onToggleSection && onToggleSection("BS")}
             className={`flex items-center gap-2.5 px-4 py-2.5 rounded-xl border font-bold text-xs sm:text-sm transition-all cursor-pointer select-none ${
               isBS
-                ? "bg-[#1b263b] text-white border-[#1b263b] shadow-sm"
-                : "bg-[#f3f4f6] text-[#415a77] border-black/[0.06] hover:bg-[#eaecee]"
+                ? "bg-[#719100] text-white border-[#719100] shadow-sm"
+                : "bg-[#eef2dc] text-[#576b2d] border-[#719100]/20 hover:bg-[#e4eacb]"
             }`}
           >
             <div
               className={`w-4 h-4 rounded flex items-center justify-center transition-colors shrink-0 ${
                 isBS
-                  ? "bg-white text-[#1b263b]"
-                  : "bg-white border border-[#c8d1dc]"
+                  ? "bg-white text-[#719100]"
+                  : "bg-white border border-[#cbd8a7]"
               }`}
             >
               {isBS && <Check className="w-3 h-3 stroke-[3]" />}
@@ -99,7 +99,7 @@ export default function StepBatchSelect({
           </button>
 
           {(isHS || isBS) && (
-            <span className="text-xs text-[#3875b6] font-semibold bg-[#3875b6]/10 px-2.5 py-1 rounded-lg">
+            <span className="text-xs text-[#556d00] font-bold bg-[#719100]/15 px-2.5 py-1 rounded-lg">
               Selected: {[isHS ? "HS" : null, isBS ? "BS" : null].filter(Boolean).join(" & ")}
             </span>
           )}

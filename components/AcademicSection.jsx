@@ -160,16 +160,16 @@ export default function AcademicSection({ formData, errors, onChange, setFormDat
   };
 
   return (
-    <div className="space-y-4 pt-4 border-t border-black/[0.05]">
+    <div className="space-y-4 pt-4 border-t border-[#719100]/15">
       <div>
-        <h3 className="text-xs sm:text-sm font-extrabold tracking-wider text-[#0d1b2a] uppercase">
+        <h3 className="text-xs sm:text-sm font-extrabold tracking-wider text-[#192200] uppercase">
           Qualifications & Academic Record
         </h3>
       </div>
 
       {/* Hifz Status: Hafiz or Not Checkbox Buttons */}
       <div>
-        <label className="block text-xs sm:text-sm font-bold text-[#1b263b] mb-1.5">
+        <label className="block text-xs sm:text-sm font-bold text-[#192200] mb-1.5">
           Hifz Status <span className="text-red-500">*</span>
         </label>
         <div className="grid grid-cols-2 gap-2.5 max-w-xs">
@@ -179,15 +179,15 @@ export default function AcademicSection({ formData, errors, onChange, setFormDat
             onClick={() => handleHifzToggle("Hafiz")}
             className={`flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl border-0 font-bold text-xs sm:text-sm transition-all cursor-pointer select-none text-left ${
               formData.hifzStatus === "Hafiz"
-                ? "bg-emerald-600 text-white shadow-sm"
-                : "bg-[#f3f4f6] text-[#415a77] hover:bg-[#eaecee]"
+                ? "bg-[#719100] text-white shadow-sm"
+                : "bg-[#eef2dc] text-[#576b2d] hover:bg-[#e4eacb]"
             }`}
           >
             <div
               className={`w-4 h-4 rounded flex items-center justify-center transition-colors shrink-0 ${
                 formData.hifzStatus === "Hafiz"
                   ? "bg-white/20 text-white"
-                  : "bg-white border border-[#c8d1dc]"
+                  : "bg-white border border-[#cbd8a7]"
               }`}
             >
               {formData.hifzStatus === "Hafiz" && <Check className="w-3 h-3 stroke-[3]" />}
@@ -201,15 +201,15 @@ export default function AcademicSection({ formData, errors, onChange, setFormDat
             onClick={() => handleHifzToggle("Not Hafiz")}
             className={`flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl border-0 font-bold text-xs sm:text-sm transition-all cursor-pointer select-none text-left ${
               formData.hifzStatus === "Not Hafiz"
-                ? "bg-[#1b263b] text-white shadow-sm"
-                : "bg-[#f3f4f6] text-[#415a77] hover:bg-[#eaecee]"
+                ? "bg-[#2d3a00] text-white shadow-sm"
+                : "bg-[#eef2dc] text-[#576b2d] hover:bg-[#e4eacb]"
             }`}
           >
             <div
               className={`w-4 h-4 rounded flex items-center justify-center transition-colors shrink-0 ${
                 formData.hifzStatus === "Not Hafiz"
                   ? "bg-white/20 text-white"
-                  : "bg-white border border-[#c8d1dc]"
+                  : "bg-white border border-[#cbd8a7]"
               }`}
             >
               {formData.hifzStatus === "Not Hafiz" && <Check className="w-3 h-3 stroke-[3]" />}
@@ -225,7 +225,7 @@ export default function AcademicSection({ formData, errors, onChange, setFormDat
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         {/* Islamic Qualification */}
         <div>
-          <label className="block text-xs sm:text-sm font-bold text-[#1b263b] mb-1">
+          <label className="block text-xs sm:text-sm font-bold text-[#192200] mb-1">
             Islamic Qualification <span className="text-red-500">*</span>
           </label>
 
@@ -242,7 +242,7 @@ export default function AcademicSection({ formData, errors, onChange, setFormDat
                   {q}
                 </option>
               ))}
-              <option value="__ADD_NEW__" className="font-semibold text-[#3875b6]">
+              <option value="__ADD_NEW__" className="font-bold text-[#719100]">
                 + Other / Add Custom...
               </option>
             </select>
@@ -269,7 +269,7 @@ export default function AcademicSection({ formData, errors, onChange, setFormDat
                   <button
                     type="button"
                     onClick={handleSaveCustomIslamic}
-                    className="p-1 text-[#1b263b] hover:text-emerald-700 cursor-pointer"
+                    className="p-1 text-[#719100] hover:text-[#556d00] cursor-pointer"
                     title="Save qualification"
                   >
                     <Check className="w-4 h-4" />
@@ -278,7 +278,7 @@ export default function AcademicSection({ formData, errors, onChange, setFormDat
                 <button
                   type="button"
                   onClick={handleCancelCustomIslamic}
-                  className="p-1 text-[#778da9] hover:text-[#0d1b2a] cursor-pointer"
+                  className="p-1 text-[#6e8242] hover:text-[#192200] cursor-pointer"
                   title="Cancel & choose from list"
                 >
                   <X className="w-4 h-4" />
@@ -294,7 +294,7 @@ export default function AcademicSection({ formData, errors, onChange, setFormDat
 
         {/* Academic Qualification */}
         <div>
-          <label className="block text-xs sm:text-sm font-bold text-[#1b263b] mb-1">
+          <label className="block text-xs sm:text-sm font-bold text-[#192200] mb-1">
             Academic Qualification <span className="text-red-500">*</span>
           </label>
 
@@ -311,7 +311,7 @@ export default function AcademicSection({ formData, errors, onChange, setFormDat
                   {q}
                 </option>
               ))}
-              <option value="__ADD_NEW__" className="font-semibold text-[#3875b6]">
+              <option value="__ADD_NEW__" className="font-bold text-[#719100]">
                 + Other / Add Custom...
               </option>
             </select>
@@ -338,7 +338,7 @@ export default function AcademicSection({ formData, errors, onChange, setFormDat
                   <button
                     type="button"
                     onClick={handleSaveCustomAcademic}
-                    className="p-1 text-[#1b263b] hover:text-emerald-700 cursor-pointer"
+                    className="p-1 text-[#719100] hover:text-[#556d00] cursor-pointer"
                     title="Save qualification"
                   >
                     <Check className="w-4 h-4" />
@@ -347,7 +347,7 @@ export default function AcademicSection({ formData, errors, onChange, setFormDat
                 <button
                   type="button"
                   onClick={handleCancelCustomAcademic}
-                  className="p-1 text-[#778da9] hover:text-[#0d1b2a] cursor-pointer"
+                  className="p-1 text-[#6e8242] hover:text-[#192200] cursor-pointer"
                   title="Cancel & choose from list"
                 >
                   <X className="w-4 h-4" />

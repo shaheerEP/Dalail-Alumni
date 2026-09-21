@@ -61,7 +61,7 @@ export default function StepNameSearch({
   return (
     <div className="space-y-2 pt-2" ref={containerRef}>
       <div className="flex items-center justify-between">
-        <label className="block text-sm sm:text-base font-bold text-[#0d1b2a]">
+        <label className="block text-sm sm:text-base font-bold text-[#192200]">
           Select Your Name <span className="text-red-500">*</span>
         </label>
 
@@ -69,7 +69,7 @@ export default function StepNameSearch({
         <button
           type="button"
           onClick={onToggleManualEntry}
-          className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-semibold text-[#3875b6] hover:text-[#234870] transition-colors py-1 px-2.5 rounded-lg hover:bg-[#e3e8ee] cursor-pointer"
+          className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-bold text-[#719100] hover:text-[#556d00] transition-colors py-1 px-2.5 rounded-lg hover:bg-[#eef2dc] cursor-pointer"
         >
           {isManualEntry ? (
             <>
@@ -84,8 +84,8 @@ export default function StepNameSearch({
 
       {!isManualEntry ? (
         <div className="relative">
-          <div className="flex items-center w-full rounded-xl bg-[#f3f4f6] px-4 py-2.5 transition-all border-0 focus-within:bg-white focus-within:ring-3 focus-within:ring-[#3875b6]/15">
-            <Search className="w-5 h-5 text-[#778da9] shrink-0 mr-3 pointer-events-none" />
+          <div className="flex items-center w-full rounded-xl bg-[#eef2dc] px-4 py-2.5 transition-all border border-[#719100]/15 focus-within:bg-white focus-within:ring-3 focus-within:ring-[#719100]/20 focus-within:border-[#719100]">
+            <Search className="w-5 h-5 text-[#6e8242] shrink-0 mr-3 pointer-events-none" />
             <input
               type="text"
               placeholder="Search name or place..."
@@ -95,13 +95,13 @@ export default function StepNameSearch({
                 setIsOpen(true);
               }}
               onFocus={() => setIsOpen(true)}
-              className="w-full bg-transparent text-[#0d1b2a] text-sm sm:text-base outline-none font-medium placeholder:text-[#778da9]"
+              className="w-full bg-transparent text-[#192200] text-sm sm:text-base outline-none font-medium placeholder:text-[#6e8242]"
             />
             {searchTerm && (
               <button
                 type="button"
                 onClick={handleClear}
-                className="text-[#778da9] hover:text-[#0d1b2a] p-1 shrink-0 ml-1 cursor-pointer"
+                className="text-[#6e8242] hover:text-[#192200] p-1 shrink-0 ml-1 cursor-pointer"
                 title="Clear search"
               >
                 <X className="w-4 h-4" />
@@ -111,36 +111,36 @@ export default function StepNameSearch({
 
           {/* Autocomplete Dropdown */}
           {isOpen && (
-            <div className="absolute z-30 left-0 right-0 mt-1.5 bg-white rounded-2xl shadow-xl border-0 overflow-hidden max-h-60 overflow-y-auto">
+            <div className="absolute z-30 left-0 right-0 mt-1.5 bg-white rounded-2xl shadow-xl border border-[#719100]/20 overflow-hidden max-h-60 overflow-y-auto">
               {filteredRoster.length > 0 ? (
-                <div className="divide-y divide-[#e3e8ee]">
+                <div className="divide-y divide-[#719100]/10">
                   {filteredRoster.map((student) => (
                     <div
                       key={student.id || student.name}
                       onClick={() => handleSelect(student)}
-                      className={`p-3 hover:bg-[#e3e8ee]/80 cursor-pointer flex items-center justify-between transition-colors ${
-                        selectedStudent?.id === student.id ? "bg-[#c5d0e4]/40 font-semibold" : ""
+                      className={`p-3 hover:bg-[#f5f7eb] cursor-pointer flex items-center justify-between transition-colors ${
+                        selectedStudent?.id === student.id ? "bg-[#719100]/15 font-semibold" : ""
                       }`}
                     >
                       <div>
-                        <div className="text-sm font-bold text-[#0d1b2a]">{student.name}</div>
+                        <div className="text-sm font-bold text-[#192200]">{student.name}</div>
                         {student.place && (
-                          <div className="text-xs text-[#415a77]">{student.place}</div>
+                          <div className="text-xs text-[#576b2d]">{student.place}</div>
                         )}
                       </div>
                       {selectedStudent?.id === student.id && (
-                        <Check className="w-4 h-4 text-[#3875b6]" />
+                        <Check className="w-4 h-4 text-[#719100]" />
                       )}
                     </div>
                   ))}
                 </div>
               ) : (
-                <div className="p-4 text-center text-sm text-[#415a77]">
+                <div className="p-4 text-center text-sm text-[#576b2d]">
                   <p>No matching name found.</p>
                   <button
                     type="button"
                     onClick={onToggleManualEntry}
-                    className="mt-2 text-xs font-semibold text-[#3875b6] hover:underline cursor-pointer"
+                    className="mt-2 text-xs font-bold text-[#719100] hover:underline cursor-pointer"
                   >
                     Enter name manually
                   </button>
@@ -150,12 +150,12 @@ export default function StepNameSearch({
           )}
         </div>
       ) : (
-        <div className="bg-[#f3f4f6] rounded-xl px-4 py-2.5 text-xs text-[#1b263b] flex items-center justify-between border-0">
+        <div className="bg-[#eef2dc] rounded-xl px-4 py-2.5 text-xs text-[#2d3a00] flex items-center justify-between border border-[#719100]/15">
           <span>Entering details manually</span>
           <button
             type="button"
             onClick={onToggleManualEntry}
-            className="font-bold underline text-[#3875b6] cursor-pointer"
+            className="font-bold underline text-[#719100] hover:text-[#556d00] cursor-pointer"
           >
             Search list
           </button>

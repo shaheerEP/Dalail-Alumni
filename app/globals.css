@@ -1,65 +1,65 @@
 @import "tailwindcss";
 
 @theme {
-  --color-ink-black: #0d1b2a;
-  --color-ink-black-100: #030609;
-  --color-ink-black-200: #050b11;
-  --color-ink-black-300: #08111a;
-  --color-ink-black-400: #0b1622;
-  --color-ink-black-500: #0d1b2a;
-  --color-ink-black-600: #234870;
-  --color-ink-black-700: #3875b6;
-  --color-ink-black-800: #74a3d4;
-  --color-ink-black-900: #bad1ea;
+  --color-ink-black: #192200;
+  --color-ink-black-100: #0a0e00;
+  --color-ink-black-200: #121800;
+  --color-ink-black-300: #192200;
+  --color-ink-black-400: #232d00;
+  --color-ink-black-500: #2d3a00;
+  --color-ink-black-600: #495e00;
+  --color-ink-black-700: #719100;
+  --color-ink-black-800: #99c200;
+  --color-ink-black-900: #d6f264;
 
-  --color-prussian-blue: #1b263b;
-  --color-prussian-blue-100: #05080c;
-  --color-prussian-blue-200: #0b0f18;
-  --color-prussian-blue-300: #101724;
-  --color-prussian-blue-400: #161f30;
-  --color-prussian-blue-500: #1b263b;
-  --color-prussian-blue-600: #364c75;
-  --color-prussian-blue-700: #5172af;
-  --color-prussian-blue-800: #8ba1ca;
-  --color-prussian-blue-900: #c5d0e4;
+  --color-prussian-blue: #2d3a00;
+  --color-prussian-blue-100: #0f1400;
+  --color-prussian-blue-200: #1c2400;
+  --color-prussian-blue-300: #242f00;
+  --color-prussian-blue-400: #2d3a00;
+  --color-prussian-blue-500: #3c4d00;
+  --color-prussian-blue-600: #556d00;
+  --color-prussian-blue-700: #719100;
+  --color-prussian-blue-800: #a7c932;
+  --color-prussian-blue-900: #e2f29e;
 
-  --color-dusk-blue: #415a77;
-  --color-dusk-blue-100: #0d1218;
-  --color-dusk-blue-200: #1a242f;
-  --color-dusk-blue-300: #273647;
-  --color-dusk-blue-400: #34485f;
-  --color-dusk-blue-500: #415a77;
-  --color-dusk-blue-600: #587aa1;
-  --color-dusk-blue-700: #819bb9;
-  --color-dusk-blue-800: #abbcd1;
-  --color-dusk-blue-900: #d5dee8;
+  --color-dusk-blue: #455523;
+  --color-dusk-blue-100: #171d0b;
+  --color-dusk-blue-200: #242e12;
+  --color-dusk-blue-300: #35421a;
+  --color-dusk-blue-400: #455523;
+  --color-dusk-blue-500: #576b2d;
+  --color-dusk-blue-600: #718a3e;
+  --color-dusk-blue-700: #8fa857;
+  --color-dusk-blue-800: #b5c98a;
+  --color-dusk-blue-900: #dce7c3;
 
-  --color-dusty-denim: #778da9;
-  --color-dusty-denim-100: #161c23;
-  --color-dusty-denim-200: #2c3746;
-  --color-dusty-denim-300: #425369;
-  --color-dusty-denim-400: #586f8d;
-  --color-dusty-denim-500: #778da9;
-  --color-dusty-denim-600: #91a2ba;
-  --color-dusty-denim-700: #acbacb;
-  --color-dusty-denim-800: #c8d1dc;
-  --color-dusty-denim-900: #e3e8ee;
+  --color-dusty-denim: #6e8242;
+  --color-dusty-denim-100: #1a200e;
+  --color-dusty-denim-200: #2c3619;
+  --color-dusty-denim-300: #425126;
+  --color-dusty-denim-400: #586b33;
+  --color-dusty-denim-500: #6e8242;
+  --color-dusty-denim-600: #889e5a;
+  --color-dusty-denim-700: #a7bb7c;
+  --color-dusty-denim-800: #cbd8a7;
+  --color-dusty-denim-900: #edf3d5;
 
-  --color-alabaster-grey: #e0e1dd;
-  --color-alabaster-grey-100: #2e2f2a;
-  --color-alabaster-grey-200: #5b5e53;
-  --color-alabaster-grey-300: #898c7e;
-  --color-alabaster-grey-400: #b4b6ad;
-  --color-alabaster-grey-500: #e0e1dd;
-  --color-alabaster-grey-600: #e5e6e3;
-  --color-alabaster-grey-700: #ececea;
-  --color-alabaster-grey-800: #f2f3f1;
-  --color-alabaster-grey-900: #f9f9f8;
+  --color-alabaster-grey: #e8edd7;
+  --color-alabaster-grey-100: #2f3424;
+  --color-alabaster-grey-200: #555d40;
+  --color-alabaster-grey-300: #7f8a61;
+  --color-alabaster-grey-400: #b0bb92;
+  --color-alabaster-grey-500: #e8edd7;
+  --color-alabaster-grey-600: #eef2e1;
+  --color-alabaster-grey-700: #f5f7eb;
+  --color-alabaster-grey-800: #f9fbf1;
+  --color-alabaster-grey-900: #fcfffa;
 }
 
 :root {
-  --page-bg: #ececea;
-  --text-main: #0d1b2a;
+  --page-bg: #f5f7eb;
+  --text-main: #192200;
 }
 
 body {
@@ -71,14 +71,14 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-/* Custom form input styles matching clean borderless aesthetic */
+/* Custom form input styles matching clean borderless pass aesthetic */
 .form-input {
   width: 100%;
   padding: 0.8rem 1.1rem;
   border-radius: 0.875rem;
-  border: 1px solid rgba(0, 0, 0, 0.04);
-  background-color: #f3f4f6;
-  color: #0d1b2a;
+  border: 1px solid rgba(113, 145, 0, 0.15);
+  background-color: #eef2dc;
+  color: #192200;
   font-size: 0.95rem;
   transition: all 0.2s ease;
   outline: none;
@@ -86,8 +86,8 @@ body {
 
 .form-input:focus {
   background-color: #ffffff;
-  border-color: rgba(56, 117, 182, 0.4);
-  box-shadow: 0 0 0 3px rgba(56, 117, 182, 0.12);
+  border-color: #719100;
+  box-shadow: 0 0 0 3px rgba(113, 145, 0, 0.2);
 }
 
 .form-input-error {
@@ -100,14 +100,14 @@ body {
   width: 100%;
   padding: 0.8rem 1.1rem;
   border-radius: 0.875rem;
-  border: 1px solid rgba(0, 0, 0, 0.04);
-  background-color: #f3f4f6;
-  color: #0d1b2a;
+  border: 1px solid rgba(113, 145, 0, 0.15);
+  background-color: #eef2dc;
+  color: #192200;
   font-size: 0.95rem;
   transition: all 0.2s ease;
   outline: none;
   appearance: none;
-  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23415a77' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23576b2d' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
   background-repeat: no-repeat;
   background-position: right 1rem center;
   background-size: 1.1em;
@@ -115,8 +115,8 @@ body {
 
 .form-select:focus {
   background-color: #ffffff;
-  border-color: rgba(56, 117, 182, 0.4);
-  box-shadow: 0 0 0 3px rgba(56, 117, 182, 0.12);
+  border-color: #719100;
+  box-shadow: 0 0 0 3px rgba(113, 145, 0, 0.2);
 }
 
 /* Smooth transition for active cards */

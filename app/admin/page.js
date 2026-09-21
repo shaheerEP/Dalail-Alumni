@@ -417,10 +417,10 @@ export default function AdminPage() {
   // ----------------------------------------------------
   if (isCheckingAuth) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[#0d1b2a] text-white">
+      <div className="min-h-screen flex items-center justify-center bg-[#192200] text-white">
         <div className="flex flex-col items-center gap-3">
-          <RefreshCw className="w-8 h-8 animate-spin text-amber-400" />
-          <p className="text-sm font-medium text-[#8ba1ca]">Loading Admin Portal...</p>
+          <RefreshCw className="w-8 h-8 animate-spin text-[#fff000]" />
+          <p className="text-sm font-medium text-[#e8edd7]">Loading Admin Portal...</p>
         </div>
       </div>
     );
@@ -428,26 +428,26 @@ export default function AdminPage() {
 
   if (!isAuthenticated) {
     return (
-      <div className="min-h-screen flex flex-col justify-center items-center bg-[#ececea] px-4 py-12">
-        <div className="w-full max-w-md bg-white rounded-3xl shadow-2xl p-7 sm:p-8 border border-black/[0.06]">
+      <div className="min-h-screen flex flex-col justify-center items-center bg-[#f5f7eb] px-4 py-12">
+        <div className="w-full max-w-md bg-white rounded-3xl shadow-xl p-7 sm:p-8 border border-[#719100]/15">
           <div className="text-center mb-6">
-            <div className="w-16 h-20 rounded-2xl bg-white mx-auto shadow-md p-2 flex items-center justify-center mb-3 border border-black/[0.06]">
+            <div className="w-16 h-20 rounded-2xl bg-[#eef2dc]/60 mx-auto shadow-sm p-2 flex items-center justify-center mb-3 border border-[#719100]/15">
               <Image src="/logo.png" alt="Logo" width={140} height={170} className="object-contain" priority />
             </div>
-            <span className="text-[11px] font-extrabold uppercase tracking-wider text-[#3875b6]">
+            <span className="text-[11px] font-extrabold uppercase tracking-wider text-[#719100]">
               Dalailul Khairath Kakkidippuram
             </span>
-            <h1 className="text-xl sm:text-2xl font-black text-[#0d1b2a] mt-0.5">
+            <h1 className="text-xl sm:text-2xl font-black text-[#192200] mt-0.5">
               Admin Portal Login
             </h1>
-            <p className="text-xs text-[#778da9] mt-1">
+            <p className="text-xs text-[#576b2d] mt-1">
               LINKUP 2026 Reporting & Management Console
             </p>
           </div>
 
           <form onSubmit={handleLogin} className="space-y-4">
             <div>
-              <label className="block text-xs font-bold uppercase tracking-wider text-[#415a77] mb-1.5">
+              <label className="block text-xs font-bold uppercase tracking-wider text-[#2d3a00] mb-1.5">
                 Admin Username
               </label>
               <div className="relative">
@@ -456,16 +456,16 @@ export default function AdminPage() {
                   value={usernameInput}
                   onChange={(e) => setUsernameInput(e.target.value)}
                   placeholder="Enter username"
-                  className="w-full pl-10 pr-4 py-3 rounded-xl bg-[#f3f4f6] border border-black/[0.05] text-sm text-[#0d1b2a] font-medium focus:bg-white focus:border-[#3875b6] outline-none"
+                  className="w-full pl-10 pr-4 py-3 rounded-xl bg-[#eef2dc] border border-[#719100]/20 text-sm text-[#192200] font-medium focus:bg-[#fbfdf4] focus:border-[#719100] outline-none transition-all"
                   required
                   autoFocus
                 />
-                <User className="w-4 h-4 text-[#778da9] absolute left-3.5 top-1/2 -translate-y-1/2" />
+                <User className="w-4 h-4 text-[#6e8242] absolute left-3.5 top-1/2 -translate-y-1/2" />
               </div>
             </div>
 
             <div>
-              <label className="block text-xs font-bold uppercase tracking-wider text-[#415a77] mb-1.5">
+              <label className="block text-xs font-bold uppercase tracking-wider text-[#2d3a00] mb-1.5">
                 Admin Password
               </label>
               <div className="relative">
@@ -474,10 +474,10 @@ export default function AdminPage() {
                   value={passwordInput}
                   onChange={(e) => setPasswordInput(e.target.value)}
                   placeholder="Enter password"
-                  className="w-full pl-10 pr-4 py-3 rounded-xl bg-[#f3f4f6] border border-black/[0.05] text-sm text-[#0d1b2a] font-medium focus:bg-white focus:border-[#3875b6] outline-none"
+                  className="w-full pl-10 pr-4 py-3 rounded-xl bg-[#eef2dc] border border-[#719100]/20 text-sm text-[#192200] font-medium focus:bg-[#fbfdf4] focus:border-[#719100] outline-none transition-all"
                   required
                 />
-                <Lock className="w-4 h-4 text-[#778da9] absolute left-3.5 top-1/2 -translate-y-1/2" />
+                <Lock className="w-4 h-4 text-[#6e8242] absolute left-3.5 top-1/2 -translate-y-1/2" />
               </div>
             </div>
 
@@ -490,11 +490,11 @@ export default function AdminPage() {
             <button
               type="submit"
               disabled={loginLoading}
-              className="w-full py-3.5 rounded-xl bg-[#0d1b2a] hover:bg-[#1b263b] text-white font-bold text-sm shadow-md transition-colors cursor-pointer flex items-center justify-center gap-2 mt-2"
+              className="w-full py-3.5 rounded-xl bg-gradient-to-r from-[#719100] to-[#556e00] hover:opacity-95 text-white font-bold text-sm shadow-md transition-all cursor-pointer flex items-center justify-center gap-2 mt-2"
             >
               {loginLoading ? (
                 <>
-                  <RefreshCw className="w-4 h-4 animate-spin text-amber-400" />
+                  <RefreshCw className="w-4 h-4 animate-spin text-[#fff000]" />
                   <span>Authenticating...</span>
                 </>
               ) : (
@@ -504,7 +504,7 @@ export default function AdminPage() {
           </form>
 
           <div className="mt-6 pt-4 border-t border-black/[0.06] text-center">
-            <Link href="/" className="text-xs text-[#3875b6] hover:underline font-semibold">
+            <Link href="/" className="text-xs text-[#719100] hover:underline font-semibold">
               ← Return to Alumni Registration
             </Link>
           </div>
@@ -519,9 +519,9 @@ export default function AdminPage() {
   const reportRate = stats.total > 0 ? Math.round((stats.reported / stats.total) * 100) : 0;
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#ececea]">
+    <div className="min-h-screen flex flex-col bg-[#f5f7eb]">
       {/* Top Navbar */}
-      <nav className="bg-[#0d1b2a] text-white border-b border-[#415a77]/30 sticky top-0 z-30">
+      <nav className="bg-gradient-to-r from-[#141b00] via-[#202b00] to-[#2d3a00] text-white border-b border-[#719100]/30 sticky top-0 z-30 shadow-md">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-9 h-11 rounded-lg bg-white p-1 shadow-sm flex items-center justify-center">
@@ -531,21 +531,21 @@ export default function AdminPage() {
               <h1 className="text-sm sm:text-base font-black tracking-tight text-white leading-tight">
                 LINKUP 2026 • Admin Console
               </h1>
-              <p className="text-[10px] sm:text-xs text-[#8ba1ca]">
+              <p className="text-[10px] sm:text-xs text-[#fff000] font-medium">
                 Dalailul Khairath Kakkidippuram
               </p>
             </div>
           </div>
 
           <div className="flex items-center gap-3">
-            <span className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#1b263b] text-[11px] font-bold text-[#e0e1dd] border border-[#778da9]/20">
-              <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
+            <span className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/10 text-[11px] font-bold text-[#e8edd7] border border-[#719100]/30">
+              <ShieldCheck className="w-3.5 h-3.5 text-[#fff000]" />
               <span>{adminUser}</span>
             </span>
 
             <button
               onClick={handleLogout}
-              className="px-3 py-1.5 rounded-xl bg-white/10 hover:bg-red-500/20 hover:text-red-300 text-xs font-bold text-[#c8d1dc] transition-colors flex items-center gap-1.5 cursor-pointer"
+              className="px-3 py-1.5 rounded-xl bg-white/10 hover:bg-red-500/30 hover:text-red-200 text-xs font-bold text-[#e8edd7] transition-colors flex items-center gap-1.5 cursor-pointer"
             >
               <LogOut className="w-3.5 h-3.5" />
               <span className="hidden sm:inline">Sign Out</span>
@@ -558,59 +558,59 @@ export default function AdminPage() {
       <main className="flex-1 max-w-7xl w-full mx-auto px-3 sm:px-6 py-6 space-y-6">
         {/* Metric Summary Cards */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-          <div className="bg-white rounded-2xl p-4 sm:p-5 shadow-sm border border-black/[0.04]">
-            <div className="flex items-center justify-between text-[#778da9] mb-1">
+          <div className="bg-white rounded-2xl p-4 sm:p-5 shadow-sm border border-[#719100]/15">
+            <div className="flex items-center justify-between text-[#576b2d] mb-1">
               <span className="text-[11px] font-bold uppercase tracking-wider">Total Registered</span>
-              <Users className="w-4 h-4 text-[#3875b6]" />
+              <Users className="w-4 h-4 text-[#719100]" />
             </div>
-            <div className="text-2xl sm:text-3xl font-black text-[#0d1b2a]">{stats.total}</div>
-            <p className="text-[11px] text-[#778da9] mt-0.5">Alumni enrolled</p>
+            <div className="text-2xl sm:text-3xl font-black text-[#192200]">{stats.total}</div>
+            <p className="text-[11px] text-[#576b2d] mt-0.5">Alumni enrolled</p>
           </div>
 
-          <div className="bg-white rounded-2xl p-4 sm:p-5 shadow-sm border border-black/[0.04]">
-            <div className="flex items-center justify-between text-[#778da9] mb-1">
+          <div className="bg-white rounded-2xl p-4 sm:p-5 shadow-sm border border-[#719100]/15">
+            <div className="flex items-center justify-between text-[#576b2d] mb-1">
               <span className="text-[11px] font-bold uppercase tracking-wider">Will Attend</span>
-              <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+              <CheckCircle2 className="w-4 h-4 text-[#719100]" />
             </div>
-            <div className="text-2xl sm:text-3xl font-black text-emerald-700">{stats.willAttend}</div>
-            <p className="text-[11px] text-[#778da9] mt-0.5">Confirmed arrival</p>
+            <div className="text-2xl sm:text-3xl font-black text-[#2d3a00]">{stats.willAttend}</div>
+            <p className="text-[11px] text-[#576b2d] mt-0.5">Confirmed arrival</p>
           </div>
 
-          <div className="bg-white rounded-2xl p-4 sm:p-5 shadow-sm border border-black/[0.04]">
-            <div className="flex items-center justify-between text-[#778da9] mb-1">
+          <div className="bg-white rounded-2xl p-4 sm:p-5 shadow-sm border border-[#719100]/15">
+            <div className="flex items-center justify-between text-[#576b2d] mb-1">
               <span className="text-[11px] font-bold uppercase tracking-wider">Reported Present</span>
-              <span className="text-xs font-black text-amber-500">{reportRate}%</span>
+              <span className="text-xs font-black text-[#719100]">{reportRate}%</span>
             </div>
-            <div className="text-2xl sm:text-3xl font-black text-[#0d1b2a]">{stats.reported}</div>
-            <div className="w-full bg-[#e3e8ee] h-1.5 rounded-full mt-2 overflow-hidden">
+            <div className="text-2xl sm:text-3xl font-black text-[#192200]">{stats.reported}</div>
+            <div className="w-full bg-[#eef2dc] h-1.5 rounded-full mt-2 overflow-hidden">
               <div
-                className="bg-emerald-500 h-full rounded-full transition-all duration-500"
+                className="bg-[#719100] h-full rounded-full transition-all duration-500"
                 style={{ width: `${reportRate}%` }}
               />
             </div>
           </div>
 
-          <div className="bg-white rounded-2xl p-4 sm:p-5 shadow-sm border border-black/[0.04]">
-            <div className="flex items-center justify-between text-[#778da9] mb-1">
+          <div className="bg-white rounded-2xl p-4 sm:p-5 shadow-sm border border-[#719100]/15">
+            <div className="flex items-center justify-between text-[#576b2d] mb-1">
               <span className="text-[11px] font-bold uppercase tracking-wider">Pending Arrival</span>
-              <Clock className="w-4 h-4 text-amber-500" />
+              <Clock className="w-4 h-4 text-[#8e7b16]" />
             </div>
-            <div className="text-2xl sm:text-3xl font-black text-[#415a77]">{stats.pending}</div>
-            <p className="text-[11px] text-[#778da9] mt-0.5">Yet to report</p>
+            <div className="text-2xl sm:text-3xl font-black text-[#2d3a00]">{stats.pending}</div>
+            <p className="text-[11px] text-[#576b2d] mt-0.5">Yet to report</p>
           </div>
         </div>
 
         {/* Navigation Tabs */}
-        <div className="flex items-center gap-2 border-b border-black/[0.08] pb-1">
+        <div className="flex items-center gap-2 border-b border-[#719100]/20 pb-1">
           <button
             onClick={() => setActiveTab("scanner")}
             className={`px-5 py-2.5 rounded-2xl font-bold text-xs sm:text-sm flex items-center gap-2 transition-all cursor-pointer ${
               activeTab === "scanner"
-                ? "bg-[#0d1b2a] text-white shadow-md"
-                : "bg-white text-[#415a77] hover:bg-[#e3e8ee]"
+                ? "bg-[#192200] text-white shadow-md"
+                : "bg-white text-[#576b2d] hover:bg-[#eef2dc]"
             }`}
           >
-            <QrCode className="w-4 h-4 text-amber-400" />
+            <QrCode className={`w-4 h-4 ${activeTab === "scanner" ? "text-[#fff000]" : "text-[#719100]"}`} />
             <span>QR Scanner & Reporting</span>
           </button>
 
@@ -618,13 +618,15 @@ export default function AdminPage() {
             onClick={() => setActiveTab("roster")}
             className={`px-5 py-2.5 rounded-2xl font-bold text-xs sm:text-sm flex items-center gap-2 transition-all cursor-pointer ${
               activeTab === "roster"
-                ? "bg-[#0d1b2a] text-white shadow-md"
-                : "bg-white text-[#415a77] hover:bg-[#e3e8ee]"
+                ? "bg-[#192200] text-white shadow-md"
+                : "bg-white text-[#576b2d] hover:bg-[#eef2dc]"
             }`}
           >
-            <Users className="w-4 h-4 text-[#8ba1ca]" />
+            <Users className={`w-4 h-4 ${activeTab === "roster" ? "text-[#fff000]" : "text-[#719100]"}`} />
             <span>Registered Alumni Roster</span>
-            <span className="px-2 py-0.5 rounded-full text-[10px] bg-[#1b263b] text-white font-mono">
+            <span className={`px-2 py-0.5 rounded-full text-[10px] font-mono ${
+              activeTab === "roster" ? "bg-[#719100] text-white" : "bg-[#eef2dc] text-[#192200]"
+            }`}>
               {alumni.length}
             </span>
           </button>
@@ -632,9 +634,9 @@ export default function AdminPage() {
           <button
             onClick={fetchDashboardData}
             title="Refresh Data"
-            className="ml-auto p-2.5 rounded-xl bg-white hover:bg-[#e3e8ee] text-[#415a77] transition-colors cursor-pointer"
+            className="ml-auto p-2.5 rounded-xl bg-white hover:bg-[#eef2dc] text-[#576b2d] border border-[#719100]/15 transition-colors cursor-pointer"
           >
-            <RefreshCw className={`w-4 h-4 ${isLoadingData ? "animate-spin text-[#3875b6]" : ""}`} />
+            <RefreshCw className={`w-4 h-4 ${isLoadingData ? "animate-spin text-[#719100]" : ""}`} />
           </button>
         </div>
 
@@ -643,14 +645,14 @@ export default function AdminPage() {
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
             {/* Left Col: Camera & Manual Scanner */}
             <div className="lg:col-span-7 space-y-5">
-              <div className="bg-white rounded-3xl p-5 sm:p-7 shadow-sm border border-black/[0.04]">
+              <div className="bg-white rounded-3xl p-5 sm:p-7 shadow-sm border border-[#719100]/15">
                 <div className="flex items-center justify-between mb-4">
                   <div>
-                    <h2 className="text-base sm:text-lg font-black text-[#0d1b2a] flex items-center gap-2">
-                      <Camera className="w-5 h-5 text-[#3875b6]" />
+                    <h2 className="text-base sm:text-lg font-black text-[#192200] flex items-center gap-2">
+                      <Camera className="w-5 h-5 text-[#719100]" />
                       <span>Live Pass QR Scanner</span>
                     </h2>
-                    <p className="text-xs text-[#778da9]">
+                    <p className="text-xs text-[#576b2d]">
                       Point attendee&apos;s pass QR code at the camera to report attendance instantly.
                     </p>
                   </div>
@@ -660,7 +662,7 @@ export default function AdminPage() {
                     className={`px-4 py-2 rounded-xl font-bold text-xs flex items-center gap-1.5 transition-all cursor-pointer ${
                       scannerActive
                         ? "bg-red-50 text-red-600 hover:bg-red-100 border border-red-200"
-                        : "bg-[#0d1b2a] text-amber-400 hover:bg-[#1b263b] shadow-md"
+                        : "bg-gradient-to-r from-[#719100] to-[#556e00] text-white hover:opacity-95 shadow-md"
                     }`}
                   >
                     {scannerActive ? (
@@ -679,10 +681,10 @@ export default function AdminPage() {
 
                 {/* QR Scanner Viewport */}
                 {scannerActive ? (
-                  <div className="relative rounded-2xl overflow-hidden bg-black aspect-square max-w-sm mx-auto shadow-inner">
+                  <div className="relative rounded-2xl overflow-hidden bg-black aspect-square max-w-sm mx-auto shadow-inner border border-[#719100]/30">
                     <div id="admin-qr-reader" className="w-full h-full" />
                     <div className="absolute inset-x-0 bottom-3 text-center pointer-events-none">
-                      <span className="px-3 py-1 rounded-full bg-black/75 text-[11px] text-white font-medium backdrop-blur-sm">
+                      <span className="px-3 py-1 rounded-full bg-black/75 text-[11px] text-[#fff000] font-medium backdrop-blur-sm">
                         Align QR code inside box
                       </span>
                     </div>
@@ -690,18 +692,18 @@ export default function AdminPage() {
                 ) : (
                   <div
                     onClick={() => setScannerActive(true)}
-                    className="border-2 border-dashed border-[#c8d1dc] rounded-2xl p-10 flex flex-col items-center justify-center text-center cursor-pointer hover:bg-[#f9f9f8] transition-colors"
+                    className="border-2 border-dashed border-[#719100]/30 rounded-2xl p-10 flex flex-col items-center justify-center text-center cursor-pointer hover:bg-[#fbfdf4] transition-colors"
                   >
-                    <div className="w-14 h-14 rounded-2xl bg-[#f3f4f6] text-[#3875b6] flex items-center justify-center mb-3">
+                    <div className="w-14 h-14 rounded-2xl bg-[#eef2dc] text-[#719100] flex items-center justify-center mb-3">
                       <QrCode className="w-7 h-7" />
                     </div>
-                    <h3 className="text-sm font-bold text-[#0d1b2a]">Camera Scanner is Inactive</h3>
-                    <p className="text-xs text-[#778da9] mt-1 max-w-xs">
+                    <h3 className="text-sm font-bold text-[#192200]">Camera Scanner is Inactive</h3>
+                    <p className="text-xs text-[#576b2d] mt-1 max-w-xs">
                       Click &ldquo;Start Camera&rdquo; to use your device&apos;s camera to scan student passes automatically.
                     </p>
                     <button
                       type="button"
-                      className="mt-4 px-4 py-2 rounded-xl bg-[#0d1b2a] text-white text-xs font-bold"
+                      className="mt-4 px-4 py-2 rounded-xl bg-[#192200] hover:bg-[#2d3a00] text-white text-xs font-bold transition-colors"
                     >
                       Enable Camera Now
                     </button>
@@ -710,7 +712,7 @@ export default function AdminPage() {
 
                 {/* Fallback Manual Check-in */}
                 <div className="mt-6 pt-5 border-t border-black/[0.06]">
-                  <h3 className="text-xs font-bold uppercase tracking-wider text-[#415a77] mb-2">
+                  <h3 className="text-xs font-bold uppercase tracking-wider text-[#2d3a00] mb-2">
                     Or Quick Manual Check-in
                   </h3>
                   <form onSubmit={handleManualCheckin} className="flex gap-2">
@@ -719,15 +721,15 @@ export default function AdminPage() {
                       value={manualIdInput}
                       onChange={(e) => setManualIdInput(e.target.value)}
                       placeholder="Enter Registration ID (e.g. DKK-Batch5-1279)"
-                      className="flex-1 px-4 py-3 rounded-xl bg-[#f3f4f6] border border-black/[0.05] text-xs sm:text-sm font-mono font-medium focus:bg-white focus:border-[#3875b6] outline-none"
+                      className="flex-1 px-4 py-3 rounded-xl bg-[#eef2dc] border border-[#719100]/20 text-xs sm:text-sm font-mono font-medium text-[#192200] focus:bg-[#fbfdf4] focus:border-[#719100] outline-none"
                     />
                     <button
                       type="submit"
                       disabled={manualLoading || !manualIdInput.trim()}
-                      className="px-5 py-3 rounded-xl bg-[#0d1b2a] hover:bg-[#1b263b] text-white font-bold text-xs sm:text-sm shadow-sm transition-colors cursor-pointer disabled:opacity-50 flex items-center gap-1.5 shrink-0"
+                      className="px-5 py-3 rounded-xl bg-gradient-to-r from-[#719100] to-[#556e00] hover:opacity-95 text-white font-bold text-xs sm:text-sm shadow-sm transition-all cursor-pointer disabled:opacity-50 flex items-center gap-1.5 shrink-0"
                     >
                       {manualLoading ? (
-                        <RefreshCw className="w-4 h-4 animate-spin text-amber-400" />
+                        <RefreshCw className="w-4 h-4 animate-spin text-[#fff000]" />
                       ) : (
                         <span>Check In</span>
                       )}
@@ -739,13 +741,13 @@ export default function AdminPage() {
 
             {/* Right Col: Recent Check-in Feed */}
             <div className="lg:col-span-5 space-y-4">
-              <div className="bg-white rounded-3xl p-5 sm:p-6 shadow-sm border border-black/[0.04]">
+              <div className="bg-white rounded-3xl p-5 sm:p-6 shadow-sm border border-[#719100]/15">
                 <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-sm font-black uppercase tracking-wider text-[#0d1b2a] flex items-center gap-2">
-                    <Clock className="w-4 h-4 text-emerald-600" />
+                  <h3 className="text-sm font-black uppercase tracking-wider text-[#192200] flex items-center gap-2">
+                    <Clock className="w-4 h-4 text-[#719100]" />
                     <span>Recent Check-ins Today</span>
                   </h3>
-                  <span className="text-xs font-bold text-[#778da9]">
+                  <span className="text-xs font-bold text-[#576b2d]">
                     {recentCheckins.length} recorded
                   </span>
                 </div>
@@ -758,15 +760,15 @@ export default function AdminPage() {
                         className="py-3 flex items-center justify-between gap-3 text-xs"
                       >
                         <div className="min-w-0">
-                          <h4 className="font-bold text-[#0d1b2a] truncate">{item.fullName}</h4>
-                          <div className="flex items-center gap-2 text-[11px] text-[#778da9] mt-0.5">
-                            <span className="font-mono text-[#3875b6] font-semibold">
+                          <h4 className="font-bold text-[#192200] truncate">{item.fullName}</h4>
+                          <div className="flex items-center gap-2 text-[11px] text-[#576b2d] mt-0.5">
+                            <span className="font-mono text-[#719100] font-bold">
                               {item.registrationId}
                             </span>
                             <span>•</span>
                             <span>{item.batchYear}</span>
                           </div>
-                          <span className="text-[10px] text-emerald-700 font-medium">
+                          <span className="text-[10px] text-[#719100] font-semibold">
                             Reported: {item.reportedAt}
                           </span>
                         </div>
@@ -774,7 +776,7 @@ export default function AdminPage() {
                         <button
                           type="button"
                           onClick={() => handleUndoReporting(item.registrationId)}
-                          className="text-[11px] text-[#778da9] hover:text-red-600 font-semibold px-2 py-1 rounded hover:bg-red-50 transition-colors shrink-0 cursor-pointer"
+                          className="text-[11px] text-[#6e8242] hover:text-red-600 font-semibold px-2 py-1 rounded hover:bg-red-50 transition-colors shrink-0 cursor-pointer"
                         >
                           Undo
                         </button>
@@ -782,10 +784,10 @@ export default function AdminPage() {
                     ))}
                   </div>
                 ) : (
-                  <div className="text-center py-12 text-[#778da9]">
-                    <Users className="w-8 h-8 mx-auto mb-2 text-[#c8d1dc]" />
+                  <div className="text-center py-12 text-[#6e8242]">
+                    <Users className="w-8 h-8 mx-auto mb-2 text-[#6e8242]/50" />
                     <p className="text-xs font-semibold">No check-ins in this session yet.</p>
-                    <p className="text-[11px] mt-1">
+                    <p className="text-[11px] mt-1 text-[#576b2d]">
                       Scanned or manually reported attendees will appear here.
                     </p>
                   </div>
@@ -799,21 +801,21 @@ export default function AdminPage() {
         {activeTab === "roster" && (
           <div className="space-y-4">
             {/* Filter Hub Card */}
-            <div className="bg-white rounded-3xl p-5 shadow-sm border border-black/[0.04] space-y-4">
+            <div className="bg-white rounded-3xl p-5 shadow-sm border border-[#719100]/15 space-y-4">
               {/* Search Bar */}
               <div className="relative">
-                <Search className="w-4 h-4 text-[#778da9] absolute left-3.5 top-1/2 -translate-y-1/2" />
+                <Search className="w-4 h-4 text-[#6e8242] absolute left-3.5 top-1/2 -translate-y-1/2" />
                 <input
                   type="text"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   placeholder="Search by Name, Reg ID, Mobile, Place, Job..."
-                  className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-[#f3f4f6] border border-black/[0.05] text-xs sm:text-sm font-medium focus:bg-white focus:border-[#3875b6] outline-none"
+                  className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-[#eef2dc] border border-[#719100]/20 text-xs sm:text-sm text-[#192200] font-medium focus:bg-[#fbfdf4] focus:border-[#719100] outline-none transition-all"
                 />
                 {searchTerm && (
                   <button
                     onClick={() => setSearchTerm("")}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-[#778da9] hover:text-black cursor-pointer"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-[#6e8242] hover:text-[#192200] cursor-pointer"
                   >
                     ✕
                   </button>
@@ -824,13 +826,13 @@ export default function AdminPage() {
               <div className="grid grid-cols-2 sm:grid-cols-5 gap-2.5 pt-1 text-xs">
                 {/* Batch Filter */}
                 <div>
-                  <label className="block text-[10px] font-bold uppercase tracking-wider text-[#778da9] mb-1">
+                  <label className="block text-[10px] font-bold uppercase tracking-wider text-[#576b2d] mb-1">
                     Batch
                   </label>
                   <select
                     value={filterBatch}
                     onChange={(e) => setFilterBatch(e.target.value)}
-                    className="w-full px-3 py-2 rounded-xl bg-[#f3f4f6] border border-black/[0.05] text-[#0d1b2a] font-medium outline-none"
+                    className="w-full px-3 py-2 rounded-xl bg-[#eef2dc] border border-[#719100]/20 text-[#192200] font-medium outline-none focus:border-[#719100]"
                   >
                     <option value="all">All Batches</option>
                     {BATCH_OPTIONS.map((b) => (
@@ -843,13 +845,13 @@ export default function AdminPage() {
 
                 {/* Reporting Status Filter */}
                 <div>
-                  <label className="block text-[10px] font-bold uppercase tracking-wider text-[#778da9] mb-1">
+                  <label className="block text-[10px] font-bold uppercase tracking-wider text-[#576b2d] mb-1">
                     Reporting
                   </label>
                   <select
                     value={filterReporting}
                     onChange={(e) => setFilterReporting(e.target.value)}
-                    className="w-full px-3 py-2 rounded-xl bg-[#f3f4f6] border border-black/[0.05] text-[#0d1b2a] font-medium outline-none"
+                    className="w-full px-3 py-2 rounded-xl bg-[#eef2dc] border border-[#719100]/20 text-[#192200] font-medium outline-none focus:border-[#719100]"
                   >
                     <option value="all">All Reporting</option>
                     <option value="reported">Reported Present</option>
@@ -859,13 +861,13 @@ export default function AdminPage() {
 
                 {/* Will Attend Filter */}
                 <div>
-                  <label className="block text-[10px] font-bold uppercase tracking-wider text-[#778da9] mb-1">
+                  <label className="block text-[10px] font-bold uppercase tracking-wider text-[#576b2d] mb-1">
                     Will Attend
                   </label>
                   <select
                     value={filterAttendance}
                     onChange={(e) => setFilterAttendance(e.target.value)}
-                    className="w-full px-3 py-2 rounded-xl bg-[#f3f4f6] border border-black/[0.05] text-[#0d1b2a] font-medium outline-none"
+                    className="w-full px-3 py-2 rounded-xl bg-[#eef2dc] border border-[#719100]/20 text-[#192200] font-medium outline-none focus:border-[#719100]"
                   >
                     <option value="all">All Intentions</option>
                     <option value="yes">Yes, Will Attend</option>
@@ -875,13 +877,13 @@ export default function AdminPage() {
 
                 {/* Current Status Filter */}
                 <div>
-                  <label className="block text-[10px] font-bold uppercase tracking-wider text-[#778da9] mb-1">
+                  <label className="block text-[10px] font-bold uppercase tracking-wider text-[#576b2d] mb-1">
                     Occupation
                   </label>
                   <select
                     value={filterStatus}
                     onChange={(e) => setFilterStatus(e.target.value)}
-                    className="w-full px-3 py-2 rounded-xl bg-[#f3f4f6] border border-black/[0.05] text-[#0d1b2a] font-medium outline-none"
+                    className="w-full px-3 py-2 rounded-xl bg-[#eef2dc] border border-[#719100]/20 text-[#192200] font-medium outline-none focus:border-[#719100]"
                   >
                     <option value="all">All Occupations</option>
                     <option value="Job">Job</option>
@@ -892,13 +894,13 @@ export default function AdminPage() {
 
                 {/* Hifz Status Filter */}
                 <div>
-                  <label className="block text-[10px] font-bold uppercase tracking-wider text-[#778da9] mb-1">
+                  <label className="block text-[10px] font-bold uppercase tracking-wider text-[#576b2d] mb-1">
                     Hifz Status
                   </label>
                   <select
                     value={filterHifz}
                     onChange={(e) => setFilterHifz(e.target.value)}
-                    className="w-full px-3 py-2 rounded-xl bg-[#f3f4f6] border border-black/[0.05] text-[#0d1b2a] font-medium outline-none"
+                    className="w-full px-3 py-2 rounded-xl bg-[#eef2dc] border border-[#719100]/20 text-[#192200] font-medium outline-none focus:border-[#719100]"
                   >
                     <option value="all">All Hifz</option>
                     <option value="Hafiz">Hafiz</option>
@@ -908,9 +910,9 @@ export default function AdminPage() {
               </div>
 
               {/* Filter feedback & clear */}
-              <div className="flex items-center justify-between text-xs text-[#778da9] pt-1">
+              <div className="flex items-center justify-between text-xs text-[#576b2d] pt-1">
                 <span>
-                  Showing <strong className="text-[#0d1b2a]">{filteredAlumni.length}</strong> of{" "}
+                  Showing <strong className="text-[#192200]">{filteredAlumni.length}</strong> of{" "}
                   <strong>{alumni.length}</strong> alumni
                 </span>
                 {(filterBatch !== "all" ||
@@ -928,7 +930,7 @@ export default function AdminPage() {
                       setFilterHifz("all");
                       setSearchTerm("");
                     }}
-                    className="text-[#3875b6] hover:underline font-semibold cursor-pointer"
+                    className="text-[#719100] hover:underline font-bold cursor-pointer"
                   >
                     Reset all filters
                   </button>
@@ -937,10 +939,10 @@ export default function AdminPage() {
             </div>
 
             {/* Roster Table / Card View */}
-            <div className="bg-white rounded-3xl shadow-sm border border-black/[0.04] overflow-hidden">
+            <div className="bg-white rounded-3xl shadow-sm border border-[#719100]/15 overflow-hidden">
               <div className="overflow-x-auto">
                 <table className="w-full text-left text-xs">
-                  <thead className="bg-[#0d1b2a] text-[#8ba1ca] font-bold uppercase tracking-wider text-[10px]">
+                  <thead className="bg-[#192200] text-[#e8edd7] font-bold uppercase tracking-wider text-[10px]">
                     <tr>
                       <th className="py-3.5 px-4">Reg ID</th>
                       <th className="py-3.5 px-4">Alumnus Name & Place</th>
@@ -952,34 +954,34 @@ export default function AdminPage() {
                       <th className="py-3.5 px-4 text-right">Actions</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-black/[0.05] text-[#415a77]">
+                  <tbody className="divide-y divide-black/[0.05] text-[#2d3a00]">
                     {filteredAlumni.map((alumnus) => {
                       const isAttending = (alumnus.willAttend || "").toLowerCase().includes("yes");
                       return (
                         <tr
                           key={alumnus.registrationId}
-                          className="hover:bg-[#f9f9f8] transition-colors"
+                          className="hover:bg-[#fbfdf4] transition-colors"
                         >
                           {/* Reg ID */}
-                          <td className="py-3.5 px-4 font-mono font-bold text-[#0d1b2a] whitespace-nowrap">
+                          <td className="py-3.5 px-4 font-mono font-bold text-[#192200] whitespace-nowrap">
                             {alumnus.registrationId}
                           </td>
 
                           {/* Name & Place */}
                           <td className="py-3.5 px-4">
-                            <div className="font-bold text-[#0d1b2a] uppercase">
+                            <div className="font-bold text-[#192200] uppercase">
                               {alumnus.fullName}
                             </div>
-                            <div className="text-[11px] text-[#778da9]">{alumnus.place || "—"}</div>
+                            <div className="text-[11px] text-[#576b2d]">{alumnus.place || "—"}</div>
                           </td>
 
                           {/* Batch / Section */}
                           <td className="py-3.5 px-4 whitespace-nowrap">
-                            <span className="font-semibold text-[#1b263b]">
+                            <span className="font-semibold text-[#2d3a00]">
                               {alumnus.batchYear || alumnus.joinedBatch}
                             </span>
                             {alumnus.joinedSection && (
-                              <span className="ml-1 text-[11px] text-[#778da9]">
+                              <span className="ml-1 text-[11px] text-[#576b2d]">
                                 ({alumnus.joinedSection})
                               </span>
                             )}
@@ -988,7 +990,7 @@ export default function AdminPage() {
                           {/* Phone & WhatsApp links */}
                           <td className="py-3.5 px-4 whitespace-nowrap">
                             <div className="flex items-center gap-2">
-                              <span className="font-mono text-[#0d1b2a]">
+                              <span className="font-mono text-[#192200]">
                                 {alumnus.mobileNumber || "—"}
                               </span>
                               {alumnus.whatsappNumber && (
@@ -997,7 +999,7 @@ export default function AdminPage() {
                                   target="_blank"
                                   rel="noreferrer"
                                   title="Open WhatsApp"
-                                  className="text-emerald-600 hover:text-emerald-700"
+                                  className="text-[#719100] hover:text-[#5c7700]"
                                 >
                                   <MessageSquare className="w-3.5 h-3.5" />
                                 </a>
@@ -1007,10 +1009,10 @@ export default function AdminPage() {
 
                           {/* Hifz & Status */}
                           <td className="py-3.5 px-4">
-                            <div className="font-medium text-[#0d1b2a]">
+                            <div className="font-medium text-[#192200]">
                               {alumnus.hifzStatus || "—"}
                             </div>
-                            <div className="text-[11px] text-[#778da9] truncate max-w-[140px]">
+                            <div className="text-[11px] text-[#576b2d] truncate max-w-[140px]">
                               {alumnus.currentStatus}: {alumnus.jobDesignation || alumnus.institutionName || ""}
                             </div>
                           </td>
@@ -1020,8 +1022,8 @@ export default function AdminPage() {
                             <span
                               className={`px-2.5 py-1 rounded-full text-[11px] font-bold ${
                                 isAttending
-                                  ? "bg-emerald-100 text-emerald-800"
-                                  : "bg-red-100 text-red-800"
+                                  ? "bg-[#eef2dc] text-[#2d3a00] border border-[#719100]/30"
+                                  : "bg-red-50 text-red-700 border border-red-200"
                               }`}
                             >
                               {isAttending ? "Yes" : "Cannot Attend"}
@@ -1032,11 +1034,11 @@ export default function AdminPage() {
                           <td className="py-3.5 px-4 whitespace-nowrap">
                             {alumnus.isReported ? (
                               <div>
-                                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-100 text-emerald-800">
-                                  <CheckCircle2 className="w-3 h-3 text-emerald-600" />
+                                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-[#eef2dc] text-[#2d3a00] border border-[#719100]/30">
+                                  <CheckCircle2 className="w-3 h-3 text-[#719100]" />
                                   <span>Reported</span>
                                 </span>
-                                <div className="text-[10px] text-[#778da9] mt-0.5">
+                                <div className="text-[10px] text-[#576b2d] mt-0.5">
                                   {alumnus.reportedAt}
                                 </div>
                               </div>
@@ -1044,7 +1046,7 @@ export default function AdminPage() {
                               <button
                                 type="button"
                                 onClick={() => processReportCheckin(alumnus.registrationId)}
-                                className="px-3 py-1 rounded-xl bg-amber-400 hover:bg-amber-500 text-[#0d1b2a] font-bold text-[11px] shadow-sm transition-all cursor-pointer"
+                                className="px-3 py-1 rounded-xl bg-gradient-to-r from-[#719100] to-[#556e00] hover:opacity-95 text-white font-bold text-[11px] shadow-sm transition-all cursor-pointer"
                               >
                                 Mark Present
                               </button>
@@ -1057,7 +1059,7 @@ export default function AdminPage() {
                               <button
                                 type="button"
                                 onClick={() => setSelectedAlumnusDetail(alumnus)}
-                                className="p-1.5 rounded-lg text-[#3875b6] hover:bg-[#e3e8ee] transition-colors cursor-pointer"
+                                className="p-1.5 rounded-lg text-[#719100] hover:bg-[#eef2dc] transition-colors cursor-pointer"
                                 title="View Full Details"
                               >
                                 <Eye className="w-4 h-4" />
@@ -1067,7 +1069,7 @@ export default function AdminPage() {
                                 <button
                                   type="button"
                                   onClick={() => handleUndoReporting(alumnus.registrationId)}
-                                  className="p-1.5 rounded-lg text-[#778da9] hover:text-red-600 hover:bg-red-50 transition-colors cursor-pointer"
+                                  className="p-1.5 rounded-lg text-[#6e8242] hover:text-red-600 hover:bg-red-50 transition-colors cursor-pointer"
                                   title="Undo Check-in"
                                 >
                                   <RotateCcw className="w-4 h-4" />
@@ -1083,8 +1085,8 @@ export default function AdminPage() {
               </div>
 
               {filteredAlumni.length === 0 && (
-                <div className="text-center py-12 text-[#778da9]">
-                  <p className="text-sm font-bold">No alumni records match your filters.</p>
+                <div className="text-center py-12 text-[#576b2d]">
+                  <p className="text-sm font-bold text-[#192200]">No alumni records match your filters.</p>
                   <p className="text-xs mt-1">Try relaxing your search terms or filter selections.</p>
                 </div>
               )}
@@ -1098,31 +1100,31 @@ export default function AdminPage() {
       ---------------------------------------------------- */}
       {scanResultModal && (
         <div className="fixed inset-0 z-50 overflow-y-auto bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-white w-full max-w-md rounded-3xl shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+          <div className="bg-white w-full max-w-md rounded-3xl shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-150 border border-[#719100]/20">
             <div
               className={`p-6 text-white text-center ${
                 scanResultModal.alreadyReported
                   ? "bg-gradient-to-br from-amber-600 to-amber-700"
-                  : "bg-gradient-to-br from-emerald-600 to-emerald-700"
+                  : "bg-gradient-to-br from-[#141b00] via-[#202b00] to-[#2d3a00]"
               }`}
             >
-              <div className="w-16 h-16 rounded-2xl bg-white/20 mx-auto flex items-center justify-center mb-3">
+              <div className="w-16 h-16 rounded-2xl bg-white/10 mx-auto flex items-center justify-center mb-3">
                 {scanResultModal.alreadyReported ? (
-                  <AlertTriangle className="w-8 h-8 text-white" />
+                  <AlertTriangle className="w-8 h-8 text-[#fff000]" />
                 ) : (
-                  <CheckCircle2 className="w-8 h-8 text-white" />
+                  <CheckCircle2 className="w-8 h-8 text-[#fff000]" />
                 )}
               </div>
 
-              <span className="text-xs font-black uppercase tracking-wider">
+              <span className="text-xs font-black uppercase tracking-wider text-[#fff000]">
                 {scanResultModal.alreadyReported
                   ? "⚠️ Already Reported"
                   : "Check-in Successful!"}
               </span>
-              <h3 className="text-xl sm:text-2xl font-black uppercase mt-1">
+              <h3 className="text-xl sm:text-2xl font-black uppercase mt-1 text-white">
                 {scanResultModal.alumnus?.fullName || "Registered Attendee"}
               </h3>
-              <p className="text-xs text-white/90 mt-1">
+              <p className="text-xs text-[#e8edd7] mt-1">
                 {scanResultModal.alreadyReported
                   ? `Previously marked present at ${scanResultModal.reportedAt}. Cannot report again.`
                   : `Checked in just now (${scanResultModal.reportedAt})`}
@@ -1131,15 +1133,15 @@ export default function AdminPage() {
 
             <div className="p-6 space-y-3 text-xs bg-white">
               <div className="flex justify-between py-1.5 border-b border-black/[0.05]">
-                <span className="font-bold text-[#778da9]">Registration ID:</span>
-                <span className="font-mono font-black text-[#0d1b2a]">
+                <span className="font-bold text-[#576b2d]">Registration ID:</span>
+                <span className="font-mono font-black text-[#192200]">
                   {scanResultModal.alumnus?.registrationId}
                 </span>
               </div>
 
               <div className="flex justify-between py-1.5 border-b border-black/[0.05]">
-                <span className="font-bold text-[#778da9]">Batch & Section:</span>
-                <span className="font-bold text-[#3875b6]">
+                <span className="font-bold text-[#576b2d]">Batch & Section:</span>
+                <span className="font-bold text-[#719100]">
                   {scanResultModal.alumnus?.batchYear || scanResultModal.alumnus?.joinedBatch}{" "}
                   {scanResultModal.alumnus?.joinedSection
                     ? `(${scanResultModal.alumnus.joinedSection})`
@@ -1148,29 +1150,29 @@ export default function AdminPage() {
               </div>
 
               <div className="flex justify-between py-1.5 border-b border-black/[0.05]">
-                <span className="font-bold text-[#778da9]">Place:</span>
-                <span className="font-medium text-[#0d1b2a]">
+                <span className="font-bold text-[#576b2d]">Place:</span>
+                <span className="font-medium text-[#192200]">
                   {scanResultModal.alumnus?.place || "—"}
                 </span>
               </div>
 
               <div className="flex justify-between py-1.5 border-b border-black/[0.05]">
-                <span className="font-bold text-[#778da9]">Mobile Number:</span>
-                <span className="font-mono font-medium text-[#0d1b2a]">
+                <span className="font-bold text-[#576b2d]">Mobile Number:</span>
+                <span className="font-mono font-medium text-[#192200]">
                   {scanResultModal.alumnus?.mobileNumber || "—"}
                 </span>
               </div>
 
               <div className="flex justify-between py-1.5 border-b border-black/[0.05]">
-                <span className="font-bold text-[#778da9]">Hifz Status:</span>
-                <span className="font-medium text-[#0d1b2a]">
+                <span className="font-bold text-[#576b2d]">Hifz Status:</span>
+                <span className="font-medium text-[#192200]">
                   {scanResultModal.alumnus?.hifzStatus || "—"}
                 </span>
               </div>
 
               <div className="flex justify-between py-1.5">
-                <span className="font-bold text-[#778da9]">Current Status:</span>
-                <span className="font-medium text-[#0d1b2a]">
+                <span className="font-bold text-[#576b2d]">Current Status:</span>
+                <span className="font-medium text-[#192200]">
                   {scanResultModal.alumnus?.currentStatus}:{" "}
                   {scanResultModal.alumnus?.jobDesignation ||
                     scanResultModal.alumnus?.institutionName ||
@@ -1182,7 +1184,7 @@ export default function AdminPage() {
                 <button
                   type="button"
                   onClick={() => setScanResultModal(null)}
-                  className="w-full py-3 rounded-xl bg-[#0d1b2a] text-white font-bold text-xs uppercase tracking-wider shadow-md hover:bg-[#1b263b] cursor-pointer"
+                  className="w-full py-3 rounded-xl bg-gradient-to-r from-[#719100] to-[#556e00] hover:opacity-95 text-white font-bold text-xs uppercase tracking-wider shadow-md transition-all cursor-pointer"
                 >
                   Close & Ready Next Scan
                 </button>
@@ -1197,10 +1199,10 @@ export default function AdminPage() {
       ---------------------------------------------------- */}
       {selectedAlumnusDetail && (
         <div className="fixed inset-0 z-50 overflow-y-auto bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-white w-full max-w-xl rounded-3xl shadow-2xl overflow-hidden">
-            <div className="bg-[#0d1b2a] text-white p-5 flex items-center justify-between">
+          <div className="bg-white w-full max-w-xl rounded-3xl shadow-2xl overflow-hidden border border-[#719100]/20">
+            <div className="bg-gradient-to-r from-[#141b00] via-[#202b00] to-[#2d3a00] text-white p-5 flex items-center justify-between">
               <div>
-                <span className="text-[10px] font-bold uppercase tracking-wider text-[#8ba1ca]">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-[#fff000]">
                   Alumnus Profile Record
                 </span>
                 <h3 className="text-lg font-black uppercase text-white">
@@ -1209,33 +1211,33 @@ export default function AdminPage() {
               </div>
               <button
                 onClick={() => setSelectedAlumnusDetail(null)}
-                className="p-1 rounded-full text-[#8ba1ca] hover:text-white hover:bg-white/10 cursor-pointer"
+                className="p-1 rounded-full text-[#e8edd7] hover:text-[#fff000] hover:bg-white/10 cursor-pointer"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
             <div className="p-6 space-y-4 max-h-[80vh] overflow-y-auto text-xs">
-              <div className="grid grid-cols-2 gap-3 bg-[#f9f9f8] p-4 rounded-2xl">
+              <div className="grid grid-cols-2 gap-3 bg-[#eef2dc]/60 p-4 rounded-2xl border border-[#719100]/15">
                 <div>
-                  <span className="text-[10px] font-bold text-[#778da9] uppercase">
+                  <span className="text-[10px] font-bold text-[#576b2d] uppercase">
                     Registration ID
                   </span>
-                  <p className="font-mono font-bold text-sm text-[#0d1b2a]">
+                  <p className="font-mono font-bold text-sm text-[#192200]">
                     {selectedAlumnusDetail.registrationId}
                   </p>
                 </div>
                 <div>
-                  <span className="text-[10px] font-bold text-[#778da9] uppercase">
+                  <span className="text-[10px] font-bold text-[#576b2d] uppercase">
                     Reporting Status
                   </span>
-                  <p className="font-bold text-[#0d1b2a]">
+                  <p className="font-bold text-[#192200]">
                     {selectedAlumnusDetail.isReported ? (
-                      <span className="text-emerald-700">
+                      <span className="text-[#719100] font-black">
                         Reported ({selectedAlumnusDetail.reportedAt})
                       </span>
                     ) : (
-                      <span className="text-amber-700">Pending Check-in</span>
+                      <span className="text-amber-700 font-bold">Pending Check-in</span>
                     )}
                   </p>
                 </div>
@@ -1243,84 +1245,84 @@ export default function AdminPage() {
 
               <div className="space-y-2">
                 <div className="flex justify-between py-1.5 border-b border-black/[0.05]">
-                  <span className="font-semibold text-[#415a77]">Batch:</span>
-                  <span className="font-bold text-[#0d1b2a]">
+                  <span className="font-semibold text-[#576b2d]">Batch:</span>
+                  <span className="font-bold text-[#192200]">
                     {selectedAlumnusDetail.batchYear || selectedAlumnusDetail.joinedBatch}
                   </span>
                 </div>
                 <div className="flex justify-between py-1.5 border-b border-black/[0.05]">
-                  <span className="font-semibold text-[#415a77]">Section (HS / BS):</span>
-                  <span className="font-bold text-[#0d1b2a]">
+                  <span className="font-semibold text-[#576b2d]">Section (HS / BS):</span>
+                  <span className="font-bold text-[#192200]">
                     {selectedAlumnusDetail.joinedSection || "—"}
                   </span>
                 </div>
                 <div className="flex justify-between py-1.5 border-b border-black/[0.05]">
-                  <span className="font-semibold text-[#415a77]">Place:</span>
-                  <span className="font-bold text-[#0d1b2a]">{selectedAlumnusDetail.place || "—"}</span>
+                  <span className="font-semibold text-[#576b2d]">Place:</span>
+                  <span className="font-bold text-[#192200]">{selectedAlumnusDetail.place || "—"}</span>
                 </div>
                 <div className="flex justify-between py-1.5 border-b border-black/[0.05]">
-                  <span className="font-semibold text-[#415a77]">Mobile:</span>
-                  <span className="font-mono font-bold text-[#0d1b2a]">
+                  <span className="font-semibold text-[#576b2d]">Mobile:</span>
+                  <span className="font-mono font-bold text-[#192200]">
                     {selectedAlumnusDetail.mobileNumber || "—"}
                   </span>
                 </div>
                 <div className="flex justify-between py-1.5 border-b border-black/[0.05]">
-                  <span className="font-semibold text-[#415a77]">WhatsApp:</span>
-                  <span className="font-mono font-bold text-[#0d1b2a]">
+                  <span className="font-semibold text-[#576b2d]">WhatsApp:</span>
+                  <span className="font-mono font-bold text-[#192200]">
                     {selectedAlumnusDetail.whatsappNumber || "—"}
                   </span>
                 </div>
                 <div className="flex justify-between py-1.5 border-b border-black/[0.05]">
-                  <span className="font-semibold text-[#415a77]">Hifz Status:</span>
-                  <span className="font-bold text-[#0d1b2a]">
+                  <span className="font-semibold text-[#576b2d]">Hifz Status:</span>
+                  <span className="font-bold text-[#192200]">
                     {selectedAlumnusDetail.hifzStatus || "—"}
                   </span>
                 </div>
                 <div className="flex justify-between py-1.5 border-b border-black/[0.05]">
-                  <span className="font-semibold text-[#415a77]">Islamic Qualification:</span>
-                  <span className="font-bold text-[#0d1b2a]">
+                  <span className="font-semibold text-[#576b2d]">Islamic Qualification:</span>
+                  <span className="font-bold text-[#192200]">
                     {selectedAlumnusDetail.islamicQualification || "—"}
                   </span>
                 </div>
                 <div className="flex justify-between py-1.5 border-b border-black/[0.05]">
-                  <span className="font-semibold text-[#415a77]">Academic Qualification:</span>
-                  <span className="font-bold text-[#0d1b2a]">
+                  <span className="font-semibold text-[#576b2d]">Academic Qualification:</span>
+                  <span className="font-bold text-[#192200]">
                     {selectedAlumnusDetail.academicQualification || "—"}
                   </span>
                 </div>
                 <div className="flex justify-between py-1.5 border-b border-black/[0.05]">
-                  <span className="font-semibold text-[#415a77]">Current Status:</span>
-                  <span className="font-bold text-[#0d1b2a]">
+                  <span className="font-semibold text-[#576b2d]">Current Status:</span>
+                  <span className="font-bold text-[#192200]">
                     {selectedAlumnusDetail.currentStatus || "—"}
                   </span>
                 </div>
                 <div className="flex justify-between py-1.5 border-b border-black/[0.05]">
-                  <span className="font-semibold text-[#415a77]">Designation / Job:</span>
-                  <span className="font-bold text-[#0d1b2a]">
+                  <span className="font-semibold text-[#576b2d]">Designation / Job:</span>
+                  <span className="font-bold text-[#192200]">
                     {selectedAlumnusDetail.jobDesignation || "—"}
                   </span>
                 </div>
                 <div className="flex justify-between py-1.5 border-b border-black/[0.05]">
-                  <span className="font-semibold text-[#415a77]">Institution / Org:</span>
-                  <span className="font-bold text-[#0d1b2a]">
+                  <span className="font-semibold text-[#576b2d]">Institution / Org:</span>
+                  <span className="font-bold text-[#192200]">
                     {selectedAlumnusDetail.institutionName || "—"}
                   </span>
                 </div>
                 <div className="flex justify-between py-1.5 border-b border-black/[0.05]">
-                  <span className="font-semibold text-[#415a77]">Work Location:</span>
-                  <span className="font-bold text-[#0d1b2a]">
+                  <span className="font-semibold text-[#576b2d]">Work Location:</span>
+                  <span className="font-bold text-[#192200]">
                     {selectedAlumnusDetail.workLocation || "—"}
                   </span>
                 </div>
                 <div className="flex justify-between py-1.5 border-b border-black/[0.05]">
-                  <span className="font-semibold text-[#415a77]">Will Attend Meet?:</span>
-                  <span className="font-bold text-[#0d1b2a]">
+                  <span className="font-semibold text-[#576b2d]">Will Attend Meet?:</span>
+                  <span className="font-bold text-[#192200]">
                     {selectedAlumnusDetail.willAttend || "—"}
                   </span>
                 </div>
                 <div className="flex justify-between py-1.5">
-                  <span className="font-semibold text-[#415a77]">Registered At:</span>
-                  <span className="text-[#778da9]">{selectedAlumnusDetail.timestamp || "—"}</span>
+                  <span className="font-semibold text-[#576b2d]">Registered At:</span>
+                  <span className="text-[#576b2d]">{selectedAlumnusDetail.timestamp || "—"}</span>
                 </div>
               </div>
 
@@ -1328,7 +1330,7 @@ export default function AdminPage() {
                 <button
                   type="button"
                   onClick={() => setSelectedAlumnusDetail(null)}
-                  className="w-full py-3 rounded-xl bg-[#f3f4f6] hover:bg-[#e3e8ee] text-[#0d1b2a] font-bold text-xs cursor-pointer"
+                  className="w-full py-3 rounded-xl bg-[#eef2dc] hover:bg-[#e0e7c5] text-[#192200] font-bold text-xs cursor-pointer transition-colors"
                 >
                   Close
                 </button>

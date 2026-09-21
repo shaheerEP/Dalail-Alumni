@@ -254,10 +254,10 @@ export default function AlumniForm() {
 
   return (
     <>
-      <div className="bg-white rounded-2xl sm:rounded-3xl shadow-xl border-0 p-6 sm:p-10 transition-all">
+      <div className="bg-white rounded-2xl sm:rounded-3xl shadow-xl border border-[#719100]/15 p-6 sm:p-10 transition-all">
         {/* Card Header */}
-        <div className="mb-6 pb-3 border-b border-black/[0.05]">
-          <h2 className="text-xl sm:text-2xl font-black text-[#0d1b2a] tracking-tight">
+        <div className="mb-6 pb-3 border-b border-[#719100]/15">
+          <h2 className="text-xl sm:text-2xl font-black text-[#192200] tracking-tight">
             Registration Form
           </h2>
         </div>
@@ -332,7 +332,7 @@ export default function AlumniForm() {
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="w-full py-4 px-6 rounded-2xl bg-[#1b263b] hover:bg-[#0d1b2a] text-white font-black text-base sm:text-lg flex items-center justify-center gap-2.5 shadow-lg shadow-[#1b263b]/25 hover:shadow-xl transition-all cursor-pointer disabled:opacity-70 disabled:cursor-not-allowed"
+                  className="w-full py-4 px-6 rounded-2xl bg-gradient-to-r from-[#719100] via-[#5d7700] to-[#719100] hover:from-[#5d7700] hover:to-[#4a6000] text-white font-black text-base sm:text-lg flex items-center justify-center gap-2.5 shadow-lg shadow-[#719100]/25 hover:shadow-xl transition-all cursor-pointer disabled:opacity-70 disabled:cursor-not-allowed hover:scale-[1.005] active:scale-[0.995]"
                 >
                   {isSubmitting ? (
                     <>
