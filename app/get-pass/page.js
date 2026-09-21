@@ -46,10 +46,19 @@ export default function GetPassPage() {
     setIsGeneratingPass(true);
 
     try {
+      // High-Definition 2x Retina scale for crystal-clear clarity (2048 x 1156)
+      const SCALE = 2;
+      const baseW = 1024;
+      const baseH = 578;
+
       const canvas = document.createElement("canvas");
-      canvas.width = 1024;
-      canvas.height = 578;
+      canvas.width = baseW * SCALE;
+      canvas.height = baseH * SCALE;
       const ctx = canvas.getContext("2d");
+
+      // Enable high-quality image smoothing
+      ctx.imageSmoothingEnabled = true;
+      ctx.imageSmoothingQuality = "high";
 
       // 1. Load base template image
       const template = new window.Image();
@@ -59,11 +68,11 @@ export default function GetPassPage() {
         template.onload = resolve;
         template.onerror = reject;
       });
-      ctx.drawImage(template, 0, 0, 1024, 578);
+      ctx.drawImage(template, 0, 0, canvas.width, canvas.height);
 
-      // 2. Generate QR code image
+      // 2. Generate high-resolution QR code image (width: 720px for razor-sharp modules)
       const qrData = await QRCode.toDataURL(alumnus.registrationId, {
-        width: 360,
+        width: 720,
         margin: 1,
         color: {
           dark: "#1c2b00",
@@ -76,46 +85,50 @@ export default function GetPassPage() {
         qrImg.src = qrData;
       });
 
-      // Center of right side is x ≈ 778
-      const centerX = 778;
+      // Center of right side in scaled canvas: base is 778
+      const centerX = 778 * SCALE;
 
-      // 3. Draw Alumnus Name
+      // 3. Draw Alumnus Name with crisp font rendering
       ctx.fillStyle = "#1e2c00";
-      let fontSize = 23;
+      let baseFontSize = 23;
+      let fontSize = baseFontSize * SCALE;
       ctx.font = `bold ${fontSize}px Georgia, serif`;
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
 
       let displayName = (alumnus.fullName || "").toUpperCase();
-      while (ctx.measureText(displayName).width > 340 && fontSize > 13) {
-        fontSize -= 1.5;
+      const maxTextWidth = 340 * SCALE;
+      while (ctx.measureText(displayName).width > maxTextWidth && fontSize > 13 * SCALE) {
+        fontSize -= 1.5 * SCALE;
         ctx.font = `bold ${fontSize}px Georgia, serif`;
       }
-      ctx.fillText(displayName, centerX, 106);
+      ctx.fillText(displayName, centerX, 106 * SCALE);
 
       // 4. Draw Batch Tag
       ctx.fillStyle = "#557300";
-      ctx.font = "bold 13px system-ui, -apple-system, sans-serif";
+      ctx.font = `bold ${13.5 * SCALE}px system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif`;
       const batchText = (alumnus.batchYear || alumnus.joinedBatch || "").trim();
       if (batchText) {
-        ctx.fillText(batchText, centerX, 131);
+        ctx.fillText(batchText, centerX, 131 * SCALE);
       }
 
       // 5. Draw QR Code with subtle white rounded container
-      const qrSize = 165;
+      const qrSize = 165 * SCALE;
       const qrX = centerX - qrSize / 2;
-      const qrY = 154;
+      const qrY = 154 * SCALE;
+      const padding = 8 * SCALE;
+      const cornerRadius = 14 * SCALE;
 
       // Background rounded card for QR
       ctx.fillStyle = "#ffffff";
-      ctx.shadowColor = "rgba(0, 0, 0, 0.08)";
-      ctx.shadowBlur = 10;
-      ctx.shadowOffsetY = 3;
+      ctx.shadowColor = "rgba(0, 0, 0, 0.1)";
+      ctx.shadowBlur = 12 * SCALE;
+      ctx.shadowOffsetY = 3 * SCALE;
       ctx.beginPath();
       if (ctx.roundRect) {
-        ctx.roundRect(qrX - 8, qrY - 8, qrSize + 16, qrSize + 16, 14);
+        ctx.roundRect(qrX - padding, qrY - padding, qrSize + padding * 2, qrSize + padding * 2, cornerRadius);
       } else {
-        ctx.rect(qrX - 8, qrY - 8, qrSize + 16, qrSize + 16);
+        ctx.rect(qrX - padding, qrY - padding, qrSize + padding * 2, qrSize + padding * 2);
       }
       ctx.fill();
 
@@ -128,18 +141,18 @@ export default function GetPassPage() {
 
       // 6. Draw Registration ID Badge
       const regId = alumnus.registrationId;
-      ctx.font = "bold 15px monospace";
+      ctx.font = `bold ${15 * SCALE}px monospace`;
       const textWidth = ctx.measureText(regId).width;
-      const badgeW = Math.max(textWidth + 28, 175);
-      const badgeH = 32;
+      const badgeW = Math.max(textWidth + 28 * SCALE, 175 * SCALE);
+      const badgeH = 33 * SCALE;
       const badgeX = centerX - badgeW / 2;
-      const badgeY = qrY + qrSize + 16;
+      const badgeY = qrY + qrSize + 16 * SCALE;
 
       // Badge pill background
       ctx.fillStyle = "#5c7c00";
       ctx.beginPath();
       if (ctx.roundRect) {
-        ctx.roundRect(badgeX, badgeY, badgeW, badgeH, 8);
+        ctx.roundRect(badgeX, badgeY, badgeW, badgeH, 8 * SCALE);
       } else {
         ctx.rect(badgeX, badgeY, badgeW, badgeH);
       }
@@ -147,8 +160,8 @@ export default function GetPassPage() {
 
       // Badge text
       ctx.fillStyle = "#ffffff";
-      ctx.font = "bold 15px monospace";
-      ctx.fillText(regId, centerX, badgeY + badgeH / 2 + 1);
+      ctx.font = `bold ${15 * SCALE}px monospace`;
+      ctx.fillText(regId, centerX, badgeY + badgeH / 2 + 1 * SCALE);
 
       const dataUrl = canvas.toDataURL("image/png");
       setPassCardImage(dataUrl);
@@ -271,8 +284,8 @@ export default function GetPassPage() {
         link.click();
       } else if (passRef.current) {
         const dataUrl = await toPng(passRef.current, {
-          quality: 0.98,
-          pixelRatio: 2,
+          quality: 1,
+          pixelRatio: 3,
           backgroundColor: "#f7faeb",
         });
         const link = document.createElement("a");

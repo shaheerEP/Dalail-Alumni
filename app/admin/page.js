@@ -99,6 +99,8 @@ export default function AdminPage() {
   const [manualLoading, setManualLoading] = useState(false);
   const [recentCheckins, setRecentCheckins] = useState([]);
   const scannerRef = useRef(null);
+  const lastScanMapRef = useRef(new Map()); // Map<registrationId, timestamp>
+  const isProcessingScanRef = useRef(false);
 
   // Roster Filters state
   const [searchTerm, setSearchTerm] = useState("");
@@ -200,6 +202,10 @@ export default function AdminPage() {
   const processReportCheckin = async (registrationId) => {
     if (!registrationId || !registrationId.trim()) return;
 
+    const normalizedId = registrationId.trim().toUpperCase();
+    isProcessingScanRef.current = true;
+    lastScanMapRef.current.set(normalizedId, Date.now());
+
     try {
       const res = await fetch("/api/admin/report", {
         method: "POST",
@@ -216,7 +222,7 @@ export default function AdminPage() {
           reportedAt: data.reportedAt,
         });
 
-        // Add to recent check-ins list if new
+        // Add to recent check-ins list ONLY if it was newly reported
         if (!data.alreadyReported && data.alumnus) {
           setRecentCheckins((prev) => [
             {
@@ -241,6 +247,8 @@ export default function AdminPage() {
       console.error("Check-in error:", err);
       alert("Network error processing check-in.");
       return false;
+    } finally {
+      isProcessingScanRef.current = false;
     }
   };
 
@@ -268,6 +276,7 @@ export default function AdminPage() {
       if (res.ok) {
         fetchDashboardData();
         setRecentCheckins((prev) => prev.filter((item) => item.registrationId !== registrationId));
+        lastScanMapRef.current.delete(registrationId.toUpperCase());
       }
     } catch (err) {
       console.error("Undo error:", err);
@@ -304,9 +313,28 @@ export default function AdminPage() {
                 let cleanId = decodedText.trim();
                 // If the QR contains prefix or URL, extract ID
                 if (cleanId.includes("DKK-")) {
-                  const match = cleanId.match(/DKK-[A-Za-z0-9-]+/);
+                  const match = cleanId.match(/DKK-[A-Za-z0-9-]+/i);
                   if (match) cleanId = match[0];
                 }
+
+                const normalizedId = cleanId.toUpperCase();
+                const now = Date.now();
+                const lastScanTime = lastScanMapRef.current.get(normalizedId) || 0;
+
+                // 5-second suppression for the SAME QR:
+                // If the same QR was scanned less than 5 seconds ago, ignore completely
+                if (now - lastScanTime < 5000) {
+                  return;
+                }
+
+                // If a scan request is currently in-flight, avoid concurrent race conditions
+                if (isProcessingScanRef.current) {
+                  return;
+                }
+
+                // Update cooldown timestamp immediately to debounce rapid camera frames
+                lastScanMapRef.current.set(normalizedId, now);
+
                 processReportCheckin(cleanId);
               },
               (errorMessage) => {
@@ -1088,15 +1116,15 @@ export default function AdminPage() {
 
               <span className="text-xs font-black uppercase tracking-wider">
                 {scanResultModal.alreadyReported
-                  ? "Already Reported"
+                  ? "⚠️ Already Reported"
                   : "Check-in Successful!"}
               </span>
               <h3 className="text-xl sm:text-2xl font-black uppercase mt-1">
                 {scanResultModal.alumnus?.fullName || "Registered Attendee"}
               </h3>
-              <p className="text-xs text-white/80 mt-1">
+              <p className="text-xs text-white/90 mt-1">
                 {scanResultModal.alreadyReported
-                  ? `Previously marked present at ${scanResultModal.reportedAt}`
+                  ? `Previously marked present at ${scanResultModal.reportedAt}. Cannot report again.`
                   : `Checked in just now (${scanResultModal.reportedAt})`}
               </p>
             </div>
