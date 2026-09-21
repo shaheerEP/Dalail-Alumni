@@ -45,8 +45,8 @@ export default function GetPassPage() {
     setIsGeneratingPass(true);
 
     try {
-      // High-Definition 2x Retina scale for crystal-clear clarity (2048 x 1156)
-      const SCALE = 2;
+      // Ultra High-Definition 4x scale for double clarity (4096 x 2312)
+      const SCALE = 4;
       const baseW = 1024;
       const baseH = 578;
 
@@ -69,9 +69,9 @@ export default function GetPassPage() {
       });
       ctx.drawImage(template, 0, 0, canvas.width, canvas.height);
 
-      // 2. Generate high-resolution QR code image (width: 720px for razor-sharp modules)
+      // 2. Generate ultra high-resolution QR code image (width: 1440px for razor-sharp modules)
       const qrData = await QRCode.toDataURL(alumnus.registrationId, {
-        width: 720,
+        width: 1440,
         margin: 1,
         color: {
           dark: "#1c2b00",
@@ -284,7 +284,7 @@ export default function GetPassPage() {
       } else if (passRef.current) {
         const dataUrl = await toPng(passRef.current, {
           quality: 1,
-          pixelRatio: 3,
+          pixelRatio: 4,
           backgroundColor: "#f7faeb",
         });
         const link = document.createElement("a");
