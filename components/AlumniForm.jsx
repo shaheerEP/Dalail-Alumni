@@ -47,6 +47,7 @@ export default function AlumniForm() {
     setFormData((prev) => ({
       ...prev,
       batchYear: batch,
+      joinedSections: batch === "Junior Sharia/Dars" ? [] : prev.joinedSections,
       // If batch changes, reset selected student
       fullName: "",
       place: "",
@@ -211,13 +212,15 @@ export default function AlumniForm() {
       const waCode = (sameAsMobile ? mobileCode : (formData.whatsappCountryCode || "+91")).trim();
       const cleanWhatsapp = cleanWaDigits ? `${waCode}${cleanWaDigits}` : cleanMobile;
 
-      const sectionString = (formData.joinedSections || []).join(", ");
+      const isJuniorSharia = formData.batchYear === "Junior Sharia/Dars";
+      const sectionString = isJuniorSharia ? "" : (formData.joinedSections || []).join(", ");
+      const finalSections = isJuniorSharia ? [] : (formData.joinedSections || []);
 
       const submissionData = {
         ...formData,
         joinedBatch: formData.batchYear,
         joinedSection: sectionString,
-        joinedSections: formData.joinedSections || [],
+        joinedSections: finalSections,
         mobileNumber: cleanMobile,
         whatsappNumber: cleanWhatsapp,
       };

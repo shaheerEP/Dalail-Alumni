@@ -1250,12 +1250,14 @@ export default function AdminPage() {
                     {selectedAlumnusDetail.batchYear || selectedAlumnusDetail.joinedBatch}
                   </span>
                 </div>
-                <div className="flex justify-between py-1.5 border-b border-black/[0.05]">
-                  <span className="font-semibold text-[#576b2d]">Section (HS / BS):</span>
-                  <span className="font-bold text-[#192200]">
-                    {selectedAlumnusDetail.joinedSection || "—"}
-                  </span>
-                </div>
+                {selectedAlumnusDetail.batchYear !== "Junior Sharia/Dars" && selectedAlumnusDetail.joinedBatch !== "Junior Sharia/Dars" && (
+                  <div className="flex justify-between py-1.5 border-b border-black/[0.05]">
+                    <span className="font-semibold text-[#576b2d]">Section (HS / BS):</span>
+                    <span className="font-bold text-[#192200]">
+                      {selectedAlumnusDetail.joinedSection || "—"}
+                    </span>
+                  </div>
+                )}
                 <div className="flex justify-between py-1.5 border-b border-black/[0.05]">
                   <span className="font-semibold text-[#576b2d]">Place:</span>
                   <span className="font-bold text-[#192200]">{selectedAlumnusDetail.place || "—"}</span>

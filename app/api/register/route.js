@@ -74,11 +74,18 @@ export async function POST(request) {
       return NextResponse.json({ error: "Joined with Batch is required." }, { status: 400 });
     }
 
-    const chosenSection = joinedSection || (Array.isArray(joinedSections) ? joinedSections.join(", ") : "");
+    const isJuniorSharia = chosenBatch === "Junior Sharia/Dars";
+    const chosenSection = isJuniorSharia
+      ? ""
+      : (joinedSection || (Array.isArray(joinedSections) ? joinedSections.join(", ") : ""));
+    const finalSections = isJuniorSharia
+      ? []
+      : (Array.isArray(joinedSections) ? joinedSections : (chosenSection ? [chosenSection] : []));
 
     // Generate unique Registration ID
     const randomSuffix = Math.floor(1000 + Math.random() * 9000);
-    const registrationId = `DKK-${chosenBatch ? chosenBatch.replace(/\s+/g, "") : "ALM"}-${randomSuffix}`;
+    const cleanBatchTag = chosenBatch ? chosenBatch.replace(/[^a-zA-Z0-9]/g, "") : "ALM";
+    const registrationId = `DKK-${cleanBatchTag}-${randomSuffix}`;
     const timestamp = new Date().toLocaleString("en-IN", {
       timeZone: "Asia/Kolkata",
       dateStyle: "medium",
@@ -95,7 +102,7 @@ export async function POST(request) {
       batchYear: chosenBatch,
       joinedBatch: chosenBatch,
       joinedSection: chosenSection,
-      joinedSections: Array.isArray(joinedSections) ? joinedSections : (chosenSection ? [chosenSection] : []),
+      joinedSections: finalSections,
       hifzStatus: hifzStatus || "",
       leavingYear: leavingYear || "",
       islamicQualification: islamicQualification || "",

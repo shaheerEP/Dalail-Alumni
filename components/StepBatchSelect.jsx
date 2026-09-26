@@ -8,6 +8,7 @@ export default function StepBatchSelect({
   onToggleSection,
   error,
 }) {
+  const isJuniorSharia = selectedBatch === "Junior Sharia/Dars";
   const isHS = Array.isArray(selectedSections) && selectedSections.includes("HS");
   const isBS = Array.isArray(selectedSections) && selectedSections.includes("BS");
 
@@ -48,10 +49,11 @@ export default function StepBatchSelect({
       </div>
 
       {/* Section Checkboxes: HS and BS */}
-      <div>
-        <label className="block text-xs sm:text-sm font-bold text-[#192200] mb-1.5">
-          Section (HS / BS)
-        </label>
+      {!isJuniorSharia && (
+        <div>
+          <label className="block text-xs sm:text-sm font-bold text-[#192200] mb-1.5">
+            Section (HS / BS)
+          </label>
         
         <div className="flex flex-wrap items-center gap-3">
           {/* HS Checkbox */}
@@ -105,6 +107,7 @@ export default function StepBatchSelect({
           )}
         </div>
       </div>
+      )}
     </div>
   );
 }

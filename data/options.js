@@ -1,7 +1,10 @@
 // data/options.js
 
-// Batches: Batch 1 through Batch 12
-export const BATCH_OPTIONS = Array.from({ length: 12 }, (_, i) => `Batch ${i + 1}`);
+// Batches: Batch 1 through Batch 12, and Junior Sharia/Dars
+export const BATCH_OPTIONS = [
+  ...Array.from({ length: 12 }, (_, i) => `Batch ${i + 1}`),
+  "Junior Sharia/Dars",
+];
 export const BATCH_YEARS = BATCH_OPTIONS;
 
 // Alumni roster by batch (empty by default; add official student records here when available)

@@ -940,14 +940,21 @@ export default function GetPassPage() {
                 </div>
 
                 {/* Batch & Section */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div className={`grid gap-3 ${editFormData.batchYear === "Junior Sharia/Dars" ? "grid-cols-1" : "grid-cols-1 sm:grid-cols-2"}`}>
                   <div>
                     <label className="block text-[11px] font-bold uppercase tracking-wider text-[#2d3a00] mb-1">
                       Joined with Batch
                     </label>
                     <select
                       value={editFormData.batchYear || ""}
-                      onChange={(e) => setEditFormData({ ...editFormData, batchYear: e.target.value })}
+                      onChange={(e) => {
+                        const newBatch = e.target.value;
+                        setEditFormData({
+                          ...editFormData,
+                          batchYear: newBatch,
+                          ...(newBatch === "Junior Sharia/Dars" ? { joinedSection: "" } : {}),
+                        });
+                      }}
                       className="w-full px-3 py-2.5 rounded-xl bg-[#eef2dc] border border-[#719100]/20 text-xs font-bold text-[#192200] focus:bg-white focus:border-[#719100] outline-none"
                     >
                       {BATCH_OPTIONS.map((b) => (
@@ -958,21 +965,23 @@ export default function GetPassPage() {
                     </select>
                   </div>
 
-                  <div>
-                    <label className="block text-[11px] font-bold uppercase tracking-wider text-[#2d3a00] mb-1">
-                      Section (HS / BS)
-                    </label>
-                    <select
-                      value={editFormData.joinedSection || ""}
-                      onChange={(e) => setEditFormData({ ...editFormData, joinedSection: e.target.value })}
-                      className="w-full px-3 py-2.5 rounded-xl bg-[#eef2dc] border border-[#719100]/20 text-xs font-bold text-[#192200] focus:bg-white focus:border-[#719100] outline-none"
-                    >
-                      <option value="HS">HS</option>
-                      <option value="BS">BS</option>
-                      <option value="Both (HS & BS)">Both (HS & BS)</option>
-                      <option value="">None / Other</option>
-                    </select>
-                  </div>
+                  {editFormData.batchYear !== "Junior Sharia/Dars" && (
+                    <div>
+                      <label className="block text-[11px] font-bold uppercase tracking-wider text-[#2d3a00] mb-1">
+                        Section (HS / BS)
+                      </label>
+                      <select
+                        value={editFormData.joinedSection || ""}
+                        onChange={(e) => setEditFormData({ ...editFormData, joinedSection: e.target.value })}
+                        className="w-full px-3 py-2.5 rounded-xl bg-[#eef2dc] border border-[#719100]/20 text-xs font-bold text-[#192200] focus:bg-white focus:border-[#719100] outline-none"
+                      >
+                        <option value="HS">HS</option>
+                        <option value="BS">BS</option>
+                        <option value="Both (HS & BS)">Both (HS & BS)</option>
+                        <option value="">None / Other</option>
+                      </select>
+                    </div>
+                  )}
                 </div>
 
                 {/* Mobile & WhatsApp */}
