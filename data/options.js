@@ -1,8 +1,9 @@
 // data/options.js
 
-// Batches: Junior Sharia/Dars, followed by Batch 1 through Batch 12
+// Batches: Junior Sharia/Dars, Hifz, followed by Batch 1 through Batch 12
 export const BATCH_OPTIONS = [
   "Junior Sharia/Dars",
+  "Hifz",
   ...Array.from({ length: 12 }, (_, i) => `Batch ${i + 1}`),
 ];
 export const BATCH_YEARS = BATCH_OPTIONS;

@@ -1250,7 +1250,7 @@ export default function AdminPage() {
                     {selectedAlumnusDetail.batchYear || selectedAlumnusDetail.joinedBatch}
                   </span>
                 </div>
-                {selectedAlumnusDetail.batchYear !== "Junior Sharia/Dars" && selectedAlumnusDetail.joinedBatch !== "Junior Sharia/Dars" && (
+                {!["Junior Sharia/Dars", "Hifz"].includes(selectedAlumnusDetail.batchYear) && !["Junior Sharia/Dars", "Hifz"].includes(selectedAlumnusDetail.joinedBatch) && (
                   <div className="flex justify-between py-1.5 border-b border-black/[0.05]">
                     <span className="font-semibold text-[#576b2d]">Section (HS / BS):</span>
                     <span className="font-bold text-[#192200]">

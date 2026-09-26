@@ -74,11 +74,11 @@ export async function POST(request) {
       return NextResponse.json({ error: "Joined with Batch is required." }, { status: 400 });
     }
 
-    const isJuniorSharia = chosenBatch === "Junior Sharia/Dars";
-    const chosenSection = isJuniorSharia
+    const hasNoSection = chosenBatch === "Junior Sharia/Dars" || chosenBatch === "Hifz";
+    const chosenSection = hasNoSection
       ? ""
       : (joinedSection || (Array.isArray(joinedSections) ? joinedSections.join(", ") : ""));
-    const finalSections = isJuniorSharia
+    const finalSections = hasNoSection
       ? []
       : (Array.isArray(joinedSections) ? joinedSections : (chosenSection ? [chosenSection] : []));
 

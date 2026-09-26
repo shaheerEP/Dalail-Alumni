@@ -940,7 +940,7 @@ export default function GetPassPage() {
                 </div>
 
                 {/* Batch & Section */}
-                <div className={`grid gap-3 ${editFormData.batchYear === "Junior Sharia/Dars" ? "grid-cols-1" : "grid-cols-1 sm:grid-cols-2"}`}>
+                <div className={`grid gap-3 ${(editFormData.batchYear === "Junior Sharia/Dars" || editFormData.batchYear === "Hifz") ? "grid-cols-1" : "grid-cols-1 sm:grid-cols-2"}`}>
                   <div>
                     <label className="block text-[11px] font-bold uppercase tracking-wider text-[#2d3a00] mb-1">
                       Joined with Batch
@@ -952,7 +952,7 @@ export default function GetPassPage() {
                         setEditFormData({
                           ...editFormData,
                           batchYear: newBatch,
-                          ...(newBatch === "Junior Sharia/Dars" ? { joinedSection: "" } : {}),
+                          ...((newBatch === "Junior Sharia/Dars" || newBatch === "Hifz") ? { joinedSection: "" } : {}),
                         });
                       }}
                       className="w-full px-3 py-2.5 rounded-xl bg-[#eef2dc] border border-[#719100]/20 text-xs font-bold text-[#192200] focus:bg-white focus:border-[#719100] outline-none"
@@ -965,7 +965,7 @@ export default function GetPassPage() {
                     </select>
                   </div>
 
-                  {editFormData.batchYear !== "Junior Sharia/Dars" && (
+                  {editFormData.batchYear !== "Junior Sharia/Dars" && editFormData.batchYear !== "Hifz" && (
                     <div>
                       <label className="block text-[11px] font-bold uppercase tracking-wider text-[#2d3a00] mb-1">
                         Section (HS / BS)
