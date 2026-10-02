@@ -39,9 +39,41 @@ export async function POST(request) {
       feeAmount
     );
 
-    return NextResponse.json(result);
+    if (!result.success) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: result.error || "Failed to mark attendance in database",
+          details: result.details || null,
+        },
+        {
+          status: 500,
+          headers: {
+            "Cache-Control": "no-store, no-cache, must-revalidate",
+          },
+        }
+      );
+    }
+
+    return NextResponse.json(result, {
+      headers: {
+        "Cache-Control": "no-store, no-cache, must-revalidate",
+      },
+    });
   } catch (error) {
     console.error("Error in /api/admin/report:", error);
-    return NextResponse.json({ error: "Failed to mark attendance" }, { status: 500 });
+    return NextResponse.json(
+      {
+        success: false,
+        error: error.message || "Failed to mark attendance",
+        details: error.stack || null,
+      },
+      {
+        status: 500,
+        headers: {
+          "Cache-Control": "no-store, no-cache, must-revalidate",
+        },
+      }
+    );
   }
 }

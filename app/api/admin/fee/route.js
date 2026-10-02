@@ -67,10 +67,35 @@ export async function POST(request) {
       adminName,
     });
 
-    return NextResponse.json(result);
+    if (!result.success) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: result.error || "Failed to update fee record in database",
+          details: result.details || null,
+        },
+        {
+          status: 500,
+          headers: { "Cache-Control": "no-store, no-cache, must-revalidate" },
+        }
+      );
+    }
+
+    return NextResponse.json(result, {
+      headers: { "Cache-Control": "no-store, no-cache, must-revalidate" },
+    });
   } catch (error) {
     console.error("Error in POST /api/admin/fee:", error);
-    return NextResponse.json({ error: "Failed to update fee record" }, { status: 500 });
+    return NextResponse.json(
+      {
+        success: false,
+        error: error.message || "Failed to update fee record",
+      },
+      {
+        status: 500,
+        headers: { "Cache-Control": "no-store, no-cache, must-revalidate" },
+      }
+    );
   }
 }
 

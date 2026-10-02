@@ -101,6 +101,7 @@ export default function AdminPage() {
   // Scanner state
   const [scannerActive, setScannerActive] = useState(false);
   const [scanResultModal, setScanResultModal] = useState(null); // { alumnus, alreadyReported, reportedAt }
+  const [errorModal, setErrorModal] = useState(null); // { title, message, details, registrationId, markFee }
   const [manualIdInput, setManualIdInput] = useState("");
   const [manualLoading, setManualLoading] = useState(false);
   const [recentCheckins, setRecentCheckins] = useState([]);
@@ -150,11 +151,20 @@ export default function AdminPage() {
   const fetchDashboardData = async () => {
     setIsLoadingData(true);
     try {
-      const res = await fetch("/api/admin/alumni");
+      const res = await fetch(`/api/admin/alumni?_t=${Date.now()}`, {
+        cache: "no-store",
+        headers: {
+          "Cache-Control": "no-cache",
+          Pragma: "no-cache",
+        },
+      });
       if (res.ok) {
         const data = await res.json();
         setAlumni(data.alumni || []);
         setStats(data.stats || { total: 0, willAttend: 0, reported: 0, pending: 0 });
+        if (Array.isArray(data.recentCheckins)) {
+          setRecentCheckins(data.recentCheckins);
+        }
       } else if (res.status === 401) {
         setIsAuthenticated(false);
       }
@@ -214,25 +224,31 @@ export default function AdminPage() {
 
   // Handle Reporting a Registration ID with optional fee marking
   const processReportCheckin = async (registrationId, markFee = false) => {
-    if (!registrationId || !registrationId.trim()) return;
+    if (!registrationId || !registrationId.trim()) return false;
 
-    const normalizedId = registrationId.trim().toUpperCase();
+    const cleanId = registrationId.trim();
+    const normalizedId = cleanId.toUpperCase();
     isProcessingScanRef.current = true;
     lastScanMapRef.current.set(normalizedId, Date.now());
 
     try {
       const res = await fetch("/api/admin/report", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          "Cache-Control": "no-cache",
+        },
         body: JSON.stringify({
-          registrationId: registrationId.trim(),
+          registrationId: cleanId,
           markFeePaid: Boolean(markFee),
           feeAmount: stats.feeStats?.defaultFee ?? 200,
         }),
       });
 
-      const data = await res.json();
-      if (res.ok && data.success) {
+      const data = await res.json().catch(() => null);
+
+      if (res.ok && data?.success) {
+        setErrorModal(null);
         playScanSound(!data.alreadyReported);
         setScanResultModal({
           alumnus: data.alumnus,
@@ -240,32 +256,60 @@ export default function AdminPage() {
           reportedAt: data.reportedAt,
         });
 
-        // Add to recent check-ins list ONLY if it was newly reported
-        if (!data.alreadyReported && data.alumnus) {
-          setRecentCheckins((prev) => [
-            {
-              registrationId: data.alumnus.registrationId,
-              fullName: data.alumnus.fullName,
-              batchYear: data.alumnus.batchYear,
-              reportedAt: data.reportedAt,
-              feePaid: data.alumnus.feePaid,
-              feeAmount: data.alumnus.feeAmount,
-            },
-            ...prev.slice(0, 9),
-          ]);
+        // Add to recent check-ins list immediately
+        if (data.alumnus) {
+          setRecentCheckins((prev) => {
+            const filtered = prev.filter(
+              (item) => item.registrationId?.trim().toLowerCase() !== cleanId.toLowerCase()
+            );
+            return [
+              {
+                registrationId: data.alumnus.registrationId,
+                fullName: data.alumnus.fullName,
+                batchYear: data.alumnus.batchYear || data.alumnus.joinedBatch,
+                reportedAt: data.reportedAt,
+                feePaid: Boolean(data.alumnus.feePaid),
+                feeAmount: data.alumnus.feeAmount,
+              },
+              ...filtered.slice(0, 24),
+            ];
+          });
         }
 
-        // Refresh data
+        // Refresh data to confirm server-side state
         fetchDashboardData();
         return true;
       } else {
         playScanSound(false);
-        alert(data.error || "Check-in failed. Please verify registration ID.");
+        const errorTitle = data?.alreadyReported
+          ? "Attendee Already Reported"
+          : "Database Persistence Error";
+        const errorMsg =
+          data?.error ||
+          (res.status !== 200
+            ? `Server error (${res.status}: ${res.statusText || "Database Error"})`
+            : "Check-in could not be confirmed in the database.");
+        const errorDetails = data?.details || (data?.code ? `Code: ${data.code}` : null);
+
+        setErrorModal({
+          title: errorTitle,
+          message: errorMsg,
+          details: errorDetails,
+          registrationId: cleanId,
+          markFee,
+        });
         return false;
       }
     } catch (err) {
       console.error("Check-in error:", err);
-      alert("Network error processing check-in.");
+      playScanSound(false);
+      setErrorModal({
+        title: "Connection / Network Error",
+        message: err.message || "Failed to communicate with database server.",
+        details: "Network connection failed. The check-in was NOT recorded in the database.",
+        registrationId: cleanId,
+        markFee,
+      });
       return false;
     } finally {
       isProcessingScanRef.current = false;
@@ -280,7 +324,10 @@ export default function AdminPage() {
     try {
       const res = await fetch("/api/admin/fee", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          "Cache-Control": "no-cache",
+        },
         body: JSON.stringify({
           registrationId,
           paid,
@@ -288,14 +335,29 @@ export default function AdminPage() {
         }),
       });
 
-      const data = await res.json();
-      if (res.ok && data.success) {
+      const data = await res.json().catch(() => null);
+      if (res.ok && data?.success) {
         if (paid) playScanSound(true);
 
         // Optimistically update alumni list
         setAlumni((prev) =>
           prev.map((item) => {
-            if (item.registrationId?.toLowerCase() === registrationId.toLowerCase()) {
+            if (item.registrationId?.trim().toLowerCase() === registrationId.trim().toLowerCase()) {
+              return {
+                ...item,
+                feePaid: paid,
+                feeAmount: data.amount,
+                feePaidAt: data.paidAt,
+              };
+            }
+            return item;
+          })
+        );
+
+        // Also update recent check-ins list if item is present
+        setRecentCheckins((prev) =>
+          prev.map((item) => {
+            if (item.registrationId?.trim().toLowerCase() === registrationId.trim().toLowerCase()) {
               return {
                 ...item,
                 feePaid: paid,
@@ -308,7 +370,7 @@ export default function AdminPage() {
         );
 
         // Also update scan result modal if it shows this alumnus
-        if (scanResultModal?.alumnus?.registrationId?.toLowerCase() === registrationId.toLowerCase()) {
+        if (scanResultModal?.alumnus?.registrationId?.trim().toLowerCase() === registrationId.trim().toLowerCase()) {
           setScanResultModal((prev) => ({
             ...prev,
             alumnus: {
@@ -322,11 +384,23 @@ export default function AdminPage() {
 
         fetchDashboardData();
       } else {
-        alert(data.error || "Failed to update fee record.");
+        playScanSound(false);
+        setErrorModal({
+          title: "Fee Update Failed",
+          message: data?.error || "Failed to update fee record in database.",
+          details: data?.details || null,
+          registrationId,
+        });
       }
     } catch (err) {
       console.error("Fee update error:", err);
-      alert("Network error updating fee.");
+      playScanSound(false);
+      setErrorModal({
+        title: "Connection / Network Error",
+        message: err.message || "Failed to reach server to update fee record.",
+        details: "Network connection error.",
+        registrationId,
+      });
     } finally {
       setFeeUpdatingId(null);
     }
@@ -440,7 +514,7 @@ export default function AdminPage() {
 
   // Undo Check-in
   const handleUndoReporting = async (registrationId) => {
-    if (!confirm(`Are you sure you want to unmark attendance for ${registrationId}?`)) return;
+    if (!registrationId || !confirm(`Are you sure you want to unmark attendance for ${registrationId}?`)) return;
 
     try {
       const res = await fetch("/api/admin/unreport", {
@@ -449,13 +523,28 @@ export default function AdminPage() {
         body: JSON.stringify({ registrationId }),
       });
 
-      if (res.ok) {
+      const data = await res.json().catch(() => null);
+
+      if (res.ok && data?.success) {
         fetchDashboardData();
-        setRecentCheckins((prev) => prev.filter((item) => item.registrationId !== registrationId));
+        setRecentCheckins((prev) =>
+          prev.filter((item) => item.registrationId?.trim().toLowerCase() !== registrationId.trim().toLowerCase())
+        );
         lastScanMapRef.current.delete(registrationId.toUpperCase());
+      } else {
+        setErrorModal({
+          title: "Undo Check-in Failed",
+          message: data?.error || "Failed to remove attendance record from database.",
+          registrationId,
+        });
       }
     } catch (err) {
       console.error("Undo error:", err);
+      setErrorModal({
+        title: "Connection Error",
+        message: err.message || "Failed to communicate with database server.",
+        registrationId,
+      });
     }
   };
 
@@ -1075,9 +1164,9 @@ export default function AdminPage() {
                 ) : (
                   <div className="text-center py-12 text-[#6e8242]">
                     <Users className="w-8 h-8 mx-auto mb-2 text-[#6e8242]/50" />
-                    <p className="text-xs font-semibold">No check-ins in this session yet.</p>
+                    <p className="text-xs font-semibold">No check-ins recorded yet today.</p>
                     <p className="text-[11px] mt-1 text-[#576b2d]">
-                      Scanned or manually reported attendees will appear here.
+                      Scanned or manually reported attendees will appear here in real time.
                     </p>
                   </div>
                 )}
@@ -1584,6 +1673,91 @@ export default function AdminPage() {
                 >
                   Close & Ready Next Scan
                 </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ----------------------------------------------------
+          MODAL: Database Persistence & Check-in Error Modal
+      ---------------------------------------------------- */}
+      {errorModal && (
+        <div className="fixed inset-0 z-50 overflow-y-auto bg-black/75 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white w-full max-w-md rounded-3xl shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-150 border-2 border-red-500">
+            {/* Header Banner */}
+            <div className="p-6 bg-gradient-to-br from-red-600 to-red-800 text-white text-center">
+              <div className="w-16 h-16 rounded-2xl bg-white/15 mx-auto flex items-center justify-center mb-3">
+                <AlertTriangle className="w-9 h-9 text-white stroke-[2.5]" />
+              </div>
+
+              <span className="text-[11px] font-black uppercase tracking-wider text-red-200 bg-red-950/40 px-3 py-1 rounded-full inline-block">
+                Database Error Notice
+              </span>
+              <h3 className="text-xl font-black uppercase mt-2 text-white">
+                {errorModal.title || "Check-in Not Recorded"}
+              </h3>
+              <p className="text-xs text-red-100 mt-1">
+                Attendance was NOT confirmed in database storage
+              </p>
+            </div>
+
+            {/* Error Body */}
+            <div className="p-6 space-y-4 text-xs bg-white">
+              {errorModal.registrationId && (
+                <div className="flex items-center justify-between py-2 px-3.5 rounded-xl bg-stone-100 border border-stone-200">
+                  <span className="font-bold text-stone-600">Registration ID:</span>
+                  <span className="font-mono font-black text-stone-900 text-sm">
+                    {errorModal.registrationId}
+                  </span>
+                </div>
+              )}
+
+              {/* The Real Issue Details */}
+              <div className="p-4 rounded-2xl bg-red-50 border border-red-200 space-y-2">
+                <div className="text-[10px] font-black uppercase tracking-wider text-red-800 flex items-center gap-1.5">
+                  <span className="w-2 h-2 rounded-full bg-red-600 inline-block animate-pulse"></span>
+                  <span>The Real Issue:</span>
+                </div>
+                <div className="text-xs font-semibold text-red-950 break-words font-mono bg-white/80 p-2.5 rounded-xl border border-red-200/60 shadow-xs">
+                  {errorModal.message}
+                </div>
+                {errorModal.details && (
+                  <div className="text-[11px] text-red-700/90 font-mono break-words bg-red-100/60 p-2 rounded-lg border border-red-200">
+                    <span className="font-bold">Details: </span>
+                    {errorModal.details}
+                  </div>
+                )}
+              </div>
+
+              <div className="p-3.5 rounded-xl bg-amber-50 border border-amber-200 text-amber-900 text-[11px] leading-relaxed">
+                <strong>Important:</strong> Because this check-in did not reach the database, refreshing the page will show this member as <u>Pending / Not Reported</u>. Please retry once network or storage is accessible.
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex gap-2.5 pt-2">
+                <button
+                  type="button"
+                  onClick={() => setErrorModal(null)}
+                  className="flex-1 py-3 rounded-xl border border-stone-300 hover:bg-stone-100 font-bold text-xs uppercase tracking-wider text-stone-700 transition-colors cursor-pointer"
+                >
+                  Dismiss
+                </button>
+                {errorModal.registrationId && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const id = errorModal.registrationId;
+                      const fee = errorModal.markFee;
+                      setErrorModal(null);
+                      processReportCheckin(id, fee);
+                    }}
+                    className="flex-1 py-3 rounded-xl bg-gradient-to-r from-red-600 to-red-700 hover:opacity-95 text-white font-bold text-xs uppercase tracking-wider shadow-md transition-all cursor-pointer flex items-center justify-center gap-1.5"
+                  >
+                    <RotateCcw className="w-3.5 h-3.5" />
+                    <span>Retry Check-in</span>
+                  </button>
+                )}
               </div>
             </div>
           </div>
