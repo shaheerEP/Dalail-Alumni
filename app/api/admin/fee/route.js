@@ -112,7 +112,7 @@ export async function PUT(request) {
     const body = await request.json();
     const { defaultFee } = body;
 
-    const result = updateFeeSettings({ defaultFee });
+    const result = await updateFeeSettings({ defaultFee });
     if (!result.success) {
       return NextResponse.json({ error: result.error }, { status: 400 });
     }

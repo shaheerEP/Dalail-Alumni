@@ -339,6 +339,25 @@ function doPost(e) {
     }
 
     // ----------------------------------------------------
+    // ACTION: FEE_SETTINGS (Set Default Meet Fee, e.g. ₹200)
+    // ----------------------------------------------------
+    if (action === "FEE_SETTINGS") {
+      var newFee = Number(data.defaultFee) || 200;
+      PropertiesService.getScriptProperties().setProperty("DEFAULT_FEE", newFee.toString());
+
+      var feeSheet = ss.getSheetByName("Fees");
+      if (feeSheet) {
+        feeSheet.getRange(1, 4).setNote("Default Meet Fee: ₹" + newFee);
+      }
+
+      return ContentService.createTextOutput(JSON.stringify({
+        status: "success",
+        action: "FEE_SETTINGS",
+        defaultFee: newFee
+      })).setMimeType(ContentService.MimeType.JSON);
+    }
+
+    // ----------------------------------------------------
     // DEFAULT ACTION: REGISTRATION
     // ----------------------------------------------------
     var regId = data.registrationId || data["Registration ID"] || data.regId || "";
