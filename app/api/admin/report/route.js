@@ -5,6 +5,16 @@ import { isValidSession } from "@/app/api/admin/auth/route";
 
 const ADMIN_COOKIE_NAME = "dkk_admin_session";
 
+function getSessionUser(token) {
+  try {
+    const raw = Buffer.from(token, "base64").toString("utf8");
+    const parsed = JSON.parse(raw);
+    return parsed.u || "Admin";
+  } catch (e) {
+    return "Admin";
+  }
+}
+
 export async function POST(request) {
   try {
     const cookieStore = await cookies();
@@ -14,14 +24,20 @@ export async function POST(request) {
       return NextResponse.json({ error: "Unauthorized access" }, { status: 401 });
     }
 
+    const adminName = getSessionUser(token);
     const body = await request.json();
-    const { registrationId } = body;
+    const { registrationId, markFeePaid, feeAmount } = body;
 
     if (!registrationId) {
       return NextResponse.json({ error: "Registration ID is required" }, { status: 400 });
     }
 
-    const result = await markReporting(registrationId);
+    const result = await markReporting(
+      registrationId,
+      adminName,
+      Boolean(markFeePaid),
+      feeAmount
+    );
 
     return NextResponse.json(result);
   } catch (error) {

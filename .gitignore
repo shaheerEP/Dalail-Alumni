@@ -37,6 +37,7 @@ yarn-error.log*
 # local submissions backup
 data/submissions.json
 data/checkins.json
+data/fees.json
 
 # vercel
 .vercel

@@ -29,6 +29,12 @@ import {
   RotateCcw,
   Sparkles,
   ArrowUpDown,
+  IndianRupee,
+  Wallet,
+  Download,
+  Pencil,
+  Plus,
+  Check,
 } from "lucide-react";
 import { BATCH_OPTIONS } from "@/data/options";
 
@@ -102,6 +108,12 @@ export default function AdminPage() {
   const lastScanMapRef = useRef(new Map()); // Map<registrationId, timestamp>
   const isProcessingScanRef = useRef(false);
 
+  // Fee state
+  const [autoMarkFee, setAutoMarkFee] = useState(true);
+  const [showFeeSettingsModal, setShowFeeSettingsModal] = useState(false);
+  const [newFeeInput, setNewFeeInput] = useState(200);
+  const [feeUpdatingId, setFeeUpdatingId] = useState(null);
+
   // Roster Filters state
   const [searchTerm, setSearchTerm] = useState("");
   const [filterBatch, setFilterBatch] = useState("all");
@@ -109,6 +121,7 @@ export default function AdminPage() {
   const [filterAttendance, setFilterAttendance] = useState("all"); // "all" | "yes" | "no"
   const [filterStatus, setFilterStatus] = useState("all"); // "all" | "Job" | "Study"
   const [filterHifz, setFilterHifz] = useState("all"); // "all" | "Hafiz" | "Not Hafiz"
+  const [filterFee, setFilterFee] = useState("all"); // "all" | "paid" | "unpaid"
 
   // Modal for Viewing Single Alumnus Full Details
   const [selectedAlumnusDetail, setSelectedAlumnusDetail] = useState(null);
@@ -198,8 +211,8 @@ export default function AdminPage() {
     setAlumni([]);
   };
 
-  // Handle Reporting a Registration ID
-  const processReportCheckin = async (registrationId) => {
+  // Handle Reporting a Registration ID with optional fee marking
+  const processReportCheckin = async (registrationId, markFee = autoMarkFee) => {
     if (!registrationId || !registrationId.trim()) return;
 
     const normalizedId = registrationId.trim().toUpperCase();
@@ -210,7 +223,11 @@ export default function AdminPage() {
       const res = await fetch("/api/admin/report", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ registrationId: registrationId.trim() }),
+        body: JSON.stringify({
+          registrationId: registrationId.trim(),
+          markFeePaid: Boolean(markFee),
+          feeAmount: stats.feeStats?.defaultFee ?? 200,
+        }),
       });
 
       const data = await res.json();
@@ -230,6 +247,8 @@ export default function AdminPage() {
               fullName: data.alumnus.fullName,
               batchYear: data.alumnus.batchYear,
               reportedAt: data.reportedAt,
+              feePaid: data.alumnus.feePaid,
+              feeAmount: data.alumnus.feeAmount,
             },
             ...prev.slice(0, 9),
           ]);
@@ -250,6 +269,162 @@ export default function AdminPage() {
     } finally {
       isProcessingScanRef.current = false;
     }
+  };
+
+  // Toggle alumnus fee status directly
+  const toggleAlumnusFee = async (registrationId, paid, amount) => {
+    if (!registrationId) return;
+    setFeeUpdatingId(registrationId);
+
+    try {
+      const res = await fetch("/api/admin/fee", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          registrationId,
+          paid,
+          amount: amount !== undefined ? amount : (stats.feeStats?.defaultFee ?? 200),
+        }),
+      });
+
+      const data = await res.json();
+      if (res.ok && data.success) {
+        if (paid) playScanSound(true);
+
+        // Optimistically update alumni list
+        setAlumni((prev) =>
+          prev.map((item) => {
+            if (item.registrationId?.toLowerCase() === registrationId.toLowerCase()) {
+              return {
+                ...item,
+                feePaid: paid,
+                feeAmount: data.amount,
+                feePaidAt: data.paidAt,
+              };
+            }
+            return item;
+          })
+        );
+
+        // Also update scan result modal if it shows this alumnus
+        if (scanResultModal?.alumnus?.registrationId?.toLowerCase() === registrationId.toLowerCase()) {
+          setScanResultModal((prev) => ({
+            ...prev,
+            alumnus: {
+              ...prev.alumnus,
+              feePaid: paid,
+              feeAmount: data.amount,
+              feePaidAt: data.paidAt,
+            },
+          }));
+        }
+
+        fetchDashboardData();
+      } else {
+        alert(data.error || "Failed to update fee record.");
+      }
+    } catch (err) {
+      console.error("Fee update error:", err);
+      alert("Network error updating fee.");
+    } finally {
+      setFeeUpdatingId(null);
+    }
+  };
+
+  // Update default meet fee setting
+  const handleUpdateDefaultFee = async (e) => {
+    e.preventDefault();
+    const val = Number(newFeeInput);
+    if (isNaN(val) || val < 0) {
+      alert("Please enter a valid positive number for fee.");
+      return;
+    }
+
+    try {
+      const res = await fetch("/api/admin/fee", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ defaultFee: val }),
+      });
+
+      const data = await res.json();
+      if (res.ok && data.success) {
+        setShowFeeSettingsModal(false);
+        fetchDashboardData();
+      } else {
+        alert(data.error || "Failed to update default fee.");
+      }
+    } catch (err) {
+      console.error("Default fee update error:", err);
+      alert("Network error saving default fee.");
+    }
+  };
+
+  // Export full attendance and fee report as CSV
+  const exportReportToCSV = () => {
+    if (!alumni || alumni.length === 0) {
+      alert("No alumni data to export.");
+      return;
+    }
+
+    const headers = [
+      "Registration ID",
+      "Full Name",
+      "Place",
+      "Batch",
+      "Section",
+      "Mobile",
+      "WhatsApp",
+      "Current Status",
+      "Designation / Job",
+      "Institution",
+      "Will Attend",
+      "Attendance Status",
+      "Reported At",
+      "Fee Status",
+      "Fee Amount (INR)",
+      "Fee Paid At",
+    ];
+
+    const escapeCSV = (val) => {
+      if (val === null || val === undefined) return '""';
+      const str = String(val).replace(/"/g, '""');
+      return `"${str}"`;
+    };
+
+    const rows = filteredAlumni.map((a) => [
+      escapeCSV(a.registrationId),
+      escapeCSV(a.fullName),
+      escapeCSV(a.place),
+      escapeCSV(a.batchYear || a.joinedBatch),
+      escapeCSV(a.joinedSection),
+      escapeCSV(a.mobileNumber),
+      escapeCSV(a.whatsappNumber),
+      escapeCSV(a.currentStatus),
+      escapeCSV(a.jobDesignation),
+      escapeCSV(a.institutionName),
+      escapeCSV(a.willAttend),
+      escapeCSV(a.isReported ? "Reported Present" : "Pending"),
+      escapeCSV(a.reportedAt || ""),
+      escapeCSV(a.feePaid ? "PAID" : "UNPAID"),
+      escapeCSV(a.feePaid ? (a.feeAmount || stats.feeStats?.defaultFee || 0) : 0),
+      escapeCSV(a.feePaidAt || ""),
+    ]);
+
+    const csvContent =
+      "data:text/csv;charset=utf-8,\uFEFF" +
+      [headers.join(","), ...rows.map((r) => r.join(","))].join("\r\n");
+
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute(
+      "download",
+      `DKK-Alumni-Meet-Report-${new Date().toISOString().slice(0, 10)}.csv`
+    );
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   };
 
   // Manual Check-in Submission
@@ -408,9 +583,13 @@ export default function AdminPage() {
         return false;
       }
 
+      // 7. Fee Status Filter
+      if (filterFee === "paid" && !item.feePaid) return false;
+      if (filterFee === "unpaid" && item.feePaid) return false;
+
       return true;
     });
-  }, [alumni, searchTerm, filterBatch, filterReporting, filterAttendance, filterStatus, filterHifz]);
+  }, [alumni, searchTerm, filterBatch, filterReporting, filterAttendance, filterStatus, filterHifz, filterFee]);
 
   // ----------------------------------------------------
   // RENDER: Loading or Login Screen
@@ -538,6 +717,21 @@ export default function AdminPage() {
           </div>
 
           <div className="flex items-center gap-3">
+            {/* Fee Setting Button / Pill */}
+            <button
+              type="button"
+              onClick={() => {
+                setNewFeeInput(stats.feeStats?.defaultFee ?? 200);
+                setShowFeeSettingsModal(true);
+              }}
+              title={`Meet Fee: ₹${stats.feeStats?.defaultFee ?? 200} (Click to edit)`}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-xs font-bold text-[#e8edd7] border border-[#719100]/30 transition-all cursor-pointer shadow-xs"
+            >
+              <IndianRupee className="w-3.5 h-3.5 text-[#fff000]" />
+              <span>{stats.feeStats?.defaultFee ?? 200}</span>
+              <Pencil className="w-2.5 h-2.5 text-[#fff000]/70" />
+            </button>
+
             <span className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/10 text-[11px] font-bold text-[#e8edd7] border border-[#719100]/30">
               <ShieldCheck className="w-3.5 h-3.5 text-[#fff000]" />
               <span>{adminUser}</span>
@@ -557,7 +751,7 @@ export default function AdminPage() {
       {/* Main Container */}
       <main className="flex-1 max-w-7xl w-full mx-auto px-3 sm:px-6 py-6 space-y-6">
         {/* Metric Summary Cards */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4">
           <div className="bg-white rounded-2xl p-4 sm:p-5 shadow-sm border border-[#719100]/15">
             <div className="flex items-center justify-between text-[#576b2d] mb-1">
               <span className="text-[11px] font-bold uppercase tracking-wider">Total Registered</span>
@@ -598,6 +792,38 @@ export default function AdminPage() {
             <div className="text-2xl sm:text-3xl font-black text-[#2d3a00]">{stats.pending}</div>
             <p className="text-[11px] text-[#576b2d] mt-0.5">Yet to report</p>
           </div>
+
+          <div className="bg-white rounded-2xl p-4 sm:p-5 shadow-sm border border-[#719100]/15 col-span-2 sm:col-span-1">
+            <div className="flex items-center justify-between text-[#576b2d] mb-1">
+              <span className="text-[11px] font-bold uppercase tracking-wider flex items-center gap-1">
+                <IndianRupee className="w-3.5 h-3.5 text-[#719100]" />
+                <span>Fees</span>
+              </span>
+              <span className="text-xs font-black text-[#719100]">
+                {stats.feeStats?.collectionRate || 0}%
+              </span>
+            </div>
+            <div className="text-2xl sm:text-3xl font-black text-[#192200]">
+              ₹{(stats.feeStats?.totalCollected || 0).toLocaleString("en-IN")}
+            </div>
+            <div className="flex items-center justify-between text-[11px] mt-1 text-[#576b2d]">
+              <span className="inline-flex items-center gap-1 text-emerald-700 font-bold" title="Paid count">
+                <CheckCircle2 className="w-3 h-3 text-emerald-600" />
+                {stats.feeStats?.paidCount || 0}
+              </span>
+              <span>•</span>
+              <span className="inline-flex items-center gap-1 text-amber-700 font-bold" title="Unpaid count">
+                <Clock className="w-3 h-3 text-amber-600" />
+                {stats.feeStats?.pendingCount || 0}
+              </span>
+            </div>
+            <div className="w-full bg-[#eef2dc] h-1.5 rounded-full mt-2 overflow-hidden">
+              <div
+                className="bg-[#719100] h-full rounded-full transition-all duration-500"
+                style={{ width: `${stats.feeStats?.collectionRate || 0}%` }}
+              />
+            </div>
+          </div>
         </div>
 
         {/* Navigation Tabs */}
@@ -632,9 +858,18 @@ export default function AdminPage() {
           </button>
 
           <button
+            onClick={exportReportToCSV}
+            title="Download CSV Report with Attendance & Fee Records"
+            className="ml-auto p-2.5 rounded-xl bg-white hover:bg-[#eef2dc] text-[#576b2d] border border-[#719100]/15 transition-colors cursor-pointer flex items-center gap-1.5"
+          >
+            <Download className="w-4 h-4 text-[#719100]" />
+            <span className="hidden sm:inline text-xs font-bold text-[#192200]">Report</span>
+          </button>
+
+          <button
             onClick={fetchDashboardData}
             title="Refresh Data"
-            className="ml-auto p-2.5 rounded-xl bg-white hover:bg-[#eef2dc] text-[#576b2d] border border-[#719100]/15 transition-colors cursor-pointer"
+            className="p-2.5 rounded-xl bg-white hover:bg-[#eef2dc] text-[#576b2d] border border-[#719100]/15 transition-colors cursor-pointer"
           >
             <RefreshCw className={`w-4 h-4 ${isLoadingData ? "animate-spin text-[#719100]" : ""}`} />
           </button>
@@ -712,9 +947,33 @@ export default function AdminPage() {
 
                 {/* Fallback Manual Check-in */}
                 <div className="mt-6 pt-5 border-t border-black/[0.06]">
-                  <h3 className="text-xs font-bold uppercase tracking-wider text-[#2d3a00] mb-2">
-                    Or Quick Manual Check-in
-                  </h3>
+                  <div className="flex items-center justify-between mb-2">
+                    <h3 className="text-xs font-bold uppercase tracking-wider text-[#2d3a00]">
+                      Quick Manual Check-in
+                    </h3>
+                    <button
+                      type="button"
+                      onClick={() => setAutoMarkFee(!autoMarkFee)}
+                      title={
+                        autoMarkFee
+                          ? `Collect Fee (₹${stats.feeStats?.defaultFee ?? 200}) is ON for scans & check-in. Click to toggle OFF.`
+                          : `Collect Fee is OFF for scans & check-in. Click to toggle ON.`
+                      }
+                      className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold transition-all border cursor-pointer ${
+                        autoMarkFee
+                          ? "bg-emerald-50 text-emerald-800 border-emerald-300 shadow-xs"
+                          : "bg-[#eef2dc] text-[#576b2d] border-[#719100]/20"
+                      }`}
+                    >
+                      <IndianRupee className="w-3 h-3 text-emerald-600" />
+                      <span>{stats.feeStats?.defaultFee ?? 200}</span>
+                      {autoMarkFee ? (
+                        <Check className="w-3 h-3 text-emerald-600 stroke-[3]" />
+                      ) : (
+                        <X className="w-3 h-3 text-stone-400" />
+                      )}
+                    </button>
+                  </div>
                   <form onSubmit={handleManualCheckin} className="flex gap-2">
                     <input
                       type="text"
@@ -773,13 +1032,38 @@ export default function AdminPage() {
                           </span>
                         </div>
 
-                        <button
-                          type="button"
-                          onClick={() => handleUndoReporting(item.registrationId)}
-                          className="text-[11px] text-[#6e8242] hover:text-red-600 font-semibold px-2 py-1 rounded hover:bg-red-50 transition-colors shrink-0 cursor-pointer"
-                        >
-                          Undo
-                        </button>
+                        <div className="flex items-center gap-2 shrink-0">
+                          <button
+                            type="button"
+                            onClick={() => toggleAlumnusFee(item.registrationId, !item.feePaid)}
+                            title={
+                              item.feePaid
+                                ? `Fee Paid ₹${item.feeAmount || (stats.feeStats?.defaultFee ?? 200)} (Click to unmark)`
+                                : `Unpaid (Click to mark ₹${stats.feeStats?.defaultFee ?? 200} Paid)`
+                            }
+                            className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full font-mono text-[10px] font-bold border transition-colors cursor-pointer ${
+                              item.feePaid
+                                ? "bg-emerald-50 text-emerald-800 border-emerald-300"
+                                : "bg-[#f4f6ea] text-stone-600 border-[#719100]/20 hover:border-emerald-300 hover:text-emerald-800"
+                            }`}
+                          >
+                            <IndianRupee className="w-2.5 h-2.5 text-emerald-600" />
+                            <span>{item.feeAmount || (stats.feeStats?.defaultFee ?? 200)}</span>
+                            {item.feePaid ? (
+                              <Check className="w-2.5 h-2.5 text-emerald-600 stroke-[3]" />
+                            ) : (
+                              <Plus className="w-2.5 h-2.5 text-stone-400" />
+                            )}
+                          </button>
+
+                          <button
+                            type="button"
+                            onClick={() => handleUndoReporting(item.registrationId)}
+                            className="text-[11px] text-[#6e8242] hover:text-red-600 font-semibold px-2 py-1 rounded hover:bg-red-50 transition-colors shrink-0 cursor-pointer"
+                          >
+                            Undo
+                          </button>
+                        </div>
                       </div>
                     ))}
                   </div>
@@ -823,7 +1107,7 @@ export default function AdminPage() {
               </div>
 
               {/* Filter Dropdowns Row */}
-              <div className="grid grid-cols-2 sm:grid-cols-5 gap-2.5 pt-1 text-xs">
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2.5 pt-1 text-xs">
                 {/* Batch Filter */}
                 <div>
                   <label className="block text-[10px] font-bold uppercase tracking-wider text-[#576b2d] mb-1">
@@ -856,6 +1140,23 @@ export default function AdminPage() {
                     <option value="all">All Reporting</option>
                     <option value="reported">Reported Present</option>
                     <option value="pending">Pending Check-in</option>
+                  </select>
+                </div>
+
+                {/* Fee Status Filter */}
+                <div>
+                  <label className="block text-[10px] font-bold uppercase tracking-wider text-[#576b2d] mb-1 flex items-center gap-1">
+                    <IndianRupee className="w-3 h-3 text-[#719100]" />
+                    <span>Fee</span>
+                  </label>
+                  <select
+                    value={filterFee}
+                    onChange={(e) => setFilterFee(e.target.value)}
+                    className="w-full px-3 py-2 rounded-xl bg-[#eef2dc] border border-[#719100]/20 text-[#192200] font-medium outline-none focus:border-[#719100]"
+                  >
+                    <option value="all">All Fees</option>
+                    <option value="paid">₹ Paid</option>
+                    <option value="unpaid">₹ Unpaid</option>
                   </select>
                 </div>
 
@@ -920,6 +1221,7 @@ export default function AdminPage() {
                   filterAttendance !== "all" ||
                   filterStatus !== "all" ||
                   filterHifz !== "all" ||
+                  filterFee !== "all" ||
                   searchTerm) && (
                   <button
                     onClick={() => {
@@ -928,6 +1230,7 @@ export default function AdminPage() {
                       setFilterAttendance("all");
                       setFilterStatus("all");
                       setFilterHifz("all");
+                      setFilterFee("all");
                       setSearchTerm("");
                     }}
                     className="text-[#719100] hover:underline font-bold cursor-pointer"
@@ -950,6 +1253,11 @@ export default function AdminPage() {
                       <th className="py-3.5 px-4">Phone & WhatsApp</th>
                       <th className="py-3.5 px-4">Hifz & Status</th>
                       <th className="py-3.5 px-4">Will Attend?</th>
+                      <th className="py-3.5 px-4 text-center">
+                        <span title="Fee Status" className="inline-flex items-center justify-center">
+                          <IndianRupee className="w-3.5 h-3.5 text-[#fff000]" />
+                        </span>
+                      </th>
                       <th className="py-3.5 px-4">Meet Reporting</th>
                       <th className="py-3.5 px-4 text-right">Actions</th>
                     </tr>
@@ -1030,6 +1338,37 @@ export default function AdminPage() {
                             </span>
                           </td>
 
+                          {/* Fee Status */}
+                          <td className="py-3.5 px-4 text-center whitespace-nowrap">
+                            {alumnus.feePaid ? (
+                              <button
+                                type="button"
+                                disabled={feeUpdatingId === alumnus.registrationId}
+                                onClick={() => toggleAlumnusFee(alumnus.registrationId, false)}
+                                title={`Paid ₹${alumnus.feeAmount || (stats.feeStats?.defaultFee ?? 200)} (${alumnus.feePaidAt || ""}) • Click to undo`}
+                                className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-emerald-50 hover:bg-red-50 text-emerald-800 hover:text-red-700 border border-emerald-300 hover:border-red-300 font-mono text-[11px] font-bold transition-all cursor-pointer group shadow-xs disabled:opacity-50"
+                              >
+                                <IndianRupee className="w-3 h-3 text-emerald-600 group-hover:hidden" />
+                                <span className="group-hover:hidden">{alumnus.feeAmount || (stats.feeStats?.defaultFee ?? 200)}</span>
+                                <Check className="w-3 h-3 text-emerald-600 stroke-[3] group-hover:hidden" />
+                                <RotateCcw className="w-3 h-3 text-red-600 hidden group-hover:inline" />
+                                <span className="hidden group-hover:inline text-[10px]">Undo</span>
+                              </button>
+                            ) : (
+                              <button
+                                type="button"
+                                disabled={feeUpdatingId === alumnus.registrationId}
+                                onClick={() => toggleAlumnusFee(alumnus.registrationId, true)}
+                                title={`Unpaid • Click to mark ₹${stats.feeStats?.defaultFee ?? 200} Paid`}
+                                className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-[#f4f6ea] hover:bg-emerald-50 text-[#576b2d] hover:text-emerald-800 border border-[#719100]/20 hover:border-emerald-300 font-mono text-[11px] font-semibold transition-all cursor-pointer shadow-xs disabled:opacity-50"
+                              >
+                                <IndianRupee className="w-3 h-3 text-stone-400" />
+                                <span>{stats.feeStats?.defaultFee ?? 200}</span>
+                                <Plus className="w-3 h-3 text-[#719100]" />
+                              </button>
+                            )}
+                          </td>
+
                           {/* Reporting Status */}
                           <td className="py-3.5 px-4 whitespace-nowrap">
                             {alumnus.isReported ? (
@@ -1043,13 +1382,27 @@ export default function AdminPage() {
                                 </div>
                               </div>
                             ) : (
-                              <button
-                                type="button"
-                                onClick={() => processReportCheckin(alumnus.registrationId)}
-                                className="px-3 py-1 rounded-xl bg-gradient-to-r from-[#719100] to-[#556e00] hover:opacity-95 text-white font-bold text-[11px] shadow-sm transition-all cursor-pointer"
-                              >
-                                Mark Present
-                              </button>
+                              <div className="inline-flex items-center gap-1.5">
+                                <button
+                                  type="button"
+                                  onClick={() => processReportCheckin(alumnus.registrationId, autoMarkFee)}
+                                  className="px-3 py-1 rounded-xl bg-gradient-to-r from-[#719100] to-[#556e00] hover:opacity-95 text-white font-bold text-[11px] shadow-sm transition-all cursor-pointer flex items-center gap-1"
+                                >
+                                  <CheckCircle2 className="w-3 h-3" />
+                                  <span>Present</span>
+                                </button>
+                                {!alumnus.feePaid && (
+                                  <button
+                                    type="button"
+                                    onClick={() => processReportCheckin(alumnus.registrationId, true)}
+                                    title={`Mark Present & Collect ₹${stats.feeStats?.defaultFee ?? 200} Fee`}
+                                    className="p-1 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white shadow-xs transition-all cursor-pointer flex items-center gap-0.5 px-2 text-[10px] font-black"
+                                  >
+                                    <IndianRupee className="w-3 h-3" />
+                                    <span>+</span>
+                                  </button>
+                                )}
+                              </div>
                             )}
                           </td>
 
@@ -1139,6 +1492,44 @@ export default function AdminPage() {
                 </span>
               </div>
 
+              <div className="flex items-center justify-between py-1.5 border-b border-black/[0.05]">
+                <span className="font-bold text-[#576b2d] flex items-center gap-1">
+                  <IndianRupee className="w-3.5 h-3.5 text-[#719100]" />
+                  <span>Fee:</span>
+                </span>
+                <button
+                  type="button"
+                  onClick={() =>
+                    toggleAlumnusFee(
+                      scanResultModal.alumnus?.registrationId,
+                      !scanResultModal.alumnus?.feePaid
+                    )
+                  }
+                  title={
+                    scanResultModal.alumnus?.feePaid
+                      ? "Fee is Paid (Click to unmark)"
+                      : "Fee is Unpaid (Click to mark Paid)"
+                  }
+                  className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold transition-all border cursor-pointer ${
+                    scanResultModal.alumnus?.feePaid
+                      ? "bg-emerald-50 text-emerald-800 border-emerald-300 shadow-xs"
+                      : "bg-amber-50 text-amber-800 border-amber-300 hover:bg-emerald-50 hover:text-emerald-800"
+                  }`}
+                >
+                  <IndianRupee className="w-3 h-3 text-emerald-600" />
+                  <span>
+                    {scanResultModal.alumnus?.feeAmount ||
+                      stats.feeStats?.defaultFee ||
+                      200}
+                  </span>
+                  {scanResultModal.alumnus?.feePaid ? (
+                    <Check className="w-3 h-3 text-emerald-600 stroke-[3]" />
+                  ) : (
+                    <Plus className="w-3 h-3 text-amber-600" />
+                  )}
+                </button>
+              </div>
+
               <div className="flex justify-between py-1.5 border-b border-black/[0.05]">
                 <span className="font-bold text-[#576b2d]">Batch & Section:</span>
                 <span className="font-bold text-[#719100]">
@@ -1218,7 +1609,7 @@ export default function AdminPage() {
             </div>
 
             <div className="p-6 space-y-4 max-h-[80vh] overflow-y-auto text-xs">
-              <div className="grid grid-cols-2 gap-3 bg-[#eef2dc]/60 p-4 rounded-2xl border border-[#719100]/15">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 bg-[#eef2dc]/60 p-4 rounded-2xl border border-[#719100]/15">
                 <div>
                   <span className="text-[10px] font-bold text-[#576b2d] uppercase">
                     Registration ID
@@ -1233,13 +1624,61 @@ export default function AdminPage() {
                   </span>
                   <p className="font-bold text-[#192200]">
                     {selectedAlumnusDetail.isReported ? (
-                      <span className="text-[#719100] font-black">
-                        Reported ({selectedAlumnusDetail.reportedAt})
+                      <span className="text-[#719100] font-black flex items-center gap-1">
+                        <CheckCircle2 className="w-3.5 h-3.5" />
+                        <span>Present</span>
                       </span>
                     ) : (
                       <span className="text-amber-700 font-bold">Pending Check-in</span>
                     )}
                   </p>
+                </div>
+                <div>
+                  <span className="text-[10px] font-bold text-[#576b2d] uppercase flex items-center gap-1">
+                    <IndianRupee className="w-3 h-3 text-[#719100]" />
+                    <span>Fee Status</span>
+                  </span>
+                  <div className="mt-1">
+                    <button
+                      type="button"
+                      onClick={async () => {
+                        const nextPaid = !selectedAlumnusDetail.feePaid;
+                        await toggleAlumnusFee(
+                          selectedAlumnusDetail.registrationId,
+                          nextPaid
+                        );
+                        setSelectedAlumnusDetail((prev) =>
+                          prev
+                            ? {
+                                ...prev,
+                                feePaid: nextPaid,
+                                feeAmount:
+                                  prev.feeAmount ||
+                                  stats.feeStats?.defaultFee ||
+                                  200,
+                              }
+                            : null
+                        );
+                      }}
+                      className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold border transition-colors cursor-pointer ${
+                        selectedAlumnusDetail.feePaid
+                          ? "bg-emerald-50 text-emerald-800 border-emerald-300"
+                          : "bg-amber-50 text-amber-800 border-amber-300 hover:bg-emerald-50 hover:text-emerald-800"
+                      }`}
+                    >
+                      <IndianRupee className="w-3 h-3 text-emerald-600" />
+                      <span>
+                        {selectedAlumnusDetail.feeAmount ||
+                          stats.feeStats?.defaultFee ||
+                          200}
+                      </span>
+                      {selectedAlumnusDetail.feePaid ? (
+                        <Check className="w-3 h-3 text-emerald-600 stroke-[3]" />
+                      ) : (
+                        <Plus className="w-3 h-3 text-amber-600" />
+                      )}
+                    </button>
+                  </div>
                 </div>
               </div>
 
@@ -1338,6 +1777,74 @@ export default function AdminPage() {
                 </button>
               </div>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* ----------------------------------------------------
+          MODAL: Fee Settings (Set Default Meet Fee)
+      ---------------------------------------------------- */}
+      {showFeeSettingsModal && (
+        <div className="fixed inset-0 z-50 overflow-y-auto bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-white w-full max-w-xs rounded-3xl shadow-2xl overflow-hidden border border-[#719100]/20 animate-in fade-in zoom-in-95 duration-150">
+            <div className="bg-gradient-to-r from-[#141b00] via-[#202b00] to-[#2d3a00] p-4 text-white flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <div className="w-7 h-7 rounded-lg bg-white/10 flex items-center justify-center">
+                  <IndianRupee className="w-4 h-4 text-[#fff000]" />
+                </div>
+                <h3 className="text-xs font-black uppercase tracking-wider text-white">
+                  Meet Fee Setting
+                </h3>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowFeeSettingsModal(false)}
+                className="p-1 rounded-full text-[#e8edd7] hover:text-[#fff000] cursor-pointer"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <form onSubmit={handleUpdateDefaultFee} className="p-5 space-y-4">
+              <div>
+                <label className="block text-[10px] font-bold uppercase tracking-wider text-[#576b2d] mb-1.5 flex items-center gap-1">
+                  <IndianRupee className="w-3 h-3 text-[#719100]" />
+                  <span>Fee Amount (₹)</span>
+                </label>
+                <div className="relative">
+                  <span className="absolute left-3.5 top-1/2 -translate-y-1/2 font-bold text-sm text-[#719100]">
+                    ₹
+                  </span>
+                  <input
+                    type="number"
+                    min="0"
+                    step="1"
+                    autoFocus
+                    value={newFeeInput}
+                    onChange={(e) => setNewFeeInput(e.target.value)}
+                    placeholder="200"
+                    className="w-full pl-8 pr-4 py-2.5 rounded-xl bg-[#eef2dc] border border-[#719100]/20 text-base font-bold font-mono text-[#192200] outline-none focus:bg-[#fbfdf4] focus:border-[#719100]"
+                  />
+                </div>
+              </div>
+
+              <div className="flex gap-2 pt-1">
+                <button
+                  type="button"
+                  onClick={() => setShowFeeSettingsModal(false)}
+                  className="flex-1 py-2.5 rounded-xl bg-[#eef2dc] hover:bg-[#e0e7c5] text-[#192200] text-xs font-bold transition-colors cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="flex-1 py-2.5 rounded-xl bg-gradient-to-r from-[#719100] to-[#556e00] hover:opacity-95 text-white text-xs font-bold transition-all shadow-sm cursor-pointer flex items-center justify-center gap-1"
+                >
+                  <Check className="w-3.5 h-3.5" />
+                  <span>Save</span>
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}
