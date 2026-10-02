@@ -1,11 +1,18 @@
 /**
  * Google Apps Script for Dalailul Khairath Kakkidippuram Alumni Portal (LINKUP 2026)
- * Handles:
- * 1. Registrations (Sheet: "Registrations" / default sheet)
- * 2. Check-ins / Attendance (Sheet: "Checkins")
- * 3. Fees (Sheet: "Fees")
  * 
- * Instructions:
+ * Features:
+ * 1. Saves registrations to Main Sheet ("Registrations" / gid=0).
+ * 2. Saves Attendance and Fee Status DIRECTLY into Columns Q, R, S, T, U of the Main Sheet (gid=0):
+ *    - Column Q: Attendance Status ("Reported" / "Pending")
+ *    - Column R: Reported At (Date & Time)
+ *    - Column S: Fee Status ("Paid" / "Pending")
+ *    - Column T: Fee Amount (₹200)
+ *    - Column U: Reported By (Admin Name)
+ * 3. Also maintains dedicated "Checkins" and "Fees" logging tabs.
+ * 4. Provides doGet(?action=checkins) for instant live synchronization with /admin.
+ * 
+ * Deployment Instructions:
  * 1. Open your Google Sheet: https://docs.google.com/spreadsheets/d/18kiHRVuWO2kEKvSFIa2XVjmN2GkpVgqnAEXCZogdkJ4/edit
  * 2. Click Extensions > Apps Script
  * 3. Replace all existing code in the editor with this script
@@ -14,22 +21,27 @@
  */
 
 var REG_HEADERS = [
-  "Timestamp",
-  "Registration ID",
-  "Full Name",
-  "Place",
-  "Mobile Number",
-  "WhatsApp Number",
-  "Joined with Batch",
-  "Section (HS / BS)",
-  "Hifz Status",
-  "Islamic Qualification",
-  "Academic Qualification",
-  "Current Status",
-  "Job / Designation",
-  "Institution / Organization Name",
-  "Work Location",
-  "Will Attend Meet?"
+  "Timestamp",                        // Col 1 (A)
+  "Registration ID",                  // Col 2 (B)
+  "Full Name",                        // Col 3 (C)
+  "Place",                            // Col 4 (D)
+  "Mobile Number",                    // Col 5 (E)
+  "WhatsApp Number",                  // Col 6 (F)
+  "Joined with Batch",                // Col 7 (G)
+  "Section (HS / BS)",                // Col 8 (H)
+  "Hifz Status",                      // Col 9 (I)
+  "Islamic Qualification",            // Col 10 (J)
+  "Academic Qualification",          // Col 11 (K)
+  "Current Status",                   // Col 12 (L)
+  "Job / Designation",                // Col 13 (M)
+  "Institution / Organization Name",  // Col 14 (N)
+  "Work Location",                    // Col 15 (O)
+  "Will Attend Meet?",                // Col 16 (P)
+  "Attendance Status",                // Col 17 (Q)
+  "Reported At",                      // Col 18 (R)
+  "Fee Status",                       // Col 19 (S)
+  "Fee Amount",                       // Col 20 (T)
+  "Reported By"                       // Col 21 (U)
 ];
 
 var CHECKIN_HEADERS = [
@@ -52,6 +64,32 @@ var FEE_HEADERS = [
   "Recorded By",
   "Epoch Timestamp"
 ];
+
+// Helper to ensure main registration sheet has all 21 columns (including Columns Q to U)
+function ensureMainSheetHeaders(mainSheet) {
+  var lastCol = mainSheet.getLastColumn();
+  if (lastCol === 0) {
+    mainSheet.appendRow(REG_HEADERS);
+    var hRange = mainSheet.getRange(1, 1, 1, REG_HEADERS.length);
+    hRange.setBackground("#192200");
+    hRange.setFontColor("#ffffff");
+    hRange.setFontWeight("bold");
+    mainSheet.setFrozenRows(1);
+    return;
+  }
+
+  // Check if header row has Attendance Status column
+  var headers = mainSheet.getRange(1, 1, 1, Math.max(lastCol, REG_HEADERS.length)).getValues()[0];
+  for (var c = 0; c < REG_HEADERS.length; c++) {
+    if (!headers[c] || headers[c].toString().trim() === "") {
+      var cell = mainSheet.getRange(1, c + 1);
+      cell.setValue(REG_HEADERS[c]);
+      cell.setBackground("#192200");
+      cell.setFontColor("#ffffff");
+      cell.setFontWeight("bold");
+    }
+  }
+}
 
 function getOrCreateSheet(ss, sheetName, headers) {
   var sheet = ss.getSheetByName(sheetName);
@@ -82,6 +120,9 @@ function doPost(e) {
 
   try {
     var ss = SpreadsheetApp.getActiveSpreadsheet();
+    var mainSheet = ss.getSheetByName("Registrations") || ss.getSheets()[0];
+    ensureMainSheetHeaders(mainSheet);
+
     var data = JSON.parse(e.postData.contents);
     var action = (data.action || "").toUpperCase();
 
@@ -89,13 +130,15 @@ function doPost(e) {
     // ACTION: CHECKIN (Mark Attendance)
     // ----------------------------------------------------
     if (action === "CHECKIN") {
-      var checkinSheet = getOrCreateSheet(ss, "Checkins", CHECKIN_HEADERS);
       var regId = (data.registrationId || "").trim();
       var nowFormatted = data.reportedAt || new Date().toLocaleString("en-IN", { timeZone: "Asia/Kolkata" });
       var epoch = data.timestamp || Date.now();
+      var feePaid = Boolean(data.markFeePaid);
+      var feeAmount = data.feeAmount || 200;
+      var adminName = data.adminName || "Admin";
 
-      // Find if already present
-      var rows = checkinSheet.getDataRange().getValues();
+      // 1. Update row directly in main sheet (gid=0)
+      var rows = mainSheet.getDataRange().getValues();
       var foundRow = -1;
       for (var r = 1; r < rows.length; r++) {
         if (rows[r][1] && rows[r][1].toString().trim().toLowerCase() === regId.toLowerCase()) {
@@ -104,30 +147,72 @@ function doPost(e) {
         }
       }
 
-      var rowData = [
+      if (foundRow > 0) {
+        // Col Q (17): Attendance Status
+        mainSheet.getRange(foundRow, 17).setValue("Reported");
+        // Col R (18): Reported At
+        mainSheet.getRange(foundRow, 18).setValue(nowFormatted);
+        if (feePaid) {
+          // Col S (19): Fee Status
+          mainSheet.getRange(foundRow, 19).setValue("Paid");
+          // Col T (20): Fee Amount
+          mainSheet.getRange(foundRow, 20).setValue(feeAmount);
+        }
+        // Col U (21): Reported By
+        mainSheet.getRange(foundRow, 21).setValue(adminName);
+      } else {
+        // Member not found in main sheet, append new row
+        mainSheet.appendRow([
+          new Date().toLocaleString("en-IN", { timeZone: "Asia/Kolkata" }),
+          regId,
+          data.fullName || "",
+          data.place || "",
+          formatPhoneText(data.mobileNumber || ""),
+          formatPhoneText(data.whatsappNumber || ""),
+          data.batchYear || "",
+          data.joinedSection || "",
+          "", "", "", "Job", "", "", "", "Yes, I will attend",
+          "Reported",
+          nowFormatted,
+          feePaid ? "Paid" : "Pending",
+          feePaid ? feeAmount : 0,
+          adminName
+        ]);
+      }
+
+      // 2. Also log in "Checkins" tab
+      var checkinSheet = getOrCreateSheet(ss, "Checkins", CHECKIN_HEADERS);
+      var cRows = checkinSheet.getDataRange().getValues();
+      var foundCheckinRow = -1;
+      for (var cr = 1; cr < cRows.length; cr++) {
+        if (cRows[cr][1] && cRows[cr][1].toString().trim().toLowerCase() === regId.toLowerCase()) {
+          foundCheckinRow = cr + 1;
+          break;
+        }
+      }
+      var cRowData = [
         new Date().toLocaleString("en-IN", { timeZone: "Asia/Kolkata" }),
         regId,
         data.fullName || "",
         data.batchYear || "",
         data.place || "",
         nowFormatted,
-        data.adminName || "Admin",
+        adminName,
         epoch
       ];
-
-      if (foundRow > 0) {
-        checkinSheet.getRange(foundRow, 1, 1, rowData.length).setValues([rowData]);
+      if (foundCheckinRow > 0) {
+        checkinSheet.getRange(foundCheckinRow, 1, 1, cRowData.length).setValues([cRowData]);
       } else {
-        checkinSheet.appendRow(rowData);
+        checkinSheet.appendRow(cRowData);
       }
 
-      // If fee was also paid during check-in, record in Fees sheet
-      if (data.markFeePaid) {
+      // 3. If fee paid, also log in "Fees" tab
+      if (feePaid) {
         var feeSheet = getOrCreateSheet(ss, "Fees", FEE_HEADERS);
-        var feeRows = feeSheet.getDataRange().getValues();
+        var fRows = feeSheet.getDataRange().getValues();
         var foundFeeRow = -1;
-        for (var f = 1; f < feeRows.length; f++) {
-          if (feeRows[f][1] && feeRows[f][1].toString().trim().toLowerCase() === regId.toLowerCase()) {
+        for (var f = 1; f < fRows.length; f++) {
+          if (fRows[f][1] && fRows[f][1].toString().trim().toLowerCase() === regId.toLowerCase()) {
             foundFeeRow = f + 1;
             break;
           }
@@ -136,9 +221,9 @@ function doPost(e) {
           new Date().toLocaleString("en-IN", { timeZone: "Asia/Kolkata" }),
           regId,
           "TRUE",
-          data.feeAmount || 200,
+          feeAmount,
           nowFormatted,
-          data.adminName || "Admin",
+          adminName,
           epoch
         ];
         if (foundFeeRow > 0) {
@@ -151,7 +236,8 @@ function doPost(e) {
       return ContentService.createTextOutput(JSON.stringify({
         status: "success",
         action: "CHECKIN",
-        registrationId: regId
+        registrationId: regId,
+        columnsUpdated: ["Attendance Status (Col Q)", "Reported At (Col R)", "Fee Status (Col S)", "Reported By (Col U)"]
       })).setMimeType(ContentService.MimeType.JSON);
     }
 
@@ -159,13 +245,26 @@ function doPost(e) {
     // ACTION: FEE (Toggle Fee Status)
     // ----------------------------------------------------
     if (action === "FEE") {
-      var feeSheet = getOrCreateSheet(ss, "Fees", FEE_HEADERS);
       var regId = (data.registrationId || "").trim();
       var paid = Boolean(data.paid);
       var amount = data.amount || 200;
       var paidAt = data.paidAt || new Date().toLocaleString("en-IN", { timeZone: "Asia/Kolkata" });
       var epoch = Date.now();
+      var adminName = data.adminName || "Admin";
 
+      // 1. Update row in main sheet (gid=0)
+      var rows = mainSheet.getDataRange().getValues();
+      for (var r = 1; r < rows.length; r++) {
+        if (rows[r][1] && rows[r][1].toString().trim().toLowerCase() === regId.toLowerCase()) {
+          var foundRow = r + 1;
+          mainSheet.getRange(foundRow, 19).setValue(paid ? "Paid" : "Pending"); // Col S: Fee Status
+          mainSheet.getRange(foundRow, 20).setValue(paid ? amount : 0); // Col T: Fee Amount
+          break;
+        }
+      }
+
+      // 2. Also log in "Fees" tab
+      var feeSheet = getOrCreateSheet(ss, "Fees", FEE_HEADERS);
       var feeRows = feeSheet.getDataRange().getValues();
       var foundFeeRow = -1;
       for (var f = 1; f < feeRows.length; f++) {
@@ -182,7 +281,7 @@ function doPost(e) {
           "TRUE",
           amount,
           paidAt,
-          data.adminName || "Admin",
+          adminName,
           epoch
         ];
         if (foundFeeRow > 0) {
@@ -208,13 +307,26 @@ function doPost(e) {
     // ACTION: UNCHECKIN (Undo Attendance)
     // ----------------------------------------------------
     if (action === "UNCHECKIN" || action === "UNREPORT") {
-      var checkinSheet = ss.getSheetByName("Checkins");
       var regId = (data.registrationId || "").trim();
+
+      // 1. Reset row in main sheet (gid=0)
+      var rows = mainSheet.getDataRange().getValues();
+      for (var r = 1; r < rows.length; r++) {
+        if (rows[r][1] && rows[r][1].toString().trim().toLowerCase() === regId.toLowerCase()) {
+          var foundRow = r + 1;
+          mainSheet.getRange(foundRow, 17).setValue("Pending"); // Col Q: Attendance Status
+          mainSheet.getRange(foundRow, 18).setValue(""); // Col R: Reported At
+          break;
+        }
+      }
+
+      // 2. Remove from "Checkins" tab
+      var checkinSheet = ss.getSheetByName("Checkins");
       if (checkinSheet) {
-        var rows = checkinSheet.getDataRange().getValues();
-        for (var r = rows.length - 1; r >= 1; r--) {
-          if (rows[r][1] && rows[r][1].toString().trim().toLowerCase() === regId.toLowerCase()) {
-            checkinSheet.deleteRow(r + 1);
+        var cRows = checkinSheet.getDataRange().getValues();
+        for (var cr = cRows.length - 1; cr >= 1; cr--) {
+          if (cRows[cr][1] && cRows[cr][1].toString().trim().toLowerCase() === regId.toLowerCase()) {
+            checkinSheet.deleteRow(cr + 1);
           }
         }
       }
@@ -227,20 +339,8 @@ function doPost(e) {
     }
 
     // ----------------------------------------------------
-    // DEFAULT ACTION: REGISTRATION (16 Columns)
+    // DEFAULT ACTION: REGISTRATION
     // ----------------------------------------------------
-    var mainSheet = ss.getSheetByName("Registrations") || ss.getSheets()[0];
-    
-    // Auto-create or fix headers if missing
-    if (mainSheet.getLastRow() === 0) {
-      mainSheet.appendRow(REG_HEADERS);
-      var headerRange = mainSheet.getRange(1, 1, 1, REG_HEADERS.length);
-      headerRange.setBackground("#0d1b2a");
-      headerRange.setFontColor("#ffffff");
-      headerRange.setFontWeight("bold");
-      mainSheet.setFrozenRows(1);
-    }
-
     var regId = data.registrationId || data["Registration ID"] || data.regId || "";
     var name = data.fullName || data["Full Name"] || data.name || "";
     var place = data.place || data["Place"] || "";
@@ -274,7 +374,12 @@ function doPost(e) {
       job,
       institution,
       location,
-      willAttend
+      willAttend,
+      "Pending", // Col Q: Attendance Status
+      "",        // Col R: Reported At
+      "Pending", // Col S: Fee Status
+      0,         // Col T: Fee Amount
+      ""         // Col U: Reported By
     ]);
 
     return ContentService.createTextOutput(JSON.stringify({
@@ -282,7 +387,7 @@ function doPost(e) {
       message: "Registration recorded successfully",
       registrationId: regId,
       fullName: name,
-      columnsWritten: 16
+      columnsWritten: 21
     })).setMimeType(ContentService.MimeType.JSON);
 
   } catch (error) {
@@ -299,43 +404,44 @@ function doGet(e) {
   var param = (e && e.parameter) || {};
   var action = (param.action || param.type || "").toLowerCase();
   var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var mainSheet = ss.getSheetByName("Registrations") || ss.getSheets()[0];
+  ensureMainSheetHeaders(mainSheet);
 
   // If requesting check-ins and fees data
   if (action === "checkins" || action === "fees" || action === "all") {
     var checkinsMap = {};
-    var checkinSheet = ss.getSheetByName("Checkins");
-    if (checkinSheet && checkinSheet.getLastRow() > 1) {
-      var cRows = checkinSheet.getDataRange().getValues();
-      for (var i = 1; i < cRows.length; i++) {
-        var rId = (cRows[i][1] || "").toString().trim();
-        if (rId) {
-          checkinsMap[rId] = {
-            registrationId: rId,
-            fullName: cRows[i][2] || "",
-            batchYear: cRows[i][3] || "",
-            place: cRows[i][4] || "",
-            reportedAt: cRows[i][5] || "",
-            reportedBy: cRows[i][6] || "Admin",
-            timestamp: Number(cRows[i][7]) || 0
-          };
-        }
-      }
-    }
-
     var feesMap = { settings: { defaultFee: 200, currency: "₹" }, records: {} };
-    var feeSheet = ss.getSheetByName("Fees");
-    if (feeSheet && feeSheet.getLastRow() > 1) {
-      var fRows = feeSheet.getDataRange().getValues();
-      for (var j = 1; j < fRows.length; j++) {
-        var fId = (fRows[j][1] || "").toString().trim();
-        if (fId) {
-          feesMap.records[fId] = {
-            paid: true,
-            amount: Number(fRows[j][3]) || 200,
-            paidAt: fRows[j][4] || "",
-            recordedBy: fRows[j][5] || "Admin"
-          };
-        }
+
+    var rows = mainSheet.getDataRange().getValues();
+    for (var i = 1; i < rows.length; i++) {
+      var rId = (rows[i][1] || "").toString().trim();
+      if (!rId) continue;
+
+      var attStatus = (rows[i][16] || "").toString().trim().toLowerCase(); // Col Q
+      var reportedAt = rows[i][17] || ""; // Col R
+      var feeStatus = (rows[i][18] || "").toString().trim().toLowerCase(); // Col S
+      var feeAmt = Number(rows[i][19]) || 200; // Col T
+      var adminName = rows[i][20] || "Admin"; // Col U
+
+      if (attStatus === "reported") {
+        checkinsMap[rId] = {
+          registrationId: rId,
+          fullName: rows[i][2] || "",
+          batchYear: rows[i][6] || "",
+          place: rows[i][3] || "",
+          reportedAt: reportedAt,
+          reportedBy: adminName,
+          timestamp: Date.now()
+        };
+      }
+
+      if (feeStatus === "paid") {
+        feesMap.records[rId] = {
+          paid: true,
+          amount: feeAmt,
+          paidAt: reportedAt,
+          recordedBy: adminName
+        };
       }
     }
 
@@ -349,7 +455,13 @@ function doGet(e) {
 
   return ContentService.createTextOutput(JSON.stringify({
     status: "active",
-    message: "Dalailul Khairath Alumni Webhook v2 is active with persistent check-in and fee support.",
-    endpoints: ["POST (register/checkin/fee)", "GET ?action=checkins"]
+    message: "Dalailul Khairath Alumni Webhook v2 is active with direct main-sheet columns (Q to U).",
+    columns: [
+      "Attendance Status (Col Q)",
+      "Reported At (Col R)",
+      "Fee Status (Col S)",
+      "Fee Amount (Col T)",
+      "Reported By (Col U)"
+    ]
   })).setMimeType(ContentService.MimeType.JSON);
 }
