@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
-import { getAllAlumni, getAlumniStats, getRecentCheckins } from "@/lib/alumniService";
+import { getAllAlumni, getAlumniStats, getRecentCheckins, getStorageStatus } from "@/lib/alumniService";
 import { isValidSession } from "@/app/api/admin/auth/route";
 
 const ADMIN_COOKIE_NAME = "dkk_admin_session";
@@ -26,6 +26,7 @@ export async function GET() {
         alumni,
         stats,
         recentCheckins,
+        storageStatus: getStorageStatus(),
       },
       {
         headers: {

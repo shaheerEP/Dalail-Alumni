@@ -21,7 +21,7 @@ export async function POST(request) {
       return NextResponse.json({ error: "Registration ID is required" }, { status: 400 });
     }
 
-    const result = unmarkReporting(registrationId);
+    const result = await unmarkReporting(registrationId);
 
     if (!result.success) {
       return NextResponse.json(

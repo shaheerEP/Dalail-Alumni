@@ -35,6 +35,9 @@ import {
   Pencil,
   Plus,
   Check,
+  Database,
+  ExternalLink,
+  Copy,
 } from "lucide-react";
 import { BATCH_OPTIONS } from "@/data/options";
 
@@ -128,6 +131,12 @@ export default function AdminPage() {
   // Modal for Viewing Single Alumnus Full Details
   const [selectedAlumnusDetail, setSelectedAlumnusDetail] = useState(null);
 
+  // Storage & Persistence status
+  const [storageStatus, setStorageStatus] = useState(null);
+  const [showStorageModal, setShowStorageModal] = useState(false);
+  const [copyingScript, setCopyingScript] = useState(false);
+  const [scriptCopied, setScriptCopied] = useState(false);
+
   // 1. Check Session Auth on Mount
   useEffect(() => {
     async function checkAuth() {
@@ -164,6 +173,9 @@ export default function AdminPage() {
         setStats(data.stats || { total: 0, willAttend: 0, reported: 0, pending: 0 });
         if (Array.isArray(data.recentCheckins)) {
           setRecentCheckins(data.recentCheckins);
+        }
+        if (data.storageStatus) {
+          setStorageStatus(data.storageStatus);
         }
       } else if (res.status === 401) {
         setIsAuthenticated(false);
@@ -432,6 +444,27 @@ export default function AdminPage() {
     } catch (err) {
       console.error("Default fee update error:", err);
       alert("Network error saving default fee.");
+    }
+  };
+
+  // Copy updated Google Apps Script to clipboard
+  const handleCopyGoogleScript = async () => {
+    setCopyingScript(true);
+    try {
+      const res = await fetch("/api/admin/script");
+      if (res.ok) {
+        const code = await res.text();
+        await navigator.clipboard.writeText(code);
+        setScriptCopied(true);
+        setTimeout(() => setScriptCopied(false), 3000);
+      } else {
+        alert("Could not load script directly. You can copy Code.gs from the google-apps-script folder.");
+      }
+    } catch (e) {
+      console.error("Error copying script:", e);
+      alert("Failed to copy automatically. Please copy Code.gs from repository.");
+    } finally {
+      setCopyingScript(false);
     }
   };
 
@@ -807,6 +840,34 @@ export default function AdminPage() {
           </div>
 
           <div className="flex items-center gap-3">
+            {/* Storage Persistence Status Pill */}
+            {storageStatus && (
+              <button
+                type="button"
+                onClick={() => setShowStorageModal(true)}
+                title={storageStatus.message}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer shadow-xs border ${
+                  storageStatus.isPersistent
+                    ? "bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-200 border-emerald-500/40"
+                    : "bg-amber-500/25 hover:bg-amber-500/35 text-amber-200 border-amber-400/40 animate-pulse"
+                }`}
+              >
+                {storageStatus.isPersistent ? (
+                  <>
+                    <span className="w-2 h-2 rounded-full bg-emerald-400" />
+                    <span className="hidden md:inline">{storageStatus.label}</span>
+                    <span className="md:hidden">Storage OK</span>
+                  </>
+                ) : (
+                  <>
+                    <AlertTriangle className="w-3.5 h-3.5 text-amber-300" />
+                    <span className="hidden md:inline">Storage: Ephemeral (Fix)</span>
+                    <span className="md:hidden">Fix Storage</span>
+                  </>
+                )}
+              </button>
+            )}
+
             {/* Fee Setting Button / Pill */}
             <button
               type="button"
@@ -915,6 +976,33 @@ export default function AdminPage() {
             </div>
           </div>
         </div>
+
+        {/* Storage Persistence Notice (if serverless ephemeral) */}
+        {storageStatus && !storageStatus.isPersistent && (
+          <div className="bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-300/80 rounded-2xl p-4 sm:p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-xs">
+            <div className="flex items-start gap-3">
+              <div className="w-10 h-10 rounded-xl bg-amber-500/20 text-amber-800 flex items-center justify-center shrink-0 mt-0.5">
+                <AlertTriangle className="w-5 h-5" />
+              </div>
+              <div>
+                <h3 className="text-sm font-bold text-amber-950 flex items-center gap-2">
+                  <span>Serverless Memory Notice: Records reset when container goes idle</span>
+                </h3>
+                <p className="text-xs text-amber-800/90 mt-1 leading-relaxed">
+                  The portal is running on Vercel Serverless. To ensure reported alumni and fees are permanently saved when the server sleeps, connect your Google Sheet as the live database. Takes only 30 seconds.
+                </p>
+              </div>
+            </div>
+            <button
+              type="button"
+              onClick={() => setShowStorageModal(true)}
+              className="px-4 py-2.5 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs shadow-sm transition-all shrink-0 flex items-center gap-2 cursor-pointer"
+            >
+              <Database className="w-3.5 h-3.5" />
+              <span>Enable Permanent Storage (30s)</span>
+            </button>
+          </div>
+        )}
 
         {/* Navigation Tabs */}
         <div className="flex items-center gap-2 border-b border-[#719100]/20 pb-1">
@@ -2024,6 +2112,238 @@ export default function AdminPage() {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* ----------------------------------------------------
+          MODAL: Permanent Database & Storage Persistence Guide
+      ---------------------------------------------------- */}
+      {showStorageModal && (
+        <div className="fixed inset-0 z-50 overflow-y-auto bg-black/70 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4">
+          <div className="bg-white w-full max-w-2xl rounded-3xl shadow-2xl overflow-hidden border border-[#719100]/20 animate-in fade-in zoom-in-95 duration-150">
+            {/* Header */}
+            <div className="bg-gradient-to-r from-[#141b00] via-[#202b00] to-[#2d3a00] p-4 sm:p-5 text-white flex items-center justify-between">
+              <div className="flex items-center gap-2.5">
+                <div className="w-8 h-8 rounded-xl bg-white/10 flex items-center justify-center">
+                  <Database className="w-4 h-4 text-[#fff000]" />
+                </div>
+                <div>
+                  <h3 className="text-sm sm:text-base font-black text-white">
+                    Database & Attendance Persistence
+                  </h3>
+                  <p className="text-[11px] text-[#e8edd7]/80">
+                    Keep attendance and fee records permanent across device refreshes
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowStorageModal(false)}
+                className="p-1.5 rounded-full text-[#e8edd7] hover:text-[#fff000] hover:bg-white/10 transition-colors cursor-pointer"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Modal Body */}
+            <div className="p-5 sm:p-6 space-y-5 max-h-[75vh] overflow-y-auto">
+              {/* Status Banner */}
+              <div
+                className={`p-4 rounded-2xl border flex items-start gap-3.5 ${
+                  storageStatus?.isPersistent
+                    ? "bg-emerald-50 border-emerald-200 text-emerald-900"
+                    : "bg-amber-50 border-amber-300 text-amber-950"
+                }`}
+              >
+                <div
+                  className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 ${
+                    storageStatus?.isPersistent
+                      ? "bg-emerald-500/20 text-emerald-700"
+                      : "bg-amber-500/20 text-amber-700"
+                  }`}
+                >
+                  {storageStatus?.isPersistent ? (
+                    <CheckCircle2 className="w-5 h-5" />
+                  ) : (
+                    <AlertTriangle className="w-5 h-5" />
+                  )}
+                </div>
+                <div>
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span className="font-bold text-xs uppercase tracking-wider">
+                      Current Storage Mode:
+                    </span>
+                    <span
+                      className={`px-2.5 py-0.5 rounded-full text-xs font-black ${
+                        storageStatus?.isPersistent
+                          ? "bg-emerald-600 text-white"
+                          : "bg-amber-600 text-white"
+                      }`}
+                    >
+                      {storageStatus?.label || "Checking..."}
+                    </span>
+                  </div>
+                  <p className="text-xs mt-1.5 leading-relaxed opacity-90">
+                    {storageStatus?.message ||
+                      "Storage persistence ensures that all checked-in members and fee payments survive server restarts."}
+                  </p>
+                </div>
+              </div>
+
+              {/* Instructions for Google Sheets Persistence */}
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <h4 className="text-xs font-black uppercase tracking-wider text-[#2d3a00]">
+                    Permanent Setup via Google Sheets (Recommended • 30 Seconds)
+                  </h4>
+                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-[#eef2dc] text-[#576b2d]">
+                    Zero extra cost
+                  </span>
+                </div>
+
+                <p className="text-xs text-[#576b2d] leading-relaxed">
+                  Your Google Sheet acts as the single source of truth. By updating the Google Apps Script once, all check-ins are saved directly to a dedicated <strong>&quot;Checkins&quot;</strong> sheet and fees to a <strong>&quot;Fees&quot;</strong> sheet.
+                </p>
+
+                <div className="bg-[#fbfdf4] border border-[#719100]/20 rounded-2xl p-4 space-y-3.5">
+                  {/* Step 1 */}
+                  <div className="flex items-start gap-3">
+                    <div className="w-6 h-6 rounded-full bg-[#192200] text-white text-[11px] font-bold flex items-center justify-center shrink-0 mt-0.5">
+                      1
+                    </div>
+                    <div className="flex-1">
+                      <p className="text-xs font-bold text-[#192200]">
+                        Open your Google Sheet
+                      </p>
+                      <a
+                        href={storageStatus?.sheetUrl || "https://docs.google.com/spreadsheets/d/18kiHRVuWO2kEKvSFIa2XVjmN2GkpVgqnAEXCZogdkJ4/edit"}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#719100] hover:underline mt-0.5"
+                      >
+                        <span>Open Dalail Alumni Spreadsheet</span>
+                        <ExternalLink className="w-3.5 h-3.5" />
+                      </a>
+                    </div>
+                  </div>
+
+                  {/* Step 2 */}
+                  <div className="flex items-start gap-3">
+                    <div className="w-6 h-6 rounded-full bg-[#192200] text-white text-[11px] font-bold flex items-center justify-center shrink-0 mt-0.5">
+                      2
+                    </div>
+                    <div>
+                      <p className="text-xs font-bold text-[#192200]">
+                        Open Apps Script Editor
+                      </p>
+                      <p className="text-[11px] text-[#576b2d] mt-0.5">
+                        In the top Google Sheets menu, click <strong>Extensions</strong> → <strong>Apps Script</strong>.
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Step 3 */}
+                  <div className="flex items-start gap-3">
+                    <div className="w-6 h-6 rounded-full bg-[#192200] text-white text-[11px] font-bold flex items-center justify-center shrink-0 mt-0.5">
+                      3
+                    </div>
+                    <div className="flex-1">
+                      <p className="text-xs font-bold text-[#192200]">
+                        Replace code with the updated script
+                      </p>
+                      <p className="text-[11px] text-[#576b2d] mt-0.5">
+                        Select all existing code in <code className="bg-[#eef2dc] px-1 py-0.5 rounded text-[10px]">Code.gs</code>, delete it, and paste this updated script:
+                      </p>
+                      <div className="mt-2">
+                        <button
+                          type="button"
+                          onClick={handleCopyGoogleScript}
+                          disabled={copyingScript}
+                          className={`px-3.5 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 cursor-pointer shadow-xs ${
+                            scriptCopied
+                              ? "bg-emerald-600 text-white"
+                              : "bg-[#192200] hover:bg-[#2d3a00] text-white"
+                          }`}
+                        >
+                          {scriptCopied ? (
+                            <>
+                              <Check className="w-3.5 h-3.5 text-[#fff000]" />
+                              <span>Script Copied to Clipboard!</span>
+                            </>
+                          ) : copyingScript ? (
+                            <>
+                              <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                              <span>Copying...</span>
+                            </>
+                          ) : (
+                            <>
+                              <Copy className="w-3.5 h-3.5 text-[#fff000]" />
+                              <span>Copy Complete Google Script (Code.gs)</span>
+                            </>
+                          )}
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Step 4 */}
+                  <div className="flex items-start gap-3">
+                    <div className="w-6 h-6 rounded-full bg-[#192200] text-white text-[11px] font-bold flex items-center justify-center shrink-0 mt-0.5">
+                      4
+                    </div>
+                    <div>
+                      <p className="text-xs font-bold text-[#192200]">
+                        Deploy as New Version
+                      </p>
+                      <p className="text-[11px] text-[#576b2d] mt-0.5">
+                        Click <strong>Deploy</strong> → <strong>Manage deployments</strong> → click the ✏️ (Edit icon) next to your Web App → change Version dropdown to <strong>New version</strong> → click <strong>Deploy</strong>!
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Alternative: Upstash Redis / Vercel KV */}
+              <div className="border-t border-[#719100]/15 pt-4">
+                <details className="text-xs text-[#576b2d] cursor-pointer group">
+                  <summary className="font-bold text-[#192200] flex items-center gap-1.5 hover:text-[#719100]">
+                    <Sparkles className="w-3.5 h-3.5 text-[#719100]" />
+                    <span>Alternative: Instant Cloud KV (Upstash Redis / Vercel KV)</span>
+                  </summary>
+                  <p className="mt-2 text-[11px] text-[#576b2d] leading-relaxed">
+                    If you use Vercel KV or Upstash Redis, simply add these environment variables in your Vercel Project Settings:
+                  </p>
+                  <div className="mt-1.5 bg-[#192200] text-[#e8edd7] p-2.5 rounded-xl font-mono text-[10px] space-y-1">
+                    <div>KV_REST_API_URL=https://...</div>
+                    <div>KV_REST_API_TOKEN=...</div>
+                  </div>
+                </details>
+              </div>
+            </div>
+
+            {/* Footer */}
+            <div className="bg-[#f5f7eb] px-5 py-4 border-t border-[#719100]/15 flex items-center justify-between">
+              <button
+                type="button"
+                onClick={async () => {
+                  await fetchDashboardData();
+                }}
+                disabled={isLoadingData}
+                className="px-4 py-2.5 rounded-xl bg-white hover:bg-[#eef2dc] text-[#192200] border border-[#719100]/20 text-xs font-bold transition-all flex items-center gap-2 cursor-pointer shadow-xs"
+              >
+                <RefreshCw className={`w-3.5 h-3.5 text-[#719100] ${isLoadingData ? "animate-spin" : ""}`} />
+                <span>Test &amp; Verify Persistence</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setShowStorageModal(false)}
+                className="px-5 py-2.5 rounded-xl bg-[#192200] hover:bg-[#2d3a00] text-white text-xs font-bold transition-all cursor-pointer shadow-sm"
+              >
+                Done
+              </button>
+            </div>
           </div>
         </div>
       )}
