@@ -109,7 +109,8 @@ export default function AdminPage() {
   const isProcessingScanRef = useRef(false);
 
   // Fee state
-  const [autoMarkFee, setAutoMarkFee] = useState(true);
+  const [autoMarkFee, setAutoMarkFee] = useState(false);
+  const autoMarkFeeRef = useRef(false);
   const [showFeeSettingsModal, setShowFeeSettingsModal] = useState(false);
   const [newFeeInput, setNewFeeInput] = useState(200);
   const [feeUpdatingId, setFeeUpdatingId] = useState(null);
@@ -212,7 +213,7 @@ export default function AdminPage() {
   };
 
   // Handle Reporting a Registration ID with optional fee marking
-  const processReportCheckin = async (registrationId, markFee = autoMarkFee) => {
+  const processReportCheckin = async (registrationId, markFee = false) => {
     if (!registrationId || !registrationId.trim()) return;
 
     const normalizedId = registrationId.trim().toUpperCase();
@@ -432,7 +433,7 @@ export default function AdminPage() {
     e.preventDefault();
     if (!manualIdInput.trim()) return;
     setManualLoading(true);
-    await processReportCheckin(manualIdInput.trim());
+    await processReportCheckin(manualIdInput.trim(), autoMarkFeeRef.current);
     setManualIdInput("");
     setManualLoading(false);
   };
@@ -510,7 +511,7 @@ export default function AdminPage() {
                 // Update cooldown timestamp immediately to debounce rapid camera frames
                 lastScanMapRef.current.set(normalizedId, now);
 
-                processReportCheckin(cleanId);
+                processReportCheckin(cleanId, autoMarkFeeRef.current);
               },
               (errorMessage) => {
                 // Minor scanning errors while reading frames (expected)
@@ -953,7 +954,11 @@ export default function AdminPage() {
                     </h3>
                     <button
                       type="button"
-                      onClick={() => setAutoMarkFee(!autoMarkFee)}
+                      onClick={() => {
+                        const next = !autoMarkFee;
+                        setAutoMarkFee(next);
+                        autoMarkFeeRef.current = next;
+                      }}
                       title={
                         autoMarkFee
                           ? `Collect Fee (₹${stats.feeStats?.defaultFee ?? 200}) is ON for scans & check-in. Click to toggle OFF.`
@@ -1385,7 +1390,7 @@ export default function AdminPage() {
                               <div className="inline-flex items-center gap-1.5">
                                 <button
                                   type="button"
-                                  onClick={() => processReportCheckin(alumnus.registrationId, autoMarkFee)}
+                                  onClick={() => processReportCheckin(alumnus.registrationId, false)}
                                   className="px-3 py-1 rounded-xl bg-gradient-to-r from-[#719100] to-[#556e00] hover:opacity-95 text-white font-bold text-[11px] shadow-sm transition-all cursor-pointer flex items-center gap-1"
                                 >
                                   <CheckCircle2 className="w-3 h-3" />
